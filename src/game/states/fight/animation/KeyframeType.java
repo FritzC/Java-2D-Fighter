@@ -6,7 +6,9 @@ package game.states.fight.animation;
  * @author Fritz
  *
  */
-public enum Instruction {
+public enum KeyframeType {
+	VELOCITY_X,
+	VELOCITY_Y,
 	ROTATE, 
 	LENGTH, 
 	VISIBLE;

@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import game.states.fight.Camera;
-import game.states.fight.animation.Instruction;
+import game.states.fight.animation.KeyframeType;
 import game.states.fight.animation.Interpolation;
 import game.util.Position;
 import game.util.Sprite;
@@ -19,12 +19,12 @@ import game.util.Vector;
  * @author Fritz
  *
  */
-public class FighterBone {
+public class Bone {
 
 	/**
 	 * Map of all children of the bone
 	 */
-	private Map<String, FighterBone> children;
+	private Map<String, Bone> children;
 	
 	/**
 	 * How to draw the bone (SPRITE or LINE)
@@ -74,7 +74,7 @@ public class FighterBone {
 	 * @param angle - Angle line is at
 	 * @param visible - Whether to draw the bone
 	 */
-	public FighterBone(float length, float width, float angle, boolean visible) {
+	public Bone(float length, float width, float angle, boolean visible) {
 		drawMode = DrawMode.LINE;
 		this.length = length;
 		this.width = width;
@@ -91,7 +91,7 @@ public class FighterBone {
 	 * @param angle - Angle bone is at
 	 * @param visible - Whether to draw the bone
 	 */
-	public FighterBone(Sprite sprite, float length, float angle, boolean visible) {
+	public Bone(Sprite sprite, float length, float angle, boolean visible) {
 		drawMode = DrawMode.SPRITE;
 		this.sprite = sprite;
 		this.length = length;
@@ -110,8 +110,8 @@ public class FighterBone {
 	 * @param camera - Camera reference to get screen coordinates
 	 */
 	public void draw(Graphics2D g, Position root, Camera camera) {
-		float currentAngle = angle + interpolatedAngle;
-		float currentLength = length + interpolatedLength;
+		float currentAngle = (interpolatedAngle != 0) ? interpolatedAngle : angle;
+		float currentLength = (interpolatedLength != 0) ? interpolatedLength : length;
 		g.setColor(Color.BLACK);
 		if (visible) {
 			int screenX = camera.getScreenX(root);
@@ -147,7 +147,7 @@ public class FighterBone {
 	 * @param identifier - Name of the bone (Must be unique)
 	 * @param child - bone to add as a child
 	 */
-	public void addChild(String identifier, FighterBone child) {
+	public void addChild(String identifier, Bone child) {
 		children.put(identifier, child);
 	}
 	
@@ -157,7 +157,7 @@ public class FighterBone {
 	 * @param identifier - Name of the bone
 	 * @return - Bone with the given identifier
 	 */
-	public FighterBone getBone(String identifier) {
+	public Bone getBone(String identifier) {
 		if (identifier.equals("root")) {
 			return this;
 		}
@@ -182,13 +182,19 @@ public class FighterBone {
 	 * @param interpolation - Type of interpolation
 	 * @param completion - % completed
 	 */
-	public void interpolate(float data, Instruction type, Interpolation interpolation, float completion) {
+	public void interpolate(float data, KeyframeType type, Interpolation interpolation, float completion) {
 		switch (type) {
 			case LENGTH:
+				if (data == length) {
+					break;
+				}
 				interpolatedLength = interpolation.getInterpolatedValue(length, data, completion);
 				break;
 			case ROTATE:
-				interpolatedAngle = interpolation.getInterpolatedValue(length, data, completion);
+				if (data == angle) {
+					break;
+				}
+				interpolatedAngle = interpolation.getInterpolatedValue(angle, data, completion);
 				break;
 			case VISIBLE:
 				visible = (data == 1);
@@ -202,13 +208,15 @@ public class FighterBone {
 	 * @param data - Auxiliary data
 	 * @param type - Type of the instruction
 	 */
-	public void applyInstruction(float data, Instruction type) {
+	public void applyInstruction(float data, KeyframeType type) {
 		switch (type) {
 			case LENGTH:
-				interpolatedLength = data;
+				length = data;
+				interpolatedLength = 0;
 				break;
 			case ROTATE:
-				interpolatedAngle = data;
+				angle = data;
+				interpolatedAngle = 0;
 				break;
 			case VISIBLE:
 				visible = (data == 1);

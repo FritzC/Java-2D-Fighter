@@ -1,6 +1,6 @@
 package game.states.fight.animation;
 
-import game.util.Position;
+import game.util.Box;
 
 /**
  * A collision box that determines where a fighter is vulnerable inside an AnimationStep
@@ -11,23 +11,16 @@ import game.util.Position;
 public class HurtBox {
 
 	/**
-	 * Top left corner of the hurtbox relative to the animation
+	 * Collision box
 	 */
-	private Position topLeftCorner;
-
-	/**
-	 * Bottom right corner of the hurtbox relative to the animation
-	 */
-	private Position bottomRightCorner;
+	private Box collision;
 
 	/**
 	 * Creates a hurtbox
 	 * 
-	 * @param topLeftCorner - Top left corner of the hurtbox
-	 * @param bottomRightCorner - Bottom right corner of the hurtbox
+	 * @param collision - Bounding box of the hurtbox
 	 */
-	public HurtBox(Position topLeftCorner, Position bottomRightCorner) {
-		this.topLeftCorner = topLeftCorner;
-		this.bottomRightCorner = bottomRightCorner;
+	public HurtBox(Box collision) {
+		this.collision = collision;
 	}
 }

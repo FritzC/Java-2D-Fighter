@@ -1,5 +1,6 @@
 package game.states;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,7 +9,11 @@ import game.states.fight.Camera;
 import game.states.fight.Fighter;
 import game.states.fight.Particle;
 import game.states.fight.Stage;
-import game.states.fight.fighter.FighterBone;
+import game.states.fight.animation.Animation;
+import game.states.fight.animation.Keyframe;
+import game.states.fight.animation.KeyframeType;
+import game.states.fight.animation.Interpolation;
+import game.states.fight.fighter.Bone;
 import game.util.Position;
 import game.util.Sprite;
 
@@ -54,18 +59,24 @@ public class FightState extends GameState {
 		this.stage = stage;
 		this.camera = new Camera(stage);
 		particles = new ArrayList<>();
+		
 	}
-	
-	private FighterBone root;
 
 	@Override
 	public void draw(Graphics2D g) {
-		root.draw(g, new Position(0.5f, 0.0f), camera);
+		if (stage != null) {
+			stage.draw(g, camera);
+		}
+		if (player1 != null) {
+			player1.draw(g, camera, stage);
+		}
+		if (player2 != null) {
+			player2.draw(g, camera, stage);
+		}
 	}
 
 	@Override
 	public void logic() {
-		
 	}
 
 }

@@ -7,7 +7,9 @@ import java.util.Map;
 import game.states.fight.animation.Animation;
 import game.states.fight.animation.HitBox;
 import game.states.fight.animation.HurtBox;
-import game.states.fight.fighter.FighterBone;
+import game.states.fight.animation.KeyframeType;
+import game.states.fight.animation.Interpolation;
+import game.states.fight.fighter.Bone;
 import game.util.Position;
 import game.util.Vector;
 
@@ -22,7 +24,7 @@ public class Fighter {
 	/**
 	 * Root node of component skeleton
 	 */
-	private FighterBone skeleton;
+	private Bone skeleton;
 
 	/**
 	 * Map of all of the fighter's animations with identifiers
@@ -75,7 +77,9 @@ public class Fighter {
 	 * @param g - Graphics2d object used to draw
 	 */
 	public void draw(Graphics2D g, Camera camera, Stage stage) {
-		
+		if (animation != null) {
+			animation.draw(position, this, skeleton, g, camera, stage);
+		}
 	}
 	
 	/**
@@ -84,7 +88,7 @@ public class Fighter {
 	 * @param newAnim - Identifier of the new animation
 	 */
 	public void setAnimation(String newAnim) {
-		
+		animation = animations.get(newAnim);
 	}
 	
 	/**
@@ -117,5 +121,24 @@ public class Fighter {
 	 */
 	public List<HurtBox> getHurtBoxes() {
 		return animation.getHurtBoxes();
+	}
+
+	/**
+	 * Interpolate velocity 
+	 * 
+	 * @param data - New velocity
+	 * @param type - Type of movement
+	 * @param interpolation - Type of interpolation
+	 * @param completion - % complete
+	 */
+	public void interpolateVelocity(float data, KeyframeType type, Interpolation interpolation, float completion) {
+		switch (type) {
+			case VELOCITY_X:
+				velocity.setX(interpolation.getInterpolatedValue(velocity.getX(), data, completion));
+				break;
+			case VELOCITY_Y:
+				velocity.setY(interpolation.getInterpolatedValue(velocity.getY(), data, completion));
+				break;
+		}
 	}
 }

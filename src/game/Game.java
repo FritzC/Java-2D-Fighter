@@ -1,6 +1,8 @@
 package game;
 
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import game.states.FightState;
 import game.states.GameState;
@@ -32,12 +34,12 @@ public class Game {
 	/**
 	 * Executor of the game loop
 	 */
-	private ScheduledExecutorService loopExecutor;
+	private static ScheduledExecutorService loopExecutor;
 	
 	/**
 	 * The game loop, currently running 60 times per second
 	 */
-	private Runnable gameLoop;
+	private static Runnable gameLoop;
 	
 	/**
 	 * Current game tick, incremented each loop
@@ -54,12 +56,34 @@ public class Game {
 		state = new FightState(null, null, new Stage());
 		window = new Window();
 		window.setState(state);
+		gameLoop = new Runnable() {
+
+			@Override
+			public void run() {
+				tick++;
+				state.logic();
+				window.repaint();
+			}
+			
+		};
+		loopExecutor = Executors.newScheduledThreadPool(1);
+		loopExecutor.scheduleAtFixedRate(gameLoop, 0, 1000 / LOOP_SPEED, TimeUnit.MILLISECONDS);
 	}
 	
+	/**
+	 * Gets the window's height
+	 * 
+	 * @return - Window's height
+	 */
 	public static int getScreenHeight() {
 		return window.getBounds().height;
 	}
 	
+	/**
+	 * Gets the window's width
+	 * 
+	 * @return - Window's width
+	 */
 	public static int getScreenWidth() {
 		return window.getBounds().width;
 	}

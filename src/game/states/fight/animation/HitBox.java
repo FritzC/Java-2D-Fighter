@@ -3,6 +3,7 @@ package game.states.fight.animation;
 import java.awt.Graphics2D;
 
 import game.states.fight.Fighter;
+import game.util.Box;
 import game.util.Position;
 import game.util.Vector;
 
@@ -13,6 +14,16 @@ import game.util.Vector;
  *
  */
 public class HitBox {
+	
+	/**
+	 * Frame the hitbox appears on in the animation
+	 */
+	private int startFrame;
+
+	/**
+	 * Frame the hitbox disappears on in the animation
+	 */
+	private int endFrame;
 
 	/**
 	 * Group of hitboxes the hitbox is in
@@ -20,14 +31,9 @@ public class HitBox {
 	private String group;
 	
 	/**
-	 * Location of the top left corner of the hitbox relative to the animation
+	 * Collision box
 	 */
-	private Position topLeftCorner;
-
-	/**
-	 * Location of the bottom right corner of the hitbox relative to the animation
-	 */
-	private Position bottomRightCorner;
+	private Box collision;
 	
 	/**
 	 * Amount of damage the hitbox does
@@ -72,11 +78,12 @@ public class HitBox {
 	 * @param launchVelocity - Vector which a fighter hit by this will be launched at
 	 * @param knockDown - Whether the hitbox knocks down
 	 */
-	public HitBox(String group, Position topLeftCorner, Position bottomRightCorner, float damage, int hitStun,
+	public HitBox(int startFrame, int endFrame, String group, Box collision, float damage, int hitStun,
 			int blockStun, float pushBack, Vector launchVelocity, boolean knockDown) {
+		this.startFrame = startFrame;
+		this.endFrame = endFrame;
 		this.group = group;
-		this.topLeftCorner = topLeftCorner;
-		this.bottomRightCorner = bottomRightCorner;
+		this.collision = collision;
 		this.damage = damage;
 		this.hitStun = hitStun;
 		this.blockStun = blockStun;

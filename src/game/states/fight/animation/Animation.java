@@ -2,10 +2,14 @@ package game.states.fight.animation;
 
 import java.awt.Graphics2D;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import game.states.fight.Camera;
+import game.states.fight.Fighter;
 import game.states.fight.Stage;
+import game.states.fight.fighter.Bone;
 import game.util.Position;
 
 /**
@@ -19,7 +23,22 @@ public class Animation {
 	/**
 	 * List of all the animation steps
 	 */
-	private List<AnimationStep> steps;
+	private List<Keyframe> steps;
+	
+	/**
+	 * List of queued interpolations
+	 */
+	private Map<String, Map<KeyframeType, Keyframe>> queuedInterpolations;
+	
+	/**
+	 * List of the animation's hitboxes
+	 */
+	private List<HitBox> hitboxes;
+	
+	/**
+	 * List of the animation's hurtboxes
+	 */
+	private List<HurtBox> hurtboxes;
 	
 	/**
 	 * Whether the animation should loop
@@ -37,12 +56,31 @@ public class Animation {
 	private int ticksUntilNextFrame;
 	
 	/**
+	 * Whether the animation is special cancelable
+	 */
+	private boolean specialCancelable;
+	
+	/**
+	 * Length in frames of the animation
+	 */
+	private int length;
+	
+	/**
 	 * Loads an animation from a file
 	 * 
 	 * @param filePath - File path to load the animation from
 	 */
-	public Animation(String filePath) {
+	public Animation(List<HitBox> hitboxes, List<HurtBox> hurtboxes, List<Keyframe> keyframes) {
 		steps = new ArrayList<>();
+		queuedInterpolations = new HashMap<>();
+		this.hitboxes = hitboxes;
+		this.hurtboxes = hurtboxes;
+		for (Keyframe frame : keyframes) {
+			steps.add(frame);
+			if (frame.getEndFrame() > length) {
+				length = frame.getEndFrame();
+			}
+		}
 	}
 	
 	/**
@@ -51,8 +89,44 @@ public class Animation {
 	 * @param position - Position to draw the animation at
 	 * @param g - Graphics2D object to draw
 	 */
-	public void draw(Position position, Graphics2D g, Camera camera, Stage stage) {
+	public void draw(Position position, Fighter fighter, Bone root, Graphics2D g, Camera camera, Stage stage) {
+		stepAnimation(fighter, root);
+		root.draw(g, position, camera);
+	}
+	
+	/**
+	 * Steps the animation forward one frame
+	 * 
+	 * @param root - Skeleton of the fighter
+	 */
+	public void stepAnimation(Fighter fighter, Bone root) {
+		Map<String, List<KeyframeType>> toRemove = new HashMap<>();
+		for (String bone : queuedInterpolations.keySet()) {
+			for (KeyframeType instruction : queuedInterpolations.get(bone).keySet()) {
+				if (queuedInterpolations.get(bone).get(instruction).getCompletion(currentFrame) >= 1) {
+					queuedInterpolations.get(bone).get(instruction).apply(root);
+					if (!toRemove.containsKey(bone)) {
+						toRemove.put(bone, new ArrayList<>());
+					}
+					toRemove.get(bone).add(instruction);
+				}
+			}
+		}
+		for (String bone : toRemove.keySet()) {
+			for (KeyframeType instruction : toRemove.get(bone)) {
+				queuedInterpolations.get(bone).remove(instruction);
+			}
+		}
 		
+		for (Keyframe keyframe : steps) {
+			keyframe.attemptToRegister(currentFrame, queuedInterpolations);
+		}
+		for (String bone : queuedInterpolations.keySet()) {
+			for (Keyframe keyframe : queuedInterpolations.get(bone).values()) {
+				keyframe.interpolate(fighter, root, currentFrame);
+			}
+		}
+		currentFrame++;
 	}
 	
 	/**
@@ -61,7 +135,7 @@ public class Animation {
 	 * @return - List of current hitboxes
 	 */
 	public List<HitBox> getHitBoxes() {
-		return steps.get(currentFrame).getHitBoxes();
+		return null;
 	}
 
 	/**
@@ -70,6 +144,6 @@ public class Animation {
 	 * @return - List of current hurtboxes
 	 */
 	public List<HurtBox> getHurtBoxes() {
-		return steps.get(currentFrame).getHurtBoxes();
+		return null;
 	}
 }
