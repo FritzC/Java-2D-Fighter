@@ -52,7 +52,7 @@ public class Fighter {
 	/**
 	 * The current health of the fighter
 	 */
-	private float health;
+	private double health;
 	
 	/**
 	 * The number of frames the fighter is still in hitstun
@@ -113,7 +113,7 @@ public class Fighter {
 	 * @param launchVector - Resulting vector of the hit
 	 * @param knockDown - Whether the hit knocks down
 	 */
-	public void applyHit(float damage, int hitStun, int blockStun, float pushBack, Vector launchVector, boolean knockDown) {
+	public void applyHit(double damage, int hitStun, int blockStun, double pushBack, Vector launchVector, boolean knockDown) {
 		skeleton.release();
 		if (false /* Grounded */) {
 			position = position.applyVector(new Vector(pushBack, 0));
@@ -183,7 +183,7 @@ public class Fighter {
 	 * @param interpolation - Type of interpolation
 	 * @param completion - % complete
 	 */
-	public void interpolateVelocity(float data, KeyframeType type, Interpolation interpolation, float completion) {
+	public void interpolateVelocity(double data, KeyframeType type, Interpolation interpolation, double completion) {
 		switch (type) {
 			case VELOCITY_X:
 				velocity.setX(interpolation.getInterpolatedValue(velocity.getX(), data, completion));

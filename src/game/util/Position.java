@@ -11,12 +11,12 @@ public class Position {
 	/**
 	 * X location
 	 */
-	private float x;
+	private double x;
 	
 	/**
 	 * Y location
 	 */
-	private float y;
+	private double y;
 	
 	/**
 	 * Creates a position
@@ -24,7 +24,7 @@ public class Position {
 	 * @param x - X location
 	 * @param y - Y location
 	 */
-	public Position(float x, float y) {
+	public Position(double x, double y) {
 		this.x = x;
 		this.y = y;
 	}
@@ -44,7 +44,7 @@ public class Position {
 	 * 
 	 * @param x - What X will be set to
 	 */
-	public void setX(float x) {
+	public void setX(double x) {
 		this.x = x;
 	}
 	
@@ -53,7 +53,7 @@ public class Position {
 	 * 
 	 * @param y - What Y will be set to
 	 */
-	public void setY(float y) {
+	public void setY(double y) {
 		this.y = y;
 	}
 	
@@ -62,7 +62,7 @@ public class Position {
 	 * 
 	 * @return - X location
 	 */
-	public float getX() {
+	public double getX() {
 		return x;
 	}
 
@@ -71,7 +71,7 @@ public class Position {
 	 * 
 	 * @return - Y location
 	 */
-	public float getY() {
+	public double getY() {
 		return y;
 	}
 }

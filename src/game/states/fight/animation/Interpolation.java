@@ -10,34 +10,34 @@ public enum Interpolation {
 	
 	LINEAR {
 		@Override
-		public float getInterpolatedValue(float begin, float end, float completion) {
+		public double getInterpolatedValue(double begin, double end, double completion) {
 			return (1 - completion) * begin + completion * end;
 		}
 	}, 
 	COS {
 		@Override
-		public float getInterpolatedValue(float begin, float end, float completion) {
+		public double getInterpolatedValue(double begin, double end, double completion) {
 			double c = (1 - Math.cos(completion * Math.PI)) / 2d;
 			return  (float) (begin * (1 - c) + end * c);
 		}
 	},
 	SMOOTH_OUT {
 		@Override
-		public float getInterpolatedValue(float begin, float end, float completion) {
+		public double getInterpolatedValue(double begin, double end, double completion) {
 			double c = (1 - Math.cos(completion * Math.PI / 2d));
 			return  (float) (begin * (1 - c) + end * c);
 		}
 	},
 	SMOOTH_IN {
 		@Override
-		public float getInterpolatedValue(float begin, float end, float completion) {
+		public double getInterpolatedValue(double begin, double end, double completion) {
 			double c = Math.sin(completion * Math.PI / 2d);
 			return  (float) (begin * (1 - c) + end * c);
 		}
 	},
 	NONE {
 		@Override
-		public float getInterpolatedValue(float begin, float end, float completion) {
+		public double getInterpolatedValue(double begin, double end, double completion) {
 			return begin;
 		}
 	};
@@ -50,6 +50,6 @@ public enum Interpolation {
 	 * @param completion - Percent complete
 	 * @return - Interpolated value
 	 */
-	public abstract float getInterpolatedValue(float begin, float end, float completion);
+	public abstract double getInterpolatedValue(double begin, double end, double completion);
 	
 }

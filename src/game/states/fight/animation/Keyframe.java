@@ -32,7 +32,7 @@ public class Keyframe {
 	/**
 	 * Auxiliary data for the instruction
 	 */
-	private float data;
+	private double data;
 	
 	/**
 	 * Frame that interpolating begins
@@ -53,7 +53,7 @@ public class Keyframe {
 	 * @param type - Type of instruction
 	 * @param interpolation - Type of interpolation to use
 	 */
-	public Keyframe(int frame, String boneId, float data, KeyframeType type, Interpolation interpolation) {
+	public Keyframe(int frame, String boneId, double data, KeyframeType type, Interpolation interpolation) {
 		this.endFrame = frame;
 		this.boneId = boneId;
 		this.type = type;
@@ -110,8 +110,8 @@ public class Keyframe {
 	 * @param currentFrame - Current frame animation is on
 	 * @return - % complete
 	 */
-	public float getCompletion(int currentFrame) {
-		return (currentFrame - beginInterpolatingFrame) / (float) (endFrame - beginInterpolatingFrame);
+	public double getCompletion(int currentFrame) {
+		return (currentFrame - beginInterpolatingFrame) / (double) (endFrame - beginInterpolatingFrame);
 	}
 	
 	/**

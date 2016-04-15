@@ -12,7 +12,7 @@ import game.util.Position;
 public class Camera {
 
 	public Position focus;
-	public float zoom;
+	public double zoom;
 	public Stage stage;
 	
 	public Camera(Stage stage) {
@@ -25,26 +25,30 @@ public class Camera {
 		focus = new Position(newFocus.getX(), newFocus.getY());
 	}
 	
-	public void setZoom(float newZoom) {
+	public void setZoom(double newZoom) {
 		zoom = newZoom;
 	}
 
-	public float getScale() {
+	public double getScale() {
 		return 1 / zoom;
 	}
 	
 	public int getScreenX(Position position) {
-		float screenRight = focus.getX() - zoom / 2;
+		double screenRight = focus.getX() - zoom / 2;
 		return (int) (((position.getX() - screenRight) / zoom) * getScreenWidth());
 	}
 	
 	public int getScreenY(Position position) {
-		float screenBottom = focus.getY() - zoom / 2;
+		double screenBottom = focus.getY() - zoom / 2;
 		return getScreenHeight() - (int) (((position.getY() - screenBottom) / zoom) * getScreenWidth());
 	}
 	
-	public int toPixels(float size) {
+	public int toPixels(double size) {
 		return (int) (size * getScreenWidth() * getScale());
+	}
+	
+	public double toGameDistance(double size) {
+		return size / (double) getScreenWidth() / (double) getScale();
 	}
 	
 	public int getScreenWidth() {

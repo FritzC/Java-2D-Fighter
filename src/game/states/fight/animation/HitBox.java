@@ -40,7 +40,7 @@ public class HitBox {
 	/**
 	 * Amount of damage the hitbox does
 	 */
-	private float damage;
+	private double damage;
 	
 	/**
 	 * Amount of hitstun the hitbox does
@@ -55,7 +55,7 @@ public class HitBox {
 	/**
 	 * Distance the hitbox will push back if blocked
 	 */
-	private float pushBack;
+	private double pushBack;
 	
 	/**
 	 * Vector a fighter hit by the hitbox will be launched at
@@ -100,8 +100,8 @@ public class HitBox {
 	 * @param launchVelocity - Vector which a fighter hit by this will be launched at
 	 * @param knockDown - Whether the hitbox knocks down
 	 */
-	public HitBox(int startFrame, int endFrame, String group, Box collision, float damage, int hitStun,
-			int blockStun, float pushBack, Vector launchVelocity, boolean knockDown) {
+	public HitBox(int startFrame, int endFrame, String group, Box collision, double damage, int hitStun,
+			int blockStun, double pushBack, Vector launchVelocity, boolean knockDown) {
 		this.startFrame = startFrame;
 		this.endFrame = endFrame;
 		this.group = group;

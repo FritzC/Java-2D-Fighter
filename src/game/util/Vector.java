@@ -11,12 +11,12 @@ public class Vector {
 	/**
 	 * X component
 	 */
-	private float x;
+	private double x;
 	
 	/**
 	 * Y component
 	 */
-	private float y;
+	private double y;
 	
 	/**
 	 * Creates a vector
@@ -24,7 +24,7 @@ public class Vector {
 	 * @param x - X component
 	 * @param y - Y component
 	 */
-	public Vector(float x, float y) {
+	public Vector(double x, double y) {
 		this.x = x;
 		this.y = y;
 	}
@@ -35,7 +35,7 @@ public class Vector {
 	 * @param x - X translation
 	 * @param y - Y translation
 	 */
-	public void transform(float x, float y) {
+	public void transform(double x, double y) {
 		this.x += x;
 		this.y += y;
 	}
@@ -45,7 +45,7 @@ public class Vector {
 	 * 
 	 * @param x - What X will be set to
 	 */
-	public void setX(float x) {
+	public void setX(double x) {
 		this.x = x;
 	}
 	
@@ -54,7 +54,7 @@ public class Vector {
 	 * 
 	 * @param y - What Y will be set to
 	 */
-	public void setY(float y) {
+	public void setY(double y) {
 		this.y = y;
 	}
 	
@@ -63,7 +63,7 @@ public class Vector {
 	 * 
 	 * @return - X location
 	 */
-	public float getX() {
+	public double getX() {
 		return x;
 	}
 
@@ -72,7 +72,7 @@ public class Vector {
 	 * 
 	 * @return - Y location
 	 */
-	public float getY() {
+	public double getY() {
 		return y;
 	}
 }

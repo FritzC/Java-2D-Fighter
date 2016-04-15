@@ -11,4 +11,19 @@ public enum DrawMode {
 	SPRITE,
 	LINE;
 	
+	/**
+	 * Gets a value for a string
+	 * 
+	 * @param s - Input string
+	 * @return - DrawMode for string
+	 */
+	public static DrawMode forString(String s) {
+		for (DrawMode mode : values()) {
+			if (s.equalsIgnoreCase(mode.toString())) {
+				return mode;
+			}
+		}
+		return LINE;
+	}
+	
 }

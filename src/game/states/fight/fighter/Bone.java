@@ -4,8 +4,8 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 import game.states.fight.Camera;
 import game.states.fight.Fighter;
@@ -26,7 +26,12 @@ public class Bone {
 	/**
 	 * Map of all children of the bone
 	 */
-	private Map<String, Bone> children;
+	private List<Bone> children;
+	
+	/**
+	 * Name of the bone
+	 */
+	private String name;
 	
 	/**
 	 * How to draw the bone (SPRITE or LINE)
@@ -36,17 +41,17 @@ public class Bone {
 	/**
 	 * Length of the bone
 	 */
-	private float length;
+	private double length;
 	
 	/**
 	 * Angle the bone is at (clockwise starting at x axis)
 	 */
-	private float angle;
+	private double angle;
 	
 	/**
 	 * Width of the bone
 	 */
-	private float width;
+	private double width;
 	
 	/**
 	 * Sprite to draw for the bone
@@ -61,12 +66,12 @@ public class Bone {
 	/**
 	 * Length offset between interpolated steps
 	 */
-	private float interpolatedLength;
+	private double interpolatedLength;
 
 	/**
 	 * Angle offset between interpolated steps
 	 */
-	private float interpolatedAngle;
+	private double interpolatedAngle;
 	
 	/**
 	 * If defined, the fighter attached to the bone (for grabs)
@@ -86,12 +91,13 @@ public class Bone {
 	 * @param angle - Angle line is at
 	 * @param visible - Whether to draw the bone
 	 */
-	public Bone(float length, float width, float angle, boolean visible) {
+	public Bone(String name, double length, double width, double angle, boolean visible) {
 		drawMode = DrawMode.LINE;
+		this.name = name;
 		this.length = length;
 		this.width = width;
 		this.angle = angle;
-		children = new HashMap<>();
+		children = new ArrayList<>();
 		this.visible = visible;
 	}
 	
@@ -102,12 +108,13 @@ public class Bone {
 	 * @param angle - Angle bone is at
 	 * @param visible - Whether to draw the bone
 	 */
-	public Bone(Sprite sprite, float length, float angle, boolean visible) {
+	public Bone(String name, Sprite sprite, double length, double angle, boolean visible) {
 		drawMode = DrawMode.SPRITE;
+		this.name = name;
 		this.sprite = sprite;
 		this.length = length;
 		this.angle = angle;
-		children = new HashMap<>();
+		children = new ArrayList<>();
 		this.visible = visible;
 	}
 	
@@ -134,8 +141,8 @@ public class Bone {
 	 * @param selected - Selected bone
 	 */
 	public void draw(Graphics2D g, Position root, Camera camera, boolean drawHidden, String selectedBone, String hoveredBone, int selectType) {
-		float currentAngle = (interpolatedAngle != 0) ? interpolatedAngle : angle;
-		float currentLength = (interpolatedLength != 0) ? interpolatedLength : length;
+		double currentAngle = (interpolatedAngle != 0) ? interpolatedAngle : angle;
+		double currentLength = (interpolatedLength != 0) ? interpolatedLength : length;
 		if (selectedBone.equals("root")) {
 			selectType = 2;
 			selectedBone = "";
@@ -149,12 +156,14 @@ public class Bone {
 			int screenY = camera.getScreenY(root);
 			switch (drawMode) {
 				case SPRITE:
-					sprite.draw(g, screenX, screenY, camera.getScale(), currentAngle);
+					if (sprite != null) {
+						sprite.draw(g, screenX, screenY, camera.getScale(), currentAngle);
+					}
 					break;
 				case LINE:
 					Graphics2D clone = (Graphics2D) g.create();
 					AffineTransform a = new AffineTransform();
-					a.concatenate(AffineTransform.getRotateInstance(Math.toRadians(currentAngle), screenX, screenY));
+					a.concatenate(AffineTransform.getRotateInstance(Math.toRadians(-currentAngle), screenX, screenY));
 					clone.setTransform(a);
 					int lineLength = camera.toPixels(currentLength);
 					int lineWidth = camera.toPixels(width);
@@ -173,13 +182,13 @@ public class Bone {
 			}
 		}
 		Position tail = root.applyVector(new Vector((float) (currentLength * Math.cos(Math.toRadians(currentAngle))),
-				-(float) (currentLength * Math.sin(Math.toRadians(currentAngle)))));
+				(float) (currentLength * Math.sin(Math.toRadians(currentAngle)))));
 		if (hasAttachedFighter) {
 			attached.setPosition(tail);
 		}
-		for (String key : children.keySet()) {
-			int drawType = (key.equals(selectedBone)) ? 2 : ((key.equals(hoveredBone)) ? 1 : 0);
-			children.get(key).draw(g, tail, camera, drawHidden, selectedBone, hoveredBone, drawType);
+		for (Bone bone : children) {
+			int drawType = (bone.name.equals(selectedBone)) ? 2 : ((bone.name.equals(hoveredBone)) ? 1 : 0);
+			bone.draw(g, tail, camera, drawHidden, selectedBone, hoveredBone, drawType);
 		}
 	}
 	
@@ -189,8 +198,8 @@ public class Bone {
 	 * @param identifier - Name of the bone (Must be unique)
 	 * @param child - bone to add as a child
 	 */
-	public void addChild(String identifier, Bone child) {
-		children.put(identifier, child);
+	public void addChild(Bone child) {
+		children.add(child);
 	}
 	
 	/**
@@ -203,11 +212,11 @@ public class Bone {
 		if (identifier.equals("root")) {
 			return this;
 		}
-		for (String key : children.keySet()) {
-			if (key.equals(identifier)) {
-				return children.get(key);
-			} else if (children.get(key).getBone(identifier) != null) {
-				return children.get(key).getBone(identifier);
+		for (Bone child : children) {
+			if (child.name.equals(identifier)) {
+				return child;
+			} else if (child.getBone(identifier) != null) {
+				return child.getBone(identifier);
 			}
 		}
 		return null;
@@ -221,7 +230,7 @@ public class Bone {
 	 * @param interpolation - Type of interpolation
 	 * @param completion - % completed
 	 */
-	public void interpolate(float data, KeyframeType type, Interpolation interpolation, float completion) {
+	public void interpolate(double data, KeyframeType type, Interpolation interpolation, double completion) {
 		switch (type) {
 			case LENGTH:
 				if (data == length) {
@@ -247,7 +256,7 @@ public class Bone {
 	 * @param data - Auxiliary data
 	 * @param type - Type of the instruction
 	 */
-	public void applyInstruction(float data, KeyframeType type) {
+	public void applyInstruction(double data, KeyframeType type) {
 		switch (type) {
 			case LENGTH:
 				length = data;
@@ -268,7 +277,7 @@ public class Bone {
 	 * 
 	 * @param angle - Angle to set to
 	 */
-	public void setAngle(float angle) {
+	public void setAngle(double angle) {
 		this.angle = angle;
 	}
 	
@@ -277,7 +286,7 @@ public class Bone {
 	 * 
 	 * @param length - Length to set to
 	 */
-	public void setLength(float length) {
+	public void setLength(double length) {
 		this.length = length;
 	}
 	
@@ -307,8 +316,111 @@ public class Bone {
 		hasAttachedFighter = false;
 	}
 	
-	public Map<String, Bone> getChildren() {
+	/**
+	 * Gets the children of the bone
+	 * 
+	 * @return - Children of the bone
+	 */
+	public List<Bone> getChildren() {
 		return children;
 	}
+	
+	public Position getPosition(String boneId, Position root, Camera camera) {
+		if (name.equals(boneId)) {
+			return root;
+		}
+		Position tail = root.applyVector(new Vector((float) (length * Math.cos(Math.toRadians(angle))),
+				(float) (length * Math.sin(Math.toRadians(angle)))));
+		for (Bone child : children) {
+			if (child.getPosition(boneId, tail, camera) != null) {
+				return child.getPosition(boneId, tail, camera); 
+			}
+		}
+		return null;
+	}
 
+	/**
+	 * Get the bone's name
+	 * 
+	 * @return - Bone name
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * Get the bone's angle
+	 * 
+	 * @return - Bone's angle
+	 */
+	public double getAngle() {
+		return angle;
+	}
+
+	/**
+	 * Gets the bone's length
+	 * 
+	 * @return - Bone's length
+	 */
+	public double getLength() {
+		return length;
+	}
+
+	/**
+	 * Gets the bone's width
+	 * 
+	 * @return - Bone's width
+	 */
+	public double getWidth() {
+		return width;
+	}
+
+	/**
+	 * Gets the bone's visibility
+	 * 
+	 * @return - Bone's visibility
+	 */
+	public boolean isVisible() {
+		return visible;
+	}
+	
+	/**
+	 * Updates the internal values
+	 *  - For the Editor
+	 */
+	public void updateValues(String name, DrawMode drawMode, double length, double width, double angle, boolean visible) {
+		this.drawMode = drawMode;
+		this.name = name;
+		this.length = length;
+		this.width = width;
+		this.angle = angle;
+		this.visible = visible;
+	}
+
+	/**
+	 * Gets the bone's draw mode
+	 * 
+	 * @return - Draw mode
+	 */
+	public DrawMode getDrawMode() {
+		return drawMode;
+	}
+
+	/**
+	 * Removes a bone from the skeleton
+	 * 
+	 * @param boneId - Bone to remove
+	 * @return - Whether removal was successful
+	 */
+	public boolean removeBone(String boneId) {
+		for (int i = 0; i < children.size(); i++) {
+			if (children.get(i).name.equals(boneId)) {
+				children.remove(i);
+				return true;
+			} else if (children.get(i).removeBone(boneId)) {
+				return true;
+			}
+		}
+		return false;
+	}
 }

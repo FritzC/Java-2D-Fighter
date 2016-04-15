@@ -42,7 +42,7 @@ public class Box {
 	 * @param width - Width of box
 	 * @param height - Height of box
 	 */
-	public Box(Position topLeft, float width, float height) {
+	public Box(Position topLeft, double width, double height) {
 		this(topLeft, new Position(topLeft.getX() + width, topLeft.getY() + height));
 	}
 

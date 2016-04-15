@@ -17,9 +17,9 @@ import javax.imageio.ImageIO;
 public class Sprite {
 	
 	private BufferedImage image;
-	private float imageScale;
+	private double imageScale;
 	
-	public Sprite(String location, float imageScale) {
+	public Sprite(String location, double imageScale) {
 		try {
 			File f = new File(location);
 			image = ImageIO.read(f);
@@ -29,7 +29,7 @@ public class Sprite {
 		}
 	}
 
-	public void draw(Graphics2D g, int x, int y, float scale, float angle) {
+	public void draw(Graphics2D g, int x, int y, double scale, double angle) {
 		Graphics2D clone = (Graphics2D) g.create();
 		AffineTransform a = new AffineTransform();
 		a.concatenate(AffineTransform.getTranslateInstance(x, y - (image.getHeight() / 2) * imageScale * scale));

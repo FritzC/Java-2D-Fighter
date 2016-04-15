@@ -14,7 +14,7 @@ public class Stage {
 		
 	}
 	
-	public float getWidth() {
+	public double getWidth() {
 		return 1.5f;
 	}
 }
