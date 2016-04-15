@@ -14,6 +14,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -36,10 +37,10 @@ import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import game.editor.Editor.BoneListElement;
+import game.states.fight.Fighter;
 import game.states.fight.fighter.Bone;
 import game.states.fight.fighter.DrawMode;
 import game.util.Position;
-import javafx.scene.input.KeyCode;
 
 public class FighterEditor {
 	
@@ -65,10 +66,11 @@ public class FighterEditor {
 	private static JComboBox<DrawMode> drawType;
 	private static JButton loadSprite;
 	private static boolean updateBone;
+	private static boolean updateFighter;
 	private static JFileChooser fighterFileChooser;
 	
 	public static void initSkeletonViewPanel() {
-		Position skeletonLoc = new Position(0.5f, 0f);
+		final Position skeletonLoc = new Position(0.5f, 0f);
 		Editor.skeletonViewPanel = new JPanel() {
 			@Override
 			public void paint(Graphics g) {
@@ -79,8 +81,8 @@ public class FighterEditor {
 				g.drawRect(0, Editor.camera.getScreenY(new Position(0f, 0f)), 1000, 1000);
 				String selected = (boneSelected != null) ? boneSelected.getName() : "";
 				String hovered = (boneHovered != null) ? boneHovered.getName() : "";
-				if (Editor.skeleton != null) {
-					Editor.skeleton.draw((Graphics2D) g, skeletonLoc, Editor.camera, true, selected, hovered, 0);
+				if (Editor.fighter != null) {
+					Editor.fighter.getSkeleton().draw((Graphics2D) g, skeletonLoc, Editor.camera, true, selected, hovered, 0);
 				}
 			}
 		};
@@ -88,8 +90,8 @@ public class FighterEditor {
 		Editor.skeletonViewPanel.addMouseMotionListener(new MouseMotionListener() {
 			@Override
 			public void mouseDragged(MouseEvent e) {
-				if (boneSelected != null && Editor.skeleton != null) {
-					Position pos = Editor.skeleton.getPosition(boneSelected.getName(), skeletonLoc, Editor.camera);
+				if (boneSelected != null && Editor.fighter != null && Editor.fighter.getSkeleton() != null) {
+					Position pos = Editor.fighter.getSkeleton().getPosition(boneSelected.getName(), skeletonLoc, Editor.camera);
 					if (pos == null) {
 						return;
 					}
@@ -108,8 +110,8 @@ public class FighterEditor {
 					if (Editor.keysDown.contains(SHIFT)) {
 						angle = angle - (angle % 5);
 					}
-					boneSelected.setAngle(angle);
-					boneSelected.setLength(Editor.camera.toGameDistance(length));
+					boneAngle.setValue(angle);
+					boneLength.setValue(Editor.camera.toGameDistance(length));
 					Editor.skeletonViewPanel.repaint();
 					updateBoneFields();
 				}
@@ -132,8 +134,8 @@ public class FighterEditor {
 
 			@Override
 			public void mousePressed(MouseEvent e) {
-				if (boneSelected != null && Editor.skeleton != null) {
-					Position pos = Editor.skeleton.getPosition(boneSelected.getName(), skeletonLoc, Editor.camera);
+				if (boneSelected != null && Editor.fighter != null && Editor.fighter.getSkeleton() != null) {
+					Position pos = Editor.fighter.getSkeleton().getPosition(boneSelected.getName(), skeletonLoc, Editor.camera);
 					if (pos == null) {
 						return;
 					}
@@ -152,10 +154,10 @@ public class FighterEditor {
 					if (Editor.keysDown.contains(SHIFT)) {
 						angle = angle - (angle % 5);
 					}
-					boneSelected.setAngle(angle);
-					boneSelected.setLength(Editor.camera.toGameDistance(length));
+					boneAngle.setValue(angle);
+					boneLength.setValue(Editor.camera.toGameDistance(length));
 					Editor.skeletonViewPanel.repaint();
-					updateBoneFields();
+					updateBoneData();
 				}
 			}
 
@@ -193,7 +195,9 @@ public class FighterEditor {
 				int returnVal = fighterFileChooser.showOpenDialog(null);
 				if (returnVal == JFileChooser.APPROVE_OPTION) {
 					try {
-						loadFile(fighterFileChooser.getSelectedFile());
+						boneSelected = null;
+						Editor.fighter = Fighter.load(fighterFileChooser.getSelectedFile());
+						updateFighterFields();
 						Editor.skeletonViewPanel.repaint();
 						skeletonTreeDiagram.repaint();
 					} catch (FileNotFoundException e1) {
@@ -203,20 +207,49 @@ public class FighterEditor {
 			}
 		});
 		saveFighter = new JButton("Save");
+		saveFighter.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				FileNameExtensionFilter filter = new FileNameExtensionFilter("Fighter files", "json");
+				fighterFileChooser.setFileFilter(filter);
+				int returnVal = fighterFileChooser.showSaveDialog(null);
+				if (returnVal == JFileChooser.APPROVE_OPTION) {
+					try {
+						Editor.fighter.save(fighterFileChooser.getSelectedFile());
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+				}
+			}
+		});
 		fighterName = new JTextField();
-		fighterHealth = new JSpinner(new SpinnerNumberModel(1000, 1, 2000, 1));
+		fighterName.getDocument().addDocumentListener(new DocumentListener() {
+			public void changedUpdate(DocumentEvent e) {
+				updateFighterData();
+			}
+
+			public void removeUpdate(DocumentEvent e) {
+				updateFighterData();
+			}
+
+			public void insertUpdate(DocumentEvent e) {
+				updateFighterData();
+			}
+		});
+		fighterHealth = new JSpinner(new SpinnerNumberModel(1000d, 1d, 2000d, 1d));
+		fighterHealth.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				updateFighterData();
+			}
+		});
 		ActionListener updateValues = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (updateBone) {
-					updateBoneValues();
-				}
+				updateBoneData();
 			}
 		};
 		ChangeListener updateValues2 = new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				if (updateBone) {
-					updateBoneValues();
-				}
+				updateBoneData();
 			}
 		};
 		addBone = new JButton("Add Child");
@@ -233,29 +266,23 @@ public class FighterEditor {
 		removeBone.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (boneSelected != null && Editor.skeleton != null) {
-					Editor.skeleton.removeBone(boneSelected.getName());
+				if (boneSelected != null && Editor.fighter != null && Editor.fighter.getSkeleton() != null) {
+					Editor.fighter.getSkeleton().removeBone(boneSelected.getName());
 				}
 			}
 		});
 		boneName = new JTextField();
 		boneName.getDocument().addDocumentListener(new DocumentListener() {
 			public void changedUpdate(DocumentEvent e) {
-				if (updateBone) {
-					updateBoneValues();
-				}
+				updateBoneData();
 			}
 
 			public void removeUpdate(DocumentEvent e) {
-				if (updateBone) {
-					updateBoneValues();
-				}
+				updateBoneData();
 			}
 
 			public void insertUpdate(DocumentEvent e) {
-				if (updateBone) {
-					updateBoneValues();
-				}
+				updateBoneData();
 			}
 		});
 		boneLength = new JSpinner(new SpinnerNumberModel(0.1 , 0, 1.5, 0.005));
@@ -283,8 +310,8 @@ public class FighterEditor {
 				g2.setFont(stringFont);
 				listYOff = 1;
 				boneListElements.clear();
-				if (Editor.skeleton != null) {
-					drawBoneLevel(g2, Editor.skeleton, null, false, 0);
+				if (Editor.fighter != null && Editor.fighter.getSkeleton() != null) {
+					drawBoneLevel(g2, Editor.fighter.getSkeleton(), null, false, 0);
 				}
 			}
 		};
@@ -413,21 +440,30 @@ public class FighterEditor {
 		}
 	}
 	
+	public static void updateFighterFields() {
+		updateFighter = false;
+		if (Editor.fighter != null) {
+			Editor.fighter.updateUIFields(fighterName, fighterHealth);
+		}
+		updateFighter = true;
+	}
+	
+	public static void updateFighterData() {
+		if (Editor.fighter != null && updateFighter) {
+			Editor.fighter.updateValues(fighterName.getText(), (double) fighterHealth.getValue());
+		}
+	}
+	
 	public static void updateBoneFields() {
 		updateBone = false;
 		if (boneSelected != null) {
-			boneName.setText(boneSelected.getName());
-			boneLength.setValue(boneSelected.getLength());
-			boneAngle.setValue(boneSelected.getAngle());
-			boneWidth.setValue(boneSelected.getWidth());
-			boneVisible.setSelected(boneSelected.isVisible());
-			drawType.setSelectedIndex(boneSelected.getDrawMode().ordinal());
+			boneSelected.updateUIFields(boneName, boneLength, boneAngle, boneWidth, boneVisible, drawType);
 		}
 		updateBone = true;
 	}
 
-	public static void updateBoneValues() {
-		if (boneSelected != null) {
+	public static void updateBoneData() {
+		if (boneSelected != null && updateBone) {
 			boneSelected.updateValues(boneName.getText(), (DrawMode) drawType.getSelectedItem(),
 					(double) boneLength.getValue(), (double) boneWidth.getValue(), (double) boneAngle.getValue(),
 					boneVisible.isSelected());
@@ -436,71 +472,8 @@ public class FighterEditor {
 		}
 	}
 	
-	public static void loadFile(File f) throws FileNotFoundException {
-		Scanner s = new Scanner(f);
-		while(s.hasNextLine()) {
-			String line = s.nextLine().trim();
-			if (!line.contains(":")) {
-				continue;
-			}
-			String type = line.substring(0, line.indexOf(":"));
-			String data = line.substring(line.indexOf(":") + 1).replaceAll(",", "").replaceAll("\"", "").trim();
-			//System.out.println(data);
-			if (type.contains("name")) {
-				//fighterName.setText(data);
-				System.out.println("NAME: " + data);
-			} else if (type.contains("health")) {
-				//fighterHealth.setValue(Double.parseDouble(data));
-				System.out.println("HEALTH: " + data);
-			} else if (type.contains("skeleton")) {
-				s.nextLine();
-				Editor.skeleton = loadBone(s);
-			}
-		}
-	}
-	
-	public static Bone loadBone(Scanner s) {
-		Bone bone = new Bone(null, 0, 0, 0, false);
-		String name = null;
-		DrawMode drawMode = null;
-		double length = 0, width = 0, angle = 0;
-		boolean visible = false;
-		int skip = 0;
-		while (s.hasNextLine()) {
-			String line = s.nextLine();
-			if (line.contains("}") &&  skip-- == 0) {
-				if (line.contains("children")) {
-					s.nextLine();
-				}
-				break;
-			}
-			String type = line.substring(0, line.indexOf(":"));
-			String data = line.substring(line.indexOf(":") + 1).replaceAll(",", "").replaceAll("\"", "").trim();
-			if (type.contains("children")) {
-				while (!line.contains("}")) {
-					line = s.nextLine();
-					Bone b = loadBone(s);
-					if (b.getName() != null) {
-						bone.addChild(b);
-					}
-				}
-				break;
-			} else if (type.contains("drawMode")) {
-				drawMode = DrawMode.forString(data);
-			} else if (type.contains("length")) {
-				length = Double.parseDouble(data);
-			} else if (type.contains("width")) {
-				width = Double.parseDouble(data);
-			} else if (type.contains("angle")) {
-				angle = Double.parseDouble(data);
-			} else if (type.contains("visible")) {
-				visible = Boolean.parseBoolean(data);
-			} else if (type.contains("name")) {
-				name = data;
-			}
-		}
-		bone.updateValues(name, drawMode, length, width, angle, visible);
-		return bone;
+	public void saveFighter(File f) {
+		
 	}
 
 }

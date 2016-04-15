@@ -114,7 +114,7 @@ public class Animation {
 				if (queuedInterpolations.get(bone).get(instruction).getCompletion(currentFrame) >= 1) {
 					queuedInterpolations.get(bone).get(instruction).apply(root);
 					if (!toRemove.containsKey(bone)) {
-						toRemove.put(bone, new ArrayList<>());
+						toRemove.put(bone, new ArrayList<KeyframeType>());
 					}
 					toRemove.get(bone).add(instruction);
 				}

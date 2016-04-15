@@ -2,8 +2,17 @@ package game.states.fight;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
+
+import javax.swing.JSpinner;
+import javax.swing.JTextField;
 
 import game.Game;
 import game.states.fight.animation.Animation;
@@ -23,6 +32,11 @@ import game.util.Vector;
  *
  */
 public class Fighter {
+	
+	/**
+	 * Name of the fighter
+	 */
+	private String name;
 	
 	/**
 	 * Root node of component skeleton
@@ -66,12 +80,16 @@ public class Fighter {
 	private List<String> hitBy;
 	
 	/**
-	 * Loads the fighter's data from the file specified
+	 * Initializes a new fighter
 	 * 
-	 * @param filePath - Path to fighter data location
+	 * @param name - Name of the fighter
+	 * @param health - Amount of health the fighter has
+	 * @param skeleton - Root Bone of the fighter's skeleton
 	 */
-	public Fighter(String filePath) {
-		
+	public Fighter(String name, double health, Bone skeleton) {
+		this.name = name;
+		this.health = health;
+		this.skeleton = skeleton;
 	}
 	
 	/**
@@ -227,6 +245,87 @@ public class Fighter {
 	 */
 	public boolean isBlocking() {
 		return false;
+	}
+
+	/**
+	 * Gets the fighter's skeleton
+	 * 
+	 * @return - Fighter's skeleton
+	 */
+	public Bone getSkeleton() {
+		return skeleton;
+	}
+
+	/**
+	 * Updates UI fields with the fighter's information
+	 * 
+	 * @param fighterName - Name textbox
+	 * @param fighterHealth - Health spinner
+	 */
+	public void updateUIFields(JTextField fighterName, JSpinner fighterHealth) {
+		fighterName.setText(name);
+		fighterHealth.setValue(health);
+	}
+	
+	/**
+	 * Updates internal values
+	 *  - For editor use
+	 */
+	public void updateValues(String name, double health) {
+		this.name = name;
+		this.health = health;
+	}
+
+	/**
+	 * Loads a fighter from a file
+	 * 
+	 * @param f - File to load from
+	 * @return - Fighter loaded
+	 * @throws FileNotFoundException
+	 */
+	public static Fighter load(File f) throws FileNotFoundException {
+		Scanner s = new Scanner(f);
+		String name = "";
+		double health = 0;
+		Bone skeleton = null;
+		while(s.hasNextLine()) {
+			String line = s.nextLine().trim();
+			if (!line.contains(":")) {
+				continue;
+			}
+			String type = line.substring(0, line.indexOf(":"));
+			String data = line.substring(line.indexOf(":") + 1).replaceAll(",", "").replaceAll("\"", "").trim();
+			if (type.contains("name")) {
+				name = data;
+			} else if (type.contains("health")) {
+				health = Double.parseDouble(data);
+			} else if (type.contains("skeleton")) {
+				s.nextLine();
+				skeleton = Bone.loadBone(s);
+			}
+		}
+		return new Fighter(name, health, skeleton);
+	}
+	
+	/**
+	 * Saves the fighter to a file
+	 * 
+	 * @param f - File to save to
+	 * @throws IOException 
+	 */
+	public void save(File f) throws IOException {
+		if (!f.exists()) {
+			f.createNewFile();
+		}
+		PrintWriter pw = new PrintWriter(new FileWriter(f));
+		pw.println("{");
+		pw.println("\t\"name\": \"" + name + "\",");
+		pw.println("\t\"health\": " + health + ",");
+		pw.println("\t\"skeleton\": {");
+		skeleton.save(pw, "\t\t", true);
+		pw.println("\t}");
+		pw.print("}");
+		pw.close();
 	}
 	
 }

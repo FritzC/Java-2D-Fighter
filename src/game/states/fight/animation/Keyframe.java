@@ -96,7 +96,7 @@ public class Keyframe {
 			return false;
 		}
 		if (table.get(boneId) == null) {
-			table.put(boneId, new HashMap<>());
+			table.put(boneId, new HashMap<KeyframeType, Keyframe>());
 		}
 		beginInterpolatingFrame = currentFrame;
 		table.get(boneId).put(type, this);

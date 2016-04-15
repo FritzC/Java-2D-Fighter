@@ -27,9 +27,8 @@ import game.util.Position;
 
 public class Editor {
 
-	private static Fighter fighter;
+	static Fighter fighter;
 	static Stage stage;
-	static Bone skeleton;
 	static Camera camera;
 	
 	private static JPanel viewPort;
@@ -79,7 +78,7 @@ public class Editor {
 	}
 
 	public static void main(String args[]) {
-		JFrame frame = new JFrame();
+		final JFrame frame = new JFrame();
 		stage = new Stage() {
 			@Override
 			public double getWidth() {

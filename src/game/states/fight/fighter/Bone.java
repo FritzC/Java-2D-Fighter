@@ -4,8 +4,15 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
+
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JSpinner;
+import javax.swing.JTextField;
 
 import game.states.fight.Camera;
 import game.states.fight.Fighter;
@@ -77,11 +84,6 @@ public class Bone {
 	 * If defined, the fighter attached to the bone (for grabs)
 	 */
 	private Fighter attached;
-	
-	/**
-	 * Whether a fighter is attached
-	 */
-	private boolean hasAttachedFighter;
 	
 	/**
 	 * Initializes a LINE Fighterbone
@@ -183,7 +185,7 @@ public class Bone {
 		}
 		Position tail = root.applyVector(new Vector((float) (currentLength * Math.cos(Math.toRadians(currentAngle))),
 				(float) (currentLength * Math.sin(Math.toRadians(currentAngle)))));
-		if (hasAttachedFighter) {
+		if (attached != null) {
 			attached.setPosition(tail);
 		}
 		for (Bone bone : children) {
@@ -273,47 +275,19 @@ public class Bone {
 	}
 
 	/**
-	 * Sets the angle of the bone
-	 * 
-	 * @param angle - Angle to set to
-	 */
-	public void setAngle(double angle) {
-		this.angle = angle;
-	}
-	
-	/**
-	 * Sets the length of the bone
-	 * 
-	 * @param length - Length to set to
-	 */
-	public void setLength(double length) {
-		this.length = length;
-	}
-	
-	/**
-	 * Sets the visibility of the bone
-	 * 
-	 * @param visible - Visibility of bone
-	 */
-	public void setVisible(boolean visible) {
-		this.visible = visible;
-	}
-
-	/**
 	 * Attaches a fighter to the bone
 	 * 
 	 * @param defender - Fighter being attached
 	 */
 	public void attachFighter(Fighter defender) {
 		attached = defender;
-		hasAttachedFighter = true;
 	}
 
 	/**
 	 * Detaches the fighter from the bone
 	 */
 	public void release() {
-		hasAttachedFighter = false;
+		attached = null;
 	}
 	
 	/**
@@ -325,6 +299,14 @@ public class Bone {
 		return children;
 	}
 	
+	/**
+	 * Gets the position of a bone
+	 * 
+	 * @param boneId - Bone name
+	 * @param root - Root position
+	 * @param camera - Camera object
+	 * @return - Position of bone
+	 */
 	public Position getPosition(String boneId, Position root, Camera camera) {
 		if (name.equals(boneId)) {
 			return root;
@@ -349,39 +331,23 @@ public class Bone {
 	}
 
 	/**
-	 * Get the bone's angle
+	 * Updates UI fields with the bone's data
 	 * 
-	 * @return - Bone's angle
+	 * @param nameField - Name textbox 
+	 * @param lengthSpinner - Length spinner
+	 * @param angleSpinner - Angle spinner
+	 * @param widthSpinner - Width spinner
+	 * @param visibleCheckbox - Visibility checkbox
+	 * @param drawModeSelector - DrawMode combobox
 	 */
-	public double getAngle() {
-		return angle;
-	}
-
-	/**
-	 * Gets the bone's length
-	 * 
-	 * @return - Bone's length
-	 */
-	public double getLength() {
-		return length;
-	}
-
-	/**
-	 * Gets the bone's width
-	 * 
-	 * @return - Bone's width
-	 */
-	public double getWidth() {
-		return width;
-	}
-
-	/**
-	 * Gets the bone's visibility
-	 * 
-	 * @return - Bone's visibility
-	 */
-	public boolean isVisible() {
-		return visible;
+	public void updateUIFields(JTextField nameField, JSpinner lengthSpinner, JSpinner angleSpinner,
+			JSpinner widthSpinner, JCheckBox visibleCheckbox, JComboBox<DrawMode> drawModeSelector) {
+		nameField.setText(name);
+		lengthSpinner.setValue(length);
+		angleSpinner.setValue(angle);
+		widthSpinner.setValue(width);
+		visibleCheckbox.setSelected(visible);
+		drawModeSelector.setSelectedIndex(drawMode.ordinal());
 	}
 	
 	/**
@@ -395,15 +361,6 @@ public class Bone {
 		this.width = width;
 		this.angle = angle;
 		this.visible = visible;
-	}
-
-	/**
-	 * Gets the bone's draw mode
-	 * 
-	 * @return - Draw mode
-	 */
-	public DrawMode getDrawMode() {
-		return drawMode;
 	}
 
 	/**
@@ -422,5 +379,77 @@ public class Bone {
 			}
 		}
 		return false;
+	}
+	
+	/**
+	 * Loads a bone from a fighter file
+	 * 
+	 * @param s - Fighter file scanner
+	 * @return - Bone loaded
+	 */
+	public static Bone loadBone(Scanner s) {
+		Bone bone = new Bone(null, 0, 0, 0, false);
+		String name = null;
+		DrawMode drawMode = null;
+		double length = 0, width = 0, angle = 0;
+		boolean visible = false;
+		int skip = 0;
+		while (s.hasNextLine()) {
+			String line = s.nextLine();
+			if (line.contains("}") &&  skip-- == 0) {
+				if (line.contains("children")) {
+					s.nextLine();
+				}
+				break;
+			}
+			String type = line.substring(0, line.indexOf(":"));
+			String data = line.substring(line.indexOf(":") + 1).replaceAll(",", "").replaceAll("\"", "").trim();
+			if (type.contains("children")) {
+				while (!line.contains("}")) {
+					line = s.nextLine();
+					Bone b = loadBone(s);
+					if (b.getName() != null) {
+						bone.addChild(b);
+					}
+				}
+				break;
+			} else if (type.contains("drawMode")) {
+				drawMode = DrawMode.forString(data);
+			} else if (type.contains("length")) {
+				length = Double.parseDouble(data);
+			} else if (type.contains("width")) {
+				width = Double.parseDouble(data);
+			} else if (type.contains("angle")) {
+				angle = Double.parseDouble(data);
+			} else if (type.contains("visible")) {
+				visible = Boolean.parseBoolean(data);
+			} else if (type.contains("name")) {
+				name = data;
+			}
+		}
+		bone.updateValues(name, drawMode, length, width, angle, visible);
+		return bone;
+	}
+
+	public void save(PrintWriter pw, String whiteSpace, boolean endOfList) {
+		pw.println(whiteSpace + "\"bone\": {");
+		pw.println(whiteSpace + "\t\"name\": \"" + name + "\",");
+		pw.println(whiteSpace + "\t\"drawMode\": " + drawMode.toString() + ",");
+		pw.println(whiteSpace + "\t\"length\": " + length + ",");
+		pw.println(whiteSpace + "\t\"width\": " + width + ",");
+		pw.println(whiteSpace + "\t\"angle\": " + angle + ",");
+		pw.println(whiteSpace + "\t\"visible\": " + visible + ",");
+		pw.println(whiteSpace + "\t\"sprite\": \"\",");
+		pw.print(whiteSpace + "\t\"children\": {");
+		for(int i = 0; i < children.size(); i++) {
+			pw.println();
+			children.get(i).save(pw, whiteSpace + "\t\t", i == children.size() - 1);
+		}
+		pw.println(((children.size() == 0) ? "" : (whiteSpace + "\t")) + "}");
+		if (endOfList) {
+			pw.println(whiteSpace + "}");
+		} else {
+			pw.print(whiteSpace + "},");
+		}
 	}
 }
