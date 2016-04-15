@@ -22,6 +22,11 @@ public class Game {
 	private final static int LOOP_SPEED = 60;
 
 	/**
+	 * Whether to display hitboxes
+	 */
+	public static final boolean DEBUG = true;
+
+	/**
 	 * The current GameState
 	 */
 	private static GameState state;

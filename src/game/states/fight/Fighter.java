@@ -1,15 +1,18 @@
 package game.states.fight;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.List;
 import java.util.Map;
 
+import game.Game;
 import game.states.fight.animation.Animation;
 import game.states.fight.animation.HitBox;
 import game.states.fight.animation.HurtBox;
-import game.states.fight.animation.KeyframeType;
 import game.states.fight.animation.Interpolation;
+import game.states.fight.animation.KeyframeType;
 import game.states.fight.fighter.Bone;
+import game.util.Box;
 import game.util.Position;
 import game.util.Vector;
 
@@ -79,6 +82,15 @@ public class Fighter {
 	public void draw(Graphics2D g, Camera camera, Stage stage) {
 		if (animation != null) {
 			animation.draw(position, this, skeleton, g, camera, stage);
+			if (Game.DEBUG) {
+				getECB().draw(g, camera, Color.GREEN);
+				for (HurtBox hurtbox : getHurtBoxes()) {
+					hurtbox.draw(position, camera, g);
+				}
+				for (HitBox hitbox : getHitBoxes()) {
+					hitbox.draw(position, camera, g);
+				}
+			}
 		}
 	}
 	
@@ -102,7 +114,47 @@ public class Fighter {
 	 * @param knockDown - Whether the hit knocks down
 	 */
 	public void applyHit(float damage, int hitStun, int blockStun, float pushBack, Vector launchVector, boolean knockDown) {
-		
+		skeleton.release();
+		if (false /* Grounded */) {
+			position = position.applyVector(new Vector(pushBack, 0));
+			// Pushback source as well
+			if (isBlocking()) {
+				this.hitStun = blockStun;
+				// do grey damage;
+				// build guard break meter
+				// setAnimation("block");
+			} else {
+				this.hitStun = hitStun;
+				velocity.setX(launchVector.getX());
+				velocity.setY(launchVector.getY());
+				// setAnimation("grounded recoil");
+				if (velocity.getY() > 0) {
+					// setAnimation("air recoil")
+					// make character rotate with trajectory
+				}
+				if (knockDown) {
+					// kSet knockdown flag;
+				}
+			}
+		} else {
+			this.hitStun = hitStun;
+			velocity.setX(launchVector.getX());
+			velocity.setY(launchVector.getY());
+			// setAnimation("air recoil")
+			// make character rotate with trajectory
+			if (knockDown) {
+				// Set knockdown flag;
+			}
+		}
+	}
+	
+	/**
+	 * Gets the fighter's ECB
+	 * 
+	 * @return - Fighter's current ECB
+	 */
+	public Box getECB() {
+		return animation.getECB();
 	}
 	
 	/**
@@ -141,4 +193,40 @@ public class Fighter {
 				break;
 		}
 	}
+
+	/**
+	 * Attaches a fighter to a specified bone
+	 *  - For grabs
+	 *  
+	 * @param attachTo - Bone to attach to
+	 * @param defender - Fighter being attached
+	 */
+	public void attach(String attachTo, Fighter defender) {
+		skeleton.getBone(attachTo).attachFighter(defender);
+	}
+	
+	/**
+	 * Releases all attached fighters from the skeleton
+	 */
+	public void release() {
+		skeleton.release();
+	}
+
+	/**
+	 * Sets the fighter's position
+	 * 
+	 * @param position - New position
+	 */
+	public void setPosition(Position position) {
+		this.position = position;
+	}
+	
+	/**
+	 * Gets whether the fighter is blocking
+	 * @return
+	 */
+	public boolean isBlocking() {
+		return false;
+	}
+	
 }

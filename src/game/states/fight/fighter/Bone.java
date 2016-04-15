@@ -1,5 +1,6 @@
 package game.states.fight.fighter;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
@@ -7,8 +8,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import game.states.fight.Camera;
-import game.states.fight.animation.KeyframeType;
+import game.states.fight.Fighter;
 import game.states.fight.animation.Interpolation;
+import game.states.fight.animation.KeyframeType;
 import game.util.Position;
 import game.util.Sprite;
 import game.util.Vector;
@@ -67,6 +69,16 @@ public class Bone {
 	private float interpolatedAngle;
 	
 	/**
+	 * If defined, the fighter attached to the bone (for grabs)
+	 */
+	private Fighter attached;
+	
+	/**
+	 * Whether a fighter is attached
+	 */
+	private boolean hasAttachedFighter;
+	
+	/**
 	 * Initializes a LINE Fighterbone
 	 * 
 	 * @param length - Length of line
@@ -80,12 +92,11 @@ public class Bone {
 		this.width = width;
 		this.angle = angle;
 		children = new HashMap<>();
-		children.put("root", this);
 		this.visible = visible;
 	}
 	
 	/**
-	 * Initializes a SPRITE Fighterbone
+	 * Initializes a SPRITE bone
 	 * @param sprite - Sprite to draw
 	 * @param length - Length of bone
 	 * @param angle - Angle bone is at
@@ -97,7 +108,6 @@ public class Bone {
 		this.length = length;
 		this.angle = angle;
 		children = new HashMap<>();
-		children.put("root", this);
 		this.visible = visible;
 	}
 	
@@ -110,10 +120,31 @@ public class Bone {
 	 * @param camera - Camera reference to get screen coordinates
 	 */
 	public void draw(Graphics2D g, Position root, Camera camera) {
+		draw(g, root, camera, false, "", "", 0);
+	}
+	
+	/**
+	 * Draws the bone and all of its children
+	 *  - Call on the root of the structure to draw the entire fighter
+	 *  
+	 * @param g - Graphics object to draw with
+	 * @param root - Position of the last node to draw from
+	 * @param camera - Camera reference to get screen coordinates
+	 * @param drawHidden - Whether to draw hidden bones
+	 * @param selected - Selected bone
+	 */
+	public void draw(Graphics2D g, Position root, Camera camera, boolean drawHidden, String selectedBone, String hoveredBone, int selectType) {
 		float currentAngle = (interpolatedAngle != 0) ? interpolatedAngle : angle;
 		float currentLength = (interpolatedLength != 0) ? interpolatedLength : length;
+		if (selectedBone.equals("root")) {
+			selectType = 2;
+			selectedBone = "";
+		} else if (hoveredBone.equals("root")) {
+			selectType = 1;
+			hoveredBone = "";
+		}
 		g.setColor(Color.BLACK);
-		if (visible) {
+		if (visible || drawHidden) {
 			int screenX = camera.getScreenX(root);
 			int screenY = camera.getScreenY(root);
 			switch (drawMode) {
@@ -127,17 +158,28 @@ public class Bone {
 					clone.setTransform(a);
 					int lineLength = camera.toPixels(currentLength);
 					int lineWidth = camera.toPixels(width);
-					clone.fillRoundRect(screenX - lineWidth / 2, screenY - lineWidth / 2, lineLength + lineWidth,
-							lineWidth, lineWidth, lineWidth);
+					if (selectType != 0) {
+						clone.setColor((selectType == 1) ? Color.GREEN : Color.BLUE);
+					}
+					if (!visible) {
+						clone.setStroke(new BasicStroke(1f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 10.0f, new float[] {5.0f}, 0.0f));
+						clone.drawRoundRect(screenX - lineWidth / 2, screenY - lineWidth / 2, lineLength + lineWidth,
+								lineWidth, lineWidth, lineWidth);
+					} else {
+						clone.fillRoundRect(screenX - lineWidth / 2, screenY - lineWidth / 2, lineLength + lineWidth,
+								lineWidth, lineWidth, lineWidth);
+					}
 					break;
 			}
 		}
 		Position tail = root.applyVector(new Vector((float) (currentLength * Math.cos(Math.toRadians(currentAngle))),
 				-(float) (currentLength * Math.sin(Math.toRadians(currentAngle)))));
+		if (hasAttachedFighter) {
+			attached.setPosition(tail);
+		}
 		for (String key : children.keySet()) {
-			if (!key.equals("root")) {
-				children.get(key).draw(g, tail, camera);
-			}
+			int drawType = (key.equals(selectedBone)) ? 2 : ((key.equals(hoveredBone)) ? 1 : 0);
+			children.get(key).draw(g, tail, camera, drawHidden, selectedBone, hoveredBone, drawType);
 		}
 	}
 	
@@ -162,9 +204,6 @@ public class Bone {
 			return this;
 		}
 		for (String key : children.keySet()) {
-			if (key.equals("root")) {
-				continue;
-			}
 			if (key.equals(identifier)) {
 				return children.get(key);
 			} else if (children.get(key).getBone(identifier) != null) {
@@ -249,6 +288,27 @@ public class Bone {
 	 */
 	public void setVisible(boolean visible) {
 		this.visible = visible;
+	}
+
+	/**
+	 * Attaches a fighter to the bone
+	 * 
+	 * @param defender - Fighter being attached
+	 */
+	public void attachFighter(Fighter defender) {
+		attached = defender;
+		hasAttachedFighter = true;
+	}
+
+	/**
+	 * Detaches the fighter from the bone
+	 */
+	public void release() {
+		hasAttachedFighter = false;
+	}
+	
+	public Map<String, Bone> getChildren() {
+		return children;
 	}
 
 }

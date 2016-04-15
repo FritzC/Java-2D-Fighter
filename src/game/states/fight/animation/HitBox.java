@@ -1,7 +1,9 @@
 package game.states.fight.animation;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 
+import game.states.fight.Camera;
 import game.states.fight.Fighter;
 import game.util.Box;
 import game.util.Position;
@@ -64,6 +66,26 @@ public class HitBox {
 	 * Whether the hitbox knocks down
 	 */
 	private boolean knockDown;
+	
+	/**
+	 * The bone that the hitbox attaches the other fighter to
+	 */
+	private String attachTo;
+	
+	/**
+	 * Whether the hitbox releases any held fighters
+	 */
+	private boolean release;
+	
+	/**
+	 * If the hitbox connects, the fighter will switch to this animation
+	 */
+	private String triggerAnimation;
+	
+	/**
+	 * If the hitbox connects, the fighter hit will switch to this animation
+	 */
+	private String triggerTargetAnimation;
 
 	/**
 	 * Creates a hit box
@@ -101,7 +123,7 @@ public class HitBox {
 	 * @return - Whether a collision is taking place
 	 */
 	public boolean isColliding(Position attackerPos, Position defenderPos, HurtBox hurtBox) {
-		return false;
+		return collision.forOffset(attackerPos).intersects(hurtBox.getCollision().forOffset(defenderPos));
 	}
 	
 	/**
@@ -112,7 +134,16 @@ public class HitBox {
 	 * @param defender - Fighter hit by the hitbox
 	 */
 	public void applyHit(Fighter source, Fighter defender) {
-		
+		if (!attachTo.equals("")) {
+			source.attach(attachTo, defender);
+		}
+		if (!triggerAnimation.equals("")) {
+			source.setAnimation(triggerAnimation);
+		}
+		if (!triggerTargetAnimation.equals("")) {
+			source.setAnimation(triggerTargetAnimation);
+		}
+		defender.applyHit(damage, hitStun, blockStun, pushBack, launchVelocity, knockDown);
 	}
 	
 	/**
@@ -121,8 +152,18 @@ public class HitBox {
 	 * @param position - Position to draw at
 	 * @param g - Graphics2D object to draw
 	 */
-	public void draw(Position position, Graphics2D g) {
-		
+	public void draw(Position position, Camera camera, Graphics2D g) {
+		collision.forOffset(position).draw(g, camera, Color.RED);
+	}
+
+	/**
+	 * Gets whether the hitbox is currently active
+	 * 
+	 * @param currentFrame - Current frame of the animation
+	 * @return - Whether the hitbox is active
+	 */
+	public boolean isActive(int currentFrame) {
+		return startFrame <= currentFrame && currentFrame <= endFrame;
 	}
 	
 }

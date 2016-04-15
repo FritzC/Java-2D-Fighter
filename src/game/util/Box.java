@@ -1,6 +1,10 @@
 package game.util;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.Rectangle;
+
+import game.states.fight.Camera;
 
 /**
  * A box
@@ -43,6 +47,17 @@ public class Box {
 	}
 
 	/**
+	 * Gets an offset instance of the box
+	 * 
+	 * @param offset - Position the box is to be offset
+	 * @return - New instance of the offset box
+	 */
+	public Box forOffset(Position offset) {
+		return new Box(new Position(topLeft.getX() + offset.getX(), topLeft.getY() + offset.getY()),
+				new Position(bottomRight.getX() + offset.getX(), bottomRight.getY() + offset.getY()));
+	}
+
+	/**
 	 * Checks if the two boxes are intersecting
 	 * 
 	 * @param box - Box checked against
@@ -57,5 +72,22 @@ public class Box {
 				(int) ((box.bottomRight.getX() - box.topLeft.getX()) * multiplier),
 				(int) ((box.topLeft.getY() - box.bottomRight.getY()) * multiplier));
 		return r1.intersects(r2);
+	}
+	
+	/**
+	 * Draws the box
+	 * 
+	 * @param g - Graphics object used to draw
+	 * @param camera - Camera on the scene
+	 * @param color - Color of the box
+	 */
+	public void draw(Graphics2D g, Camera camera, Color color) {
+		int x = camera.getScreenX(topLeft);
+		int y = camera.getScreenY(topLeft);
+		int width = camera.toPixels(topLeft.getX() - bottomRight.getX());
+		int height = camera.toPixels(topLeft.getY() - bottomRight.getY());
+		//Color outter = new Color(color.getRed(), color.getGreen(), color.getBlue());
+		g.setColor(color);
+		g.drawRect(x, y, width, height);
 	}
 }

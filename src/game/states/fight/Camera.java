@@ -35,15 +35,23 @@ public class Camera {
 	
 	public int getScreenX(Position position) {
 		float screenRight = focus.getX() - zoom / 2;
-		return (int) (((position.getX() - screenRight) / zoom) * Game.getScreenWidth());
+		return (int) (((position.getX() - screenRight) / zoom) * getScreenWidth());
 	}
 	
 	public int getScreenY(Position position) {
 		float screenBottom = focus.getY() - zoom / 2;
-		return Game.getScreenHeight() - (int) (((position.getY() - screenBottom) / zoom) * Game.getScreenWidth());
+		return getScreenHeight() - (int) (((position.getY() - screenBottom) / zoom) * getScreenWidth());
 	}
 	
 	public int toPixels(float size) {
-		return (int) (size * Game.getScreenWidth() * getScale());
+		return (int) (size * getScreenWidth() * getScale());
+	}
+	
+	public int getScreenWidth() {
+		return Game.getScreenWidth();
+	}
+	
+	public int getScreenHeight() {
+		return Game.getScreenHeight();
 	}
 }

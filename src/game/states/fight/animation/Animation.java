@@ -10,6 +10,7 @@ import game.states.fight.Camera;
 import game.states.fight.Fighter;
 import game.states.fight.Stage;
 import game.states.fight.fighter.Bone;
+import game.util.Box;
 import game.util.Position;
 
 /**
@@ -29,6 +30,12 @@ public class Animation {
 	 * List of queued interpolations
 	 */
 	private Map<String, Map<KeyframeType, Keyframe>> queuedInterpolations;
+	
+	/**
+	 * List of ECBs and the frame they begin on
+	 *  - ECB: Enviromental Collision Box
+	 */
+	private Map<Integer, Box> ecbs;
 	
 	/**
 	 * List of the animation's hitboxes
@@ -73,6 +80,7 @@ public class Animation {
 	public Animation(List<HitBox> hitboxes, List<HurtBox> hurtboxes, List<Keyframe> keyframes) {
 		steps = new ArrayList<>();
 		queuedInterpolations = new HashMap<>();
+		ecbs = new HashMap<>();
 		this.hitboxes = hitboxes;
 		this.hurtboxes = hurtboxes;
 		for (Keyframe frame : keyframes) {
@@ -135,7 +143,13 @@ public class Animation {
 	 * @return - List of current hitboxes
 	 */
 	public List<HitBox> getHitBoxes() {
-		return null;
+		List<HitBox> active = new ArrayList<>();
+		for (HitBox hitBox : hitboxes) {
+			if (hitBox.isActive(currentFrame)) {
+				active.add(hitBox);
+			}
+		}
+		return active;
 	}
 
 	/**
@@ -144,6 +158,23 @@ public class Animation {
 	 * @return - List of current hurtboxes
 	 */
 	public List<HurtBox> getHurtBoxes() {
-		return null;
+		List<HurtBox> active = new ArrayList<>();
+		for (HurtBox hurtBox : hurtboxes) {
+			if (hurtBox.isActive(currentFrame)) {
+				active.add(hurtBox);
+			}
+		}
+		return active;
+	}
+
+	/**
+	 * Gets the animation's current ECB
+	 * 
+	 * @return - Current ECB
+	 */
+	public Box getECB() {
+		int frame = currentFrame + 1;
+		while (!ecbs.containsKey(--frame)) {}
+		return ecbs.get(frame);
 	}
 }
