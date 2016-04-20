@@ -162,7 +162,7 @@ public class HitBox {
 	 * @param currentFrame - Current frame of the animation
 	 * @return - Whether the hitbox is active
 	 */
-	public boolean isActive(int currentFrame) {
+	public boolean isActive(double currentFrame) {
 		return startFrame <= currentFrame && currentFrame <= endFrame;
 	}
 	

@@ -6,7 +6,9 @@ import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 import javax.swing.JCheckBox;
@@ -17,6 +19,7 @@ import javax.swing.JTextField;
 import game.states.fight.Camera;
 import game.states.fight.Fighter;
 import game.states.fight.animation.Interpolation;
+import game.states.fight.animation.Keyframe;
 import game.states.fight.animation.KeyframeType;
 import game.util.Position;
 import game.util.Sprite;
@@ -51,14 +54,29 @@ public class Bone {
 	private double length;
 	
 	/**
+	 * Original length of the bone
+	 */
+	private double originalLength;
+	
+	/**
 	 * Angle the bone is at (clockwise starting at x axis)
 	 */
 	private double angle;
 	
 	/**
+	 * Original angle of the bone
+	 */
+	private double originalAngle;
+	
+	/**
 	 * Width of the bone
 	 */
 	private double width;
+	
+	/**
+	 * Original width of the bone
+	 */
+	private double originalWidth;
 	
 	/**
 	 * Sprite to draw for the bone
@@ -69,6 +87,11 @@ public class Bone {
 	 * Whether to draw the bone
 	 */
 	private boolean visible;
+	
+	/**
+	 * Original visiblity of the bone
+	 */
+	private boolean originalVisibility;
 	
 	/**
 	 * Length offset between interpolated steps
@@ -101,6 +124,10 @@ public class Bone {
 		this.angle = angle;
 		children = new ArrayList<>();
 		this.visible = visible;
+		originalLength = length;
+		originalAngle = angle;
+		originalWidth = width;
+		originalVisibility = visible;
 	}
 	
 	/**
@@ -118,6 +145,10 @@ public class Bone {
 		this.angle = angle;
 		children = new ArrayList<>();
 		this.visible = visible;
+		originalLength = length;
+		originalAngle = angle;
+		originalWidth = width;
+		originalVisibility = visible;
 	}
 	
 	/**
@@ -382,9 +413,43 @@ public class Bone {
 	}
 	
 	/**
+	 * Restores the bone to its original position
+	 */
+	public void restore() {
+		angle = originalAngle;
+		length = originalLength;
+		width = originalWidth;
+		visible = originalVisibility;
+		for (Bone child : children) {
+			child.restore();
+		}
+	}
+	
+	public Map<String, Map<KeyframeType, Keyframe>> getDefaultStartPositions() {
+		Map<String, Map<KeyframeType, Keyframe>> instructionSet = new HashMap<>();
+		addDefaultStartInstructions(instructionSet);
+		return instructionSet;
+	}
+
+	private void addDefaultStartInstructions(Map<String, Map<KeyframeType, Keyframe>> list) {
+		Map<KeyframeType, Keyframe> instructions = new HashMap<>();
+		instructions.put(KeyframeType.LENGTH,
+				new Keyframe(0, name, originalLength, KeyframeType.LENGTH, Interpolation.NONE));
+		instructions.put(KeyframeType.ROTATE,
+				new Keyframe(0, name, originalAngle, KeyframeType.ROTATE, Interpolation.NONE));
+		instructions.put(KeyframeType.VISIBLE,
+				new Keyframe(0, name, originalVisibility ? 1 : 0, KeyframeType.VISIBLE, Interpolation.NONE));
+		list.put(name, instructions);
+		for (Bone child : children) {
+			child.addDefaultStartInstructions(list);
+		}
+	}
+
+	/**
 	 * Loads a bone from a fighter file
 	 * 
-	 * @param s - Fighter file scanner
+	 * @param s
+	 *            - Fighter file scanner
 	 * @return - Bone loaded
 	 */
 	public static Bone loadBone(Scanner s) {

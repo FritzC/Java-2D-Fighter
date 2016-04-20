@@ -37,7 +37,7 @@ public class Keyframe {
 	/**
 	 * Frame that interpolating begins
 	 */
-	private int beginInterpolatingFrame;
+	private double beginInterpolatingFrame;
 	
 	/**
 	 * Frame the keyframe ends
@@ -67,7 +67,7 @@ public class Keyframe {
 	 * @param root - Fighter's root bone
 	 * @param completion - % completion of the movement
 	 */
-	public void interpolate(Fighter fighter, Bone root, int currentFrame) {
+	public void interpolate(Fighter fighter, Bone root, double currentFrame) {
 		if (type == KeyframeType.VELOCITY_X || type == KeyframeType.VELOCITY_Y) {
 			fighter.interpolateVelocity(data, type, interpolation, getCompletion(currentFrame));
 			return;
@@ -91,7 +91,7 @@ public class Keyframe {
 	 * @param table - Queued keyframe table
 	 * @return - Whether registration was successful
 	 */
-	public boolean attemptToRegister(int currentFrame, Map<String, Map<KeyframeType, Keyframe>> table) {
+	public boolean attemptToRegister(double currentFrame, Map<String, Map<KeyframeType, Keyframe>> table) {
 		if (table.containsKey(boneId) && table.get(boneId).containsKey(type) || getCompletion(currentFrame) >= 1) {
 			return false;
 		}
@@ -110,7 +110,7 @@ public class Keyframe {
 	 * @param currentFrame - Current frame animation is on
 	 * @return - % complete
 	 */
-	public double getCompletion(int currentFrame) {
+	public double getCompletion(double currentFrame) {
 		return (currentFrame - beginInterpolatingFrame) / (double) (endFrame - beginInterpolatingFrame);
 	}
 	

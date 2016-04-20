@@ -1,0 +1,131 @@
+{
+	"length": 10,
+	"loop": false,
+	"specialCancelable": false,
+	"initialPose": {
+		"bonePose": {
+			"name": "root",
+			"length": 0.25,
+			"angle": 135,
+			"visible:" false
+		},
+		"bonePose": {
+			"name": "l_arm",
+			"length": 0.15,
+			"angle": 10,
+			"visible:" true
+		},
+		"bonePose": {
+			"name": "l_hand",
+			"length": 0.075,
+			"angle": 90,
+			"visible:" true
+		},
+		"bonePose": {
+			"name": "l_hand_2",
+			"length": 0.05,
+			"angle": 270,
+			"visible:" true
+		},
+		"bonePose": {
+			"name": "r_arm",
+			"length": 0.2,
+			"angle": 155,
+			"visible:" true
+		},
+	},
+	"steps": {
+		"keyframe": {
+			"bone": "root",
+			"frame": 5,
+			"type": ANGLE,
+			"interpolation": LINEAR,
+			"data": 180
+		},
+		"keyframe": {
+			"bone": "root",
+			"frame": 2,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.3
+		},
+	},
+	"ecbs": {
+		"ecb": {
+			"startFrame": 0,
+			"endFrame": 10,
+			"collision": {
+				"box": {
+					"top_l x": 0,
+					"top_l y": 0.1,
+					"bottom_r x": 0.1,
+					"bottom_r y": 0
+				}
+			}
+		}
+	},
+	"hurtboxes": {
+		"hurtbox": {
+			"startFrame": 5,
+			"endFrame": 8,
+			"collision": {
+				"box": {
+					"top_l x": 0.05,
+					"top_l y": 0.05,
+					"bottom_r x": 0.075,
+					"bottom_r y": 0.025
+				}
+			}
+		}
+	},
+	"hitboxes": {
+		"hitbox": {
+			"group": "arm_1",
+			"startFrame": 5,
+			"endFrame": 8,
+			"damage": 100,
+			"blockstun": 5,
+			"hitstun": 25,
+			"pushback": 0.025,
+			"knockdown": false,
+			"collision": {
+				"box": {
+					"top_l x": 0.05,
+					"top_l y": 0.05,
+					"bottom_r x": 0.075,
+					"bottom_r y": 0.025
+				}
+			},
+			"velocity": {
+				"vector": {
+					"x": 0.1,
+					"y": 0.1
+				}
+			}
+		},
+		"hitbox": {
+			"group": "arm_2",
+			"startFrame": 1,
+			"endFrame": 3,
+			"damage": 200,
+			"blockstun": 3,
+			"hitstun": 55,
+			"pushback": 0.025,
+			"knockdown": false,
+			"collision": {
+				"box": {
+					"top_l x": 0.05,
+					"top_l y": 0.05,
+					"bottom_r x": 0.075,
+					"bottom_r y": 0.025
+				}
+			},
+			"velocity": {
+				"vector": {
+					"x": 0.1,
+					"y": 0.1
+				}
+			}
+		}
+	}
+}

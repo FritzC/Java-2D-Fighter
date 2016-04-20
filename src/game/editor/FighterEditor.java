@@ -200,6 +200,7 @@ public class FighterEditor {
 						updateFighterFields();
 						Editor.skeletonViewPanel.repaint();
 						skeletonTreeDiagram.repaint();
+						Editor.fighterDirectory = fighterFileChooser.getSelectedFile().getParentFile();
 					} catch (FileNotFoundException e1) {
 						e1.printStackTrace();
 					}
@@ -209,16 +210,26 @@ public class FighterEditor {
 		saveFighter = new JButton("Save");
 		saveFighter.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				FileNameExtensionFilter filter = new FileNameExtensionFilter("Fighter files", "json");
-				fighterFileChooser.setFileFilter(filter);
-				int returnVal = fighterFileChooser.showSaveDialog(null);
-				if (returnVal == JFileChooser.APPROVE_OPTION) {
-					try {
-						Editor.fighter.save(fighterFileChooser.getSelectedFile());
-					} catch (IOException e1) {
-						e1.printStackTrace();
+				try {
+					Editor.fighter.save(new File(
+							Editor.fighterDirectory.getAbsolutePath() + "/fighter.json"));
+					File animDir = new File(Editor.fighterDirectory.getAbsolutePath() + "/animations");
+					if (!animDir.exists()) {
+						animDir.mkdir();
 					}
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
 				}
+				/*
+				 * FileNameExtensionFilter filter = new FileNameExtensionFilter(
+				 * "Fighter files", "json");
+				 * fighterFileChooser.setFileFilter(filter); int returnVal =
+				 * fighterFileChooser.showSaveDialog(null); if (returnVal ==
+				 * JFileChooser.APPROVE_OPTION) { try {
+				 * Editor.fighter.save(fighterFileChooser.getSelectedFile()); }
+				 * catch (IOException e1) { e1.printStackTrace(); } }
+				 */
 			}
 		});
 		fighterName = new JTextField();

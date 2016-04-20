@@ -1,10 +1,13 @@
 package game.states.fight.animation;
 
 import java.awt.Graphics2D;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 
 import game.states.fight.Camera;
 import game.states.fight.Fighter;
@@ -25,6 +28,11 @@ public class Animation {
 	 * List of all the animation steps
 	 */
 	private List<Keyframe> steps;
+	
+	/**
+	 * List of initial bone positions
+	 */
+	private Map<String, Map<KeyframeType, Keyframe>> initialPose;
 	
 	/**
 	 * List of queued interpolations
@@ -55,12 +63,7 @@ public class Animation {
 	/**
 	 * The current frame the animation is displaying
 	 */
-	private int currentFrame;
-	
-	/**
-	 * Number of ticks until currentFrame advances
-	 */
-	private int ticksUntilNextFrame;
+	private double currentFrame;
 	
 	/**
 	 * Whether the animation is special cancelable
@@ -77,7 +80,10 @@ public class Animation {
 	 * 
 	 * @param filePath - File path to load the animation from
 	 */
-	public Animation(List<HitBox> hitboxes, List<HurtBox> hurtboxes, List<Keyframe> keyframes) {
+	public Animation(Bone root, List<HitBox> hitboxes, List<HurtBox> hurtboxes, List<Keyframe> keyframes) {
+		if (root != null) {
+			initialPose = root.getDefaultStartPositions();
+		}
 		steps = new ArrayList<>();
 		queuedInterpolations = new HashMap<>();
 		ecbs = new HashMap<>();
@@ -98,7 +104,10 @@ public class Animation {
 	 * @param g - Graphics2D object to draw
 	 */
 	public void draw(Position position, Fighter fighter, Bone root, Graphics2D g, Camera camera, Stage stage) {
-		stepAnimation(fighter, root);
+		if (currentFrame > length) {
+			currentFrame = 0;
+		}
+		stepAnimation(fighter, root, camera.getSpeed());
 		root.draw(g, position, camera);
 	}
 	
@@ -107,7 +116,7 @@ public class Animation {
 	 * 
 	 * @param root - Skeleton of the fighter
 	 */
-	public void stepAnimation(Fighter fighter, Bone root) {
+	public void stepAnimation(Fighter fighter, Bone root, double speed) {
 		Map<String, List<KeyframeType>> toRemove = new HashMap<>();
 		for (String bone : queuedInterpolations.keySet()) {
 			for (KeyframeType instruction : queuedInterpolations.get(bone).keySet()) {
@@ -134,7 +143,23 @@ public class Animation {
 				keyframe.interpolate(fighter, root, currentFrame);
 			}
 		}
-		currentFrame++;
+		currentFrame += speed;
+	}
+	
+	public void setFrame(Fighter fighter, double frame) {
+		currentFrame = frame;
+		queuedInterpolations.clear();
+		for (String boneId : queuedInterpolations.keySet()) {
+			for (KeyframeType instruction : queuedInterpolations.get(boneId).keySet()) {
+				initialPose.get(boneId).get(instruction).apply(fighter.getSkeleton());
+			}
+		}
+		for (int i = 0; i < frame; i++) {
+			stepAnimation(fighter, fighter.getSkeleton(), 1);
+		}
+		if (frame % 1 != 0) {
+			stepAnimation(fighter, fighter.getSkeleton(), frame % 1);
+		}
 	}
 	
 	/**
@@ -173,8 +198,47 @@ public class Animation {
 	 * @return - Current ECB
 	 */
 	public Box getECB() {
-		int frame = currentFrame + 1;
+		int frame = (int) currentFrame + 1;
 		while (!ecbs.containsKey(--frame)) {}
 		return ecbs.get(frame);
+	}
+	
+	public static Animation load(File f) throws FileNotFoundException {
+		Scanner s = new Scanner(f);
+		List<String> lines = new ArrayList<>();
+		while(s.hasNextLine()) {
+			lines.add(s.nextLine());
+		}
+		int length = 0;
+		boolean loop = false;
+		boolean specialCancelable = false;
+		List<Keyframe> keyframes = new ArrayList<>();
+		List<ECB> ecbs = new ArrayList<>();
+		List<HitBox> hitboxes = new ArrayList<>();
+		List<HurtBox> hurtboxes = new ArrayList<>();
+		for (int i = 0; i < lines.size(); i++) {
+			if (lines.get(i).contains("}")) {
+				continue;
+			}
+			String id = lines.get(i).split(":")[0].replaceAll("\"", "").trim();
+			String data = lines.get(i).split(":")[1].replaceAll(",", "").replace("\"", "").trim();
+			switch (id) {
+				case "length":
+					length = Integer.parseInt(data);
+					break;
+				case "loop":
+					loop = Boolean.parseBoolean(data);
+					break;
+				case "specialCancelable":
+					specialCancelable = Boolean.parseBoolean(data);
+					break;
+				case "initialPose":
+			}
+		}
+		return null;
+	}
+	
+	public void save(File f) {
+		
 	}
 }

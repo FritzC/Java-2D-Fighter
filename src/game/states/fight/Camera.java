@@ -13,12 +13,14 @@ public class Camera {
 
 	public Position focus;
 	public double zoom;
+	public double speed;
 	public Stage stage;
 	
 	public Camera(Stage stage) {
 		this.stage = stage;
 		focus = new Position(0.5f, 0.25f);
-		zoom = 1.0f;
+		zoom = 1.0d;
+		speed = 1.0d;
 	}
 	
 	public void setFocus(Position newFocus) {
@@ -27,6 +29,10 @@ public class Camera {
 	
 	public void setZoom(double newZoom) {
 		zoom = newZoom;
+	}
+	
+	public void setSpeed(double speed) {
+		this.speed = speed;
 	}
 
 	public double getScale() {
@@ -57,5 +63,9 @@ public class Camera {
 	
 	public int getScreenHeight() {
 		return Game.getScreenHeight();
+	}
+	
+	public double getSpeed() {
+		return speed;
 	}
 }

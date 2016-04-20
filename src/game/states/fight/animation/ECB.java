@@ -8,20 +8,20 @@ import game.util.Box;
 import game.util.Position;
 
 /**
- * A collision box that determines where a fighter is vulnerable inside an AnimationStep
+ * An enviromental collision box
  * 
  * @author Fritz
  *
  */
-public class HurtBox {
+public class ECB {
 	
 	/**
-	 * Frame the hurtbox appears on in the animation
+	 * Frame the ECB appears on in the animation
 	 */
 	private int startFrame;
 
 	/**
-	 * Frame the hurtbox disappears on in the animation
+	 * Frame the ECB disappears on in the animation
 	 */
 	private int endFrame;
 
@@ -31,11 +31,11 @@ public class HurtBox {
 	private Box collision;
 
 	/**
-	 * Creates a hurtbox
+	 * Creates a ECB
 	 * 
-	 * @param collision - Bounding box of the hurtbox
+	 * @param collision - Bounding box of the ECB
 	 */
-	public HurtBox(Box collision) {
+	public ECB(Box collision) {
 		this.collision = collision;
 	}
 
@@ -49,20 +49,20 @@ public class HurtBox {
 	}
 	
 	/**
-	 * Draws the hurtbox
+	 * Draws the ECB
 	 * 
 	 * @param position - Position to draw at
 	 * @param g - Graphics2D object to draw
 	 */
 	public void draw(Position position, Camera camera, Graphics2D g) {
-		collision.forOffset(position).draw(g, camera, Color.YELLOW);
+		collision.forOffset(position).draw(g, camera, Color.GREEN);
 	}
 
 	/**
-	 * Gets whether the hurtbox is currently active
+	 * Gets whether the ECB is currently active
 	 * 
 	 * @param currentFrame - Current frame of the animation
-	 * @return - Whether the hurtbox is active
+	 * @return - Whether the ECB is active
 	 */
 	public boolean isActive(double currentFrame) {
 		return startFrame <= currentFrame && currentFrame <= endFrame;
