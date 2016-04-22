@@ -16,12 +16,12 @@ import javax.swing.JTextField;
 
 import game.Game;
 import game.states.fight.animation.Animation;
+import game.states.fight.animation.ECB;
 import game.states.fight.animation.HitBox;
 import game.states.fight.animation.HurtBox;
 import game.states.fight.animation.Interpolation;
 import game.states.fight.animation.KeyframeType;
 import game.states.fight.fighter.Bone;
-import game.util.Box;
 import game.util.Position;
 import game.util.Vector;
 
@@ -101,7 +101,7 @@ public class Fighter {
 		if (animation != null) {
 			animation.draw(position, this, skeleton, g, camera, stage);
 			if (Game.DEBUG) {
-				getECB().draw(g, camera, Color.GREEN);
+				getECB().draw(position, camera, g);
 				for (HurtBox hurtbox : getHurtBoxes()) {
 					hurtbox.draw(position, camera, g);
 				}
@@ -171,7 +171,7 @@ public class Fighter {
 	 * 
 	 * @return - Fighter's current ECB
 	 */
-	public Box getECB() {
+	public ECB getECB() {
 		return animation.getECB();
 	}
 	

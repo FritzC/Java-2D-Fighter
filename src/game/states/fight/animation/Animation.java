@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
+import game.util.Vector;
 import game.states.fight.Camera;
 import game.states.fight.Fighter;
 import game.states.fight.Stage;
@@ -43,7 +44,7 @@ public class Animation {
 	 * List of ECBs and the frame they begin on
 	 *  - ECB: Enviromental Collision Box
 	 */
-	private Map<Integer, Box> ecbs;
+	private List<ECB> ecbs;
 	
 	/**
 	 * List of the animation's hitboxes
@@ -80,15 +81,14 @@ public class Animation {
 	 * 
 	 * @param filePath - File path to load the animation from
 	 */
-	public Animation(Bone root, List<HitBox> hitboxes, List<HurtBox> hurtboxes, List<Keyframe> keyframes) {
-		if (root != null) {
-			initialPose = root.getDefaultStartPositions();
-		}
-		steps = new ArrayList<>();
-		queuedInterpolations = new HashMap<>();
-		ecbs = new HashMap<>();
+	public Animation(Map<String, Map<KeyframeType, Keyframe>> initialPose, List<HitBox> hitboxes,
+			List<HurtBox> hurtboxes, List<Keyframe> keyframes, List<ECB> ecbs) {
+		this.initialPose = initialPose;
+		this.ecbs = ecbs;
 		this.hitboxes = hitboxes;
 		this.hurtboxes = hurtboxes;
+		this.steps = new ArrayList<>();
+		this.queuedInterpolations = new HashMap<>();
 		for (Keyframe frame : keyframes) {
 			steps.add(frame);
 			if (frame.getEndFrame() > length) {
@@ -197,10 +197,13 @@ public class Animation {
 	 * 
 	 * @return - Current ECB
 	 */
-	public Box getECB() {
-		int frame = (int) currentFrame + 1;
-		while (!ecbs.containsKey(--frame)) {}
-		return ecbs.get(frame);
+	public ECB getECB() {
+		for (ECB ecb : ecbs) {
+			if (ecb.isActive(currentFrame)) {
+				return ecb;
+			}
+		}
+		return null;
 	}
 	
 	public static Animation load(File f) throws FileNotFoundException {
@@ -212,6 +215,7 @@ public class Animation {
 		int length = 0;
 		boolean loop = false;
 		boolean specialCancelable = false;
+		Map<String, Map<KeyframeType, Keyframe>> initialPose = new HashMap<>();
 		List<Keyframe> keyframes = new ArrayList<>();
 		List<ECB> ecbs = new ArrayList<>();
 		List<HitBox> hitboxes = new ArrayList<>();
@@ -233,9 +237,84 @@ public class Animation {
 					specialCancelable = Boolean.parseBoolean(data);
 					break;
 				case "initialPose":
+					while (lines.get(++i).contains("bonePose")) {
+						String bone = lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", "").replaceAll("\"", "");
+						double boneLength = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
+						double boneAngle = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
+						boolean boneVisible = Boolean.parseBoolean(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1));
+						Map<KeyframeType, Keyframe> bonePose = new HashMap<>();
+						bonePose.put(KeyframeType.LENGTH, new Keyframe(0, bone, boneLength, KeyframeType.LENGTH, Interpolation.NONE));
+						bonePose.put(KeyframeType.ROTATE, new Keyframe(0, bone, boneAngle, KeyframeType.ROTATE, Interpolation.NONE));
+						bonePose.put(KeyframeType.VISIBLE, new Keyframe(0, bone, boneVisible ? 1 : 0, KeyframeType.VISIBLE, Interpolation.NONE));
+						initialPose.put(bone, bonePose);
+						i++;
+					}
+					break;
+				case "steps":
+					while (lines.get(++i).contains("keyframe")) {
+						String bone = lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", "").replaceAll("\"", "");
+						int frame = Integer.parseInt(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
+						KeyframeType type = KeyframeType.forString(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
+						Interpolation interpolation = Interpolation.forString(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
+						double frameData = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
+						keyframes.add(new Keyframe(frame, bone, frameData, type, interpolation));
+						i++;
+					}
+					break;
+				case "ecbs":
+					while (lines.get(++i).contains("ecb")) {
+						int startFrame = Integer.parseInt(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
+						int endFrame = Integer.parseInt(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
+						i+=2;
+						double topX = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
+						double topY = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
+						double botX = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
+						double botY = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
+						ecbs.add(new ECB(new Box(new Position(topX, topY), new Position(botX, botY))));
+						i+=2;
+					}
+					break;
+				case "hurtboxes":
+					while (lines.get(++i).contains("hurtbox")) {
+						int startFrame = Integer.parseInt(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
+						int endFrame = Integer.parseInt(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
+						i+=2;
+						double topX = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
+						double topY = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
+						double botX = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
+						double botY = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
+						hurtboxes.add(new HurtBox(new Box(new Position(topX, topY), new Position(botX, botY))));
+						i+=2;
+					}
+					break;
+				case "hitboxes":
+					while (lines.get(++i).contains("hitbox")) {
+						String group = lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", "").replaceAll("\"", "");
+						int startFrame = Integer.parseInt(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
+						int endFrame = Integer.parseInt(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
+						double damage = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
+						int blockStun = Integer.parseInt(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
+						int hitStun = Integer.parseInt(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
+						double pushBack = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
+						boolean knockDown = Boolean.parseBoolean(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1));
+						i+=2;
+						double topX = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
+						double topY = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
+						double botX = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
+						double botY = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
+						i+=4;
+						double velX = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
+						double velY = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
+						hitboxes.add(new HitBox(startFrame, endFrame, group, new Box(new Position(topX, topY), new Position(botX, botY)),
+								damage, hitStun, blockStun, pushBack, new Vector(velX, velY), knockDown));
+						i+=3;
+					}
+					break;
 			}
 		}
-		return null;
+		Animation anim = new Animation(initialPose, hitboxes, hurtboxes, keyframes, ecbs);
+		anim.ecbs = ecbs;
+		return anim;
 	}
 	
 	public void save(File f) {

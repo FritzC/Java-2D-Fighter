@@ -1,5 +1,7 @@
 package game.states.fight.animation;
 
+import game.states.fight.fighter.DrawMode;
+
 /**
  * Types of Bone instructions
  * 
@@ -12,4 +14,13 @@ public enum KeyframeType {
 	ROTATE, 
 	LENGTH, 
 	VISIBLE;
+	
+	public static KeyframeType forString(String s) {
+		for (KeyframeType mode : values()) {
+			if (s.equalsIgnoreCase(mode.toString())) {
+				return mode;
+			}
+		}
+		return null;
+	}
 }

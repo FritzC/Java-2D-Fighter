@@ -52,4 +52,13 @@ public enum Interpolation {
 	 */
 	public abstract double getInterpolatedValue(double begin, double end, double completion);
 	
+	public static Interpolation forString(String s) {
+		for (Interpolation mode : values()) {
+			if (s.equalsIgnoreCase(mode.toString())) {
+				return mode;
+			}
+		}
+		return null;
+	}
+	
 }
