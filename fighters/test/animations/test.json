@@ -1,44 +1,44 @@
 {
 	"length": 10,
 	"loop": false,
-	"specialCancelable": false,
+	"specialCancelable": true,
 	"initialPose": {
 		"bonePose": {
 			"name": "root",
 			"length": 0.25,
-			"angle": 135,
-			"visible:" false
+			"angle": 60,
+			"visible": true
 		},
 		"bonePose": {
 			"name": "l_arm",
 			"length": 0.15,
 			"angle": 10,
-			"visible:" true
+			"visible": true
 		},
 		"bonePose": {
 			"name": "l_hand",
 			"length": 0.075,
 			"angle": 90,
-			"visible:" true
+			"visible": true
 		},
 		"bonePose": {
 			"name": "l_hand_2",
 			"length": 0.05,
 			"angle": 270,
-			"visible:" true
+			"visible": true
 		},
 		"bonePose": {
 			"name": "r_arm",
 			"length": 0.2,
 			"angle": 155,
-			"visible:" true
+			"visible": true
 		},
 	},
 	"steps": {
 		"keyframe": {
 			"bone": "root",
-			"frame": 5,
-			"type": ANGLE,
+			"frame": 15,
+			"type": ROTATE,
 			"interpolation": LINEAR,
 			"data": 180
 		},

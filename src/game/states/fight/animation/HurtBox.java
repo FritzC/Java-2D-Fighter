@@ -35,8 +35,16 @@ public class HurtBox {
 	 * 
 	 * @param collision - Bounding box of the hurtbox
 	 */
-	public HurtBox(Box collision) {
+	public HurtBox(int startFrame, int endFrame, Box collision) {
+		this.startFrame = startFrame;
+		this.endFrame = endFrame;
 		this.collision = collision;
+	}
+	
+	public HurtBox(HurtBox copy) {
+		this.startFrame = copy.startFrame;
+		this.endFrame = copy.endFrame;
+		this.collision = new Box(copy.collision);
 	}
 
 	/**

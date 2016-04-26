@@ -19,7 +19,7 @@ public class Game {
 	/**
 	 * Number of times the game loop is ran per second
 	 */
-	private final static int LOOP_SPEED = 60;
+	public final static int LOOP_SPEED = 60;
 
 	/**
 	 * Whether to display hitboxes

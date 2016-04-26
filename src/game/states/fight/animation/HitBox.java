@@ -114,6 +114,19 @@ public class HitBox {
 		this.knockDown = knockDown;
 	}
 	
+	public HitBox(HitBox copy) {
+		this.startFrame = copy.startFrame;
+		this.endFrame = copy.endFrame;
+		this.group = copy.group;
+		this.collision = new Box(copy.collision);
+		this.damage = copy.damage;
+		this.hitStun = copy.hitStun;
+		this.blockStun = copy.blockStun;
+		this.pushBack = copy.pushBack;
+		this.launchVelocity = copy.launchVelocity;
+		this.knockDown = copy.knockDown;
+	}
+	
 	/**
 	 * Gets whether this hitbox is colliding with the specified hurtbox
 	 * 

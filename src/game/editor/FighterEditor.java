@@ -200,6 +200,7 @@ public class FighterEditor {
 						updateFighterFields();
 						Editor.skeletonViewPanel.repaint();
 						skeletonTreeDiagram.repaint();
+						Editor.fighter.updateUIAnimationList(AnimationEditor.animationSelector);
 						Editor.fighterDirectory = fighterFileChooser.getSelectedFile().getParentFile();
 					} catch (FileNotFoundException e1) {
 						e1.printStackTrace();
@@ -304,7 +305,9 @@ public class FighterEditor {
 		boneWidth.addChangeListener(updateValues2);
 		drawType = new JComboBox<>(DrawMode.values());
 		drawType.addActionListener(updateValues);
-		boneVisible = new JCheckBox("  Visible");
+		boneVisible = new JCheckBox("Visible: ");
+		boneVisible.setHorizontalAlignment(SwingConstants.CENTER);
+		boneVisible.setHorizontalTextPosition(SwingConstants.LEFT);
 		boneVisible.addActionListener(updateValues);
 		loadSprite = new JButton("Load Img");
 		boneListElements = new ArrayList<>();
@@ -478,6 +481,7 @@ public class FighterEditor {
 			boneSelected.updateValues(boneName.getText(), (DrawMode) drawType.getSelectedItem(),
 					(double) boneLength.getValue(), (double) boneWidth.getValue(), (double) boneAngle.getValue(),
 					boneVisible.isSelected());
+			Editor.fighter.updateEditorSkeletons();
 			Editor.skeletonViewPanel.repaint();
 			skeletonTreeDiagram.repaint();
 		}

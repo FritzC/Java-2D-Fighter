@@ -61,6 +61,14 @@ public class Keyframe {
 		this.data = data;
 	}
 	
+	public Keyframe(Keyframe keyframe) {
+		this.endFrame = keyframe.endFrame;
+		this.boneId = keyframe.boneId;
+		this.type = keyframe.type;
+		this.interpolation = keyframe.interpolation;
+		this.data = keyframe.data;
+	}
+
 	/**
 	 * Applies interpolation to the bone
 	 * 

@@ -81,7 +81,7 @@ public class Particle {
 	 * @return - List of current hitboxes
 	 */
 	public List<HitBox> getHitBoxes() {
-		return animation.getHitBoxes();
+		return animation.getActiveHitBoxes();
 	}
 
 	/**
@@ -90,6 +90,6 @@ public class Particle {
 	 * @return - List of current hurtboxes
 	 */
 	public List<HurtBox> getHurtBoxes() {
-		return animation.getHurtBoxes();
+		return animation.getActiveHurtBoxes();
 	}
 }

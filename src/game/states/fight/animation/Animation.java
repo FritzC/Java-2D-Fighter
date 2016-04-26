@@ -9,13 +9,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
-import game.util.Vector;
+import javax.swing.JCheckBox;
+import javax.swing.JSpinner;
+
 import game.states.fight.Camera;
 import game.states.fight.Fighter;
 import game.states.fight.Stage;
 import game.states.fight.fighter.Bone;
 import game.util.Box;
 import game.util.Position;
+import game.util.Vector;
 
 /**
  * A sequence of Sprites
@@ -97,6 +100,35 @@ public class Animation {
 		}
 	}
 	
+	public Animation(Animation copy) {
+		this.loop = copy.loop;
+		this.specialCancelable = copy.specialCancelable;
+		this.initialPose = new HashMap<>();
+		this.length = copy.length;
+		for (String bone : copy.initialPose.keySet()) {
+			this.initialPose.put(bone, new HashMap<>());
+			for (KeyframeType type : copy.initialPose.get(bone).keySet()) {
+				this.initialPose.get(bone).put(type, new Keyframe(copy.initialPose.get(bone).get(type)));
+			}
+		}
+		this.steps = new ArrayList<>();
+		for (Keyframe step : copy.steps) {
+			this.steps.add(new Keyframe(step));
+		}
+		this.ecbs = new ArrayList<>();
+		for (ECB ecb : copy.ecbs) {
+			this.ecbs.add(new ECB(ecb));
+		}
+		this.hitboxes = new ArrayList<>();
+		for (HitBox hitbox : copy.hitboxes) {
+			this.hitboxes.add(new HitBox(hitbox));
+		}
+		this.hurtboxes = new ArrayList<>();
+		for (HurtBox hurtbox : copy.hurtboxes) {
+			this.hurtboxes.add(new HurtBox(hurtbox));
+		}
+	}
+
 	/**
 	 * Draws the animation's current step at a position
 	 * 
@@ -104,10 +136,6 @@ public class Animation {
 	 * @param g - Graphics2D object to draw
 	 */
 	public void draw(Position position, Fighter fighter, Bone root, Graphics2D g, Camera camera, Stage stage) {
-		if (currentFrame > length) {
-			currentFrame = 0;
-		}
-		stepAnimation(fighter, root, camera.getSpeed());
 		root.draw(g, position, camera);
 	}
 	
@@ -117,6 +145,10 @@ public class Animation {
 	 * @param root - Skeleton of the fighter
 	 */
 	public void stepAnimation(Fighter fighter, Bone root, double speed) {
+		if (currentFrame > length) {
+			setFrame(fighter, root, 0);
+			return;
+		}
 		Map<String, List<KeyframeType>> toRemove = new HashMap<>();
 		for (String bone : queuedInterpolations.keySet()) {
 			for (KeyframeType instruction : queuedInterpolations.get(bone).keySet()) {
@@ -146,19 +178,19 @@ public class Animation {
 		currentFrame += speed;
 	}
 	
-	public void setFrame(Fighter fighter, double frame) {
+	public void setFrame(Fighter fighter, Bone root,double frame) {
 		currentFrame = frame;
 		queuedInterpolations.clear();
-		for (String boneId : queuedInterpolations.keySet()) {
-			for (KeyframeType instruction : queuedInterpolations.get(boneId).keySet()) {
-				initialPose.get(boneId).get(instruction).apply(fighter.getSkeleton());
+		for (String boneId : initialPose.keySet()) {
+			for (KeyframeType instruction : initialPose.get(boneId).keySet()) {
+				initialPose.get(boneId).get(instruction).apply(root);
 			}
 		}
 		for (int i = 0; i < frame; i++) {
-			stepAnimation(fighter, fighter.getSkeleton(), 1);
+			stepAnimation(fighter, root, 1);
 		}
 		if (frame % 1 != 0) {
-			stepAnimation(fighter, fighter.getSkeleton(), frame % 1);
+			stepAnimation(fighter, root, frame % 1);
 		}
 	}
 	
@@ -167,7 +199,7 @@ public class Animation {
 	 * 
 	 * @return - List of current hitboxes
 	 */
-	public List<HitBox> getHitBoxes() {
+	public List<HitBox> getActiveHitBoxes() {
 		List<HitBox> active = new ArrayList<>();
 		for (HitBox hitBox : hitboxes) {
 			if (hitBox.isActive(currentFrame)) {
@@ -182,7 +214,7 @@ public class Animation {
 	 * 
 	 * @return - List of current hurtboxes
 	 */
-	public List<HurtBox> getHurtBoxes() {
+	public List<HurtBox> getActiveHurtBoxes() {
 		List<HurtBox> active = new ArrayList<>();
 		for (HurtBox hurtBox : hurtboxes) {
 			if (hurtBox.isActive(currentFrame)) {
@@ -197,7 +229,7 @@ public class Animation {
 	 * 
 	 * @return - Current ECB
 	 */
-	public ECB getECB() {
+	public ECB getActiveECB() {
 		for (ECB ecb : ecbs) {
 			if (ecb.isActive(currentFrame)) {
 				return ecb;
@@ -206,30 +238,62 @@ public class Animation {
 		return null;
 	}
 	
+	public double getCurrentFrame() {
+		return currentFrame;
+	}
+	
+	public List<Keyframe> getKeyframes() {
+		return steps;
+	}
+	
+	public List<HurtBox> getHurtboxes() {
+		return hurtboxes;
+	}
+	
+	public List<ECB> getECBs() {
+		return ecbs;
+	}
+	
+	public List<HitBox> getHitboxes() {
+		return hitboxes;
+	}
+
+	public void updateValues(boolean loop, boolean specialCancelable) {
+		this.loop = loop;
+		this.specialCancelable = specialCancelable;
+	}
+	
+	public void updateUIFields(JCheckBox loop, JCheckBox specialCancelable) {
+		loop.setSelected(this.loop);
+		specialCancelable.setSelected(this.specialCancelable);
+	}
+
+	public Map<String, Map<KeyframeType, Keyframe>> getBonePositions(Fighter fighter, Bone root, int startFrame) {
+		setFrame(fighter, root, startFrame);
+		return root.getStartPositions();
+	}
+	
 	public static Animation load(File f) throws FileNotFoundException {
 		Scanner s = new Scanner(f);
 		List<String> lines = new ArrayList<>();
 		while(s.hasNextLine()) {
 			lines.add(s.nextLine());
 		}
-		int length = 0;
 		boolean loop = false;
 		boolean specialCancelable = false;
+		double center = 0;
 		Map<String, Map<KeyframeType, Keyframe>> initialPose = new HashMap<>();
 		List<Keyframe> keyframes = new ArrayList<>();
 		List<ECB> ecbs = new ArrayList<>();
 		List<HitBox> hitboxes = new ArrayList<>();
 		List<HurtBox> hurtboxes = new ArrayList<>();
-		for (int i = 0; i < lines.size(); i++) {
+		for (int i = 1; i < lines.size(); i++) {
 			if (lines.get(i).contains("}")) {
 				continue;
 			}
 			String id = lines.get(i).split(":")[0].replaceAll("\"", "").trim();
 			String data = lines.get(i).split(":")[1].replaceAll(",", "").replace("\"", "").trim();
 			switch (id) {
-				case "length":
-					length = Integer.parseInt(data);
-					break;
 				case "loop":
 					loop = Boolean.parseBoolean(data);
 					break;
@@ -238,73 +302,74 @@ public class Animation {
 					break;
 				case "initialPose":
 					while (lines.get(++i).contains("bonePose")) {
-						String bone = lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", "").replaceAll("\"", "");
-						double boneLength = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
-						double boneAngle = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
-						boolean boneVisible = Boolean.parseBoolean(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1));
+						String bone = lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", "").replaceAll("\"", "");
+						double boneLength = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", ""));
+						double boneAngle = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", ""));
+						boolean boneVisible = Boolean.parseBoolean(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2));
 						Map<KeyframeType, Keyframe> bonePose = new HashMap<>();
 						bonePose.put(KeyframeType.LENGTH, new Keyframe(0, bone, boneLength, KeyframeType.LENGTH, Interpolation.NONE));
 						bonePose.put(KeyframeType.ROTATE, new Keyframe(0, bone, boneAngle, KeyframeType.ROTATE, Interpolation.NONE));
 						bonePose.put(KeyframeType.VISIBLE, new Keyframe(0, bone, boneVisible ? 1 : 0, KeyframeType.VISIBLE, Interpolation.NONE));
 						initialPose.put(bone, bonePose);
 						i++;
+						System.out.println(bone + " visible: " + boneVisible);
 					}
 					break;
 				case "steps":
 					while (lines.get(++i).contains("keyframe")) {
-						String bone = lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", "").replaceAll("\"", "");
-						int frame = Integer.parseInt(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
-						KeyframeType type = KeyframeType.forString(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
-						Interpolation interpolation = Interpolation.forString(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
-						double frameData = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
+						String bone = lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", "").replaceAll("\"", "");
+						int frame = Integer.parseInt(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", ""));
+						KeyframeType type = KeyframeType.forString(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", ""));
+						Interpolation interpolation = Interpolation.forString(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", ""));
+						double frameData = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", ""));
 						keyframes.add(new Keyframe(frame, bone, frameData, type, interpolation));
 						i++;
 					}
 					break;
 				case "ecbs":
 					while (lines.get(++i).contains("ecb")) {
-						int startFrame = Integer.parseInt(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
-						int endFrame = Integer.parseInt(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
+						int startFrame = Integer.parseInt(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", ""));
+						int endFrame = Integer.parseInt(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", ""));
 						i+=2;
-						double topX = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
-						double topY = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
-						double botX = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
-						double botY = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
-						ecbs.add(new ECB(new Box(new Position(topX, topY), new Position(botX, botY))));
+						double topX = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", ""));
+						double topY = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", ""));
+						double botX = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", ""));
+						double botY = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", ""));
+						ecbs.add(new ECB(startFrame, endFrame, new Box(new Position(topX, topY), new Position(botX, botY))));
 						i+=2;
 					}
 					break;
 				case "hurtboxes":
 					while (lines.get(++i).contains("hurtbox")) {
-						int startFrame = Integer.parseInt(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
-						int endFrame = Integer.parseInt(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
+						int startFrame = Integer.parseInt(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", ""));
+						int endFrame = Integer.parseInt(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", ""));
 						i+=2;
-						double topX = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
-						double topY = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
-						double botX = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
-						double botY = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
-						hurtboxes.add(new HurtBox(new Box(new Position(topX, topY), new Position(botX, botY))));
+						double topX = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", ""));
+						double topY = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", ""));
+						double botX = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", ""));
+						double botY = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", ""));
+						hurtboxes.add(new HurtBox(startFrame, endFrame, new Box(new Position(topX, topY), new Position(botX, botY))));
 						i+=2;
 					}
 					break;
 				case "hitboxes":
 					while (lines.get(++i).contains("hitbox")) {
-						String group = lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", "").replaceAll("\"", "");
-						int startFrame = Integer.parseInt(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
-						int endFrame = Integer.parseInt(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
-						double damage = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
-						int blockStun = Integer.parseInt(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
-						int hitStun = Integer.parseInt(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
-						double pushBack = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
-						boolean knockDown = Boolean.parseBoolean(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1));
+						String group = lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", "").replaceAll("\"", "");
+						int startFrame = Integer.parseInt(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", ""));
+						int endFrame = Integer.parseInt(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", ""));
+						double damage = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", ""));
+						int blockStun = Integer.parseInt(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", ""));
+						int hitStun = Integer.parseInt(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", ""));
+						double pushBack = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", ""));
+						boolean knockDown = Boolean.parseBoolean(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2));
 						i+=2;
-						double topX = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
-						double topY = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
-						double botX = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
-						double botY = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
+						double topX = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", ""));
+						double topY = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", ""));
+						double botX = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", ""));
+						double botY = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", ""));
 						i+=4;
-						double velX = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
-						double velY = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(" ") + 1).replace(",", ""));
+						double velX = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", ""));
+						double velY = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", ""));
 						hitboxes.add(new HitBox(startFrame, endFrame, group, new Box(new Position(topX, topY), new Position(botX, botY)),
 								damage, hitStun, blockStun, pushBack, new Vector(velX, velY), knockDown));
 						i+=3;
@@ -313,7 +378,8 @@ public class Animation {
 			}
 		}
 		Animation anim = new Animation(initialPose, hitboxes, hurtboxes, keyframes, ecbs);
-		anim.ecbs = ecbs;
+		anim.loop = loop;
+		anim.specialCancelable = specialCancelable;
 		return anim;
 	}
 	

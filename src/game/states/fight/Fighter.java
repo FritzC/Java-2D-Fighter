@@ -1,16 +1,18 @@
 package game.states.fight;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
+import javax.swing.JComboBox;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 
@@ -42,6 +44,11 @@ public class Fighter {
 	 * Root node of component skeleton
 	 */
 	private Bone skeleton;
+	
+	/**
+	 * Root node of component skeleton
+	 */
+	private Bone[] editorSkeletons;
 
 	/**
 	 * Map of all of the fighter's animations with identifiers
@@ -90,6 +97,10 @@ public class Fighter {
 		this.name = name;
 		this.health = health;
 		this.skeleton = skeleton;
+		this.editorSkeletons = new Bone[3];
+		this.editorSkeletons[0] = new Bone(this.skeleton);
+		//updateEditorSkeletons();
+		animations = new HashMap<>();
 	}
 	
 	/**
@@ -172,7 +183,7 @@ public class Fighter {
 	 * @return - Fighter's current ECB
 	 */
 	public ECB getECB() {
-		return animation.getECB();
+		return animation.getActiveECB();
 	}
 	
 	/**
@@ -181,7 +192,7 @@ public class Fighter {
 	 * @return - List of current hitboxes
 	 */
 	public List<HitBox> getHitBoxes() {
-		return animation.getHitBoxes();
+		return animation.getActiveHitBoxes();
 	}
 
 	/**
@@ -190,7 +201,7 @@ public class Fighter {
 	 * @return - List of current hurtboxes
 	 */
 	public List<HurtBox> getHurtBoxes() {
-		return animation.getHurtBoxes();
+		return animation.getActiveHurtBoxes();
 	}
 
 	/**
@@ -255,6 +266,16 @@ public class Fighter {
 	public Bone getSkeleton() {
 		return skeleton;
 	}
+	
+	public Bone getEditorSkeleton(int panel) {
+		return editorSkeletons[panel];
+	}
+	
+	public void updateEditorSkeletons() {
+		for (int i = 0; i < editorSkeletons.length; i++) {
+			editorSkeletons[i] = new Bone(skeleton);
+		}
+	}
 
 	/**
 	 * Updates UI fields with the fighter's information
@@ -274,6 +295,52 @@ public class Fighter {
 	public void updateValues(String name, double health) {
 		this.name = name;
 		this.health = health;
+	}
+	
+	public void updateUIAnimationList(JComboBox<String> animationSelector) {
+		animationSelector.removeAllItems();
+		for (String key : animations.keySet()) {
+			animationSelector.addItem(key);
+		}
+	}
+	
+	public Animation getAnimation(String animName) {
+		return animations.get(animName);
+	}
+	
+	public void changeAnimationName(String oldName, String newName) {
+		animations.put(newName, animations.get(oldName));
+		animations.remove(oldName);
+	}
+
+	public Animation newAnimation() {
+		for (int i = 0;; i++) {
+			if (!animations.containsKey("animation_" + i)) {
+				animations.put("animation_" + i, new Animation(skeleton.getDefaultStartPositions(), new ArrayList<>(),
+						new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
+				return animations.get("animation_" + i);
+			}
+		}
+	}
+
+	public Animation newAnimation(Animation copy) {
+		for (int i = 0;; i++) {
+			if (!animations.containsKey("animation_" + i)) {
+				animations.put("animation_" + i, new Animation(copy));
+				return animations.get("animation_" + i);
+			}
+		}
+	}
+
+	public Animation newAnimationFrom(Animation startFrom, int startFrame) {
+		for (int i = 0;; i++) {
+			if (!animations.containsKey("animation_" + i)) {
+				animations.put("animation_" + i,
+						new Animation(startFrom.getBonePositions(this, editorSkeletons[0], startFrame),
+								new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
+				return animations.get("animation_" + i);
+			}
+		}
 	}
 
 	/**
@@ -304,7 +371,21 @@ public class Fighter {
 				skeleton = Bone.loadBone(s);
 			}
 		}
-		return new Fighter(name, health, skeleton);
+		Fighter fighter = new Fighter(name, health, skeleton);
+		File animDir = new File(f.getParent() + "/animations/");
+		if (animDir.exists()) {
+			for (File animFile : animDir.listFiles()) {
+				try {
+					fighter.animations.put(animFile.getName().replace(".json", ""), Animation.load(animFile));
+				} catch (Exception e) {
+					System.out.println("Error loading animation " + animFile.getName());
+					e.printStackTrace();
+				}
+			}
+		} else {
+			animDir.mkdirs();
+		}
+		return fighter;
 	}
 	
 	/**

@@ -46,6 +46,11 @@ public class Box {
 		this(topLeft, new Position(topLeft.getX() + width, topLeft.getY() + height));
 	}
 
+	public Box(Box copy) {
+		this.topLeft = new Position(copy.topLeft.getX(), copy.topLeft.getY());
+		this.bottomRight = new Position(copy.bottomRight.getX(), copy.bottomRight.getY());
+	}
+
 	/**
 	 * Gets an offset instance of the box
 	 * 

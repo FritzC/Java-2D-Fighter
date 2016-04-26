@@ -151,6 +151,24 @@ public class Bone {
 		originalVisibility = visible;
 	}
 	
+	public Bone(Bone copy) {
+		this.drawMode = copy.drawMode;
+		this.name = copy.name;
+		this.sprite = copy.sprite;
+		this.length = copy.length;
+		this.width = copy.width;
+		this.angle = copy.angle;
+		this.visible = copy.visible;
+		this.originalLength = copy.originalLength;
+		this.originalAngle = copy.originalAngle;
+		this.originalWidth = copy.originalWidth;
+		this.originalVisibility = copy.originalVisibility;
+		this.children = new ArrayList<>();
+		for (Bone copyChild : copy.children) {
+			this.children.add(new Bone(copyChild));
+		}
+	}
+
 	/**
 	 * Draws the bone and all of its children
 	 *  - Call on the root of the structure to draw the entire fighter
@@ -217,7 +235,7 @@ public class Bone {
 		Position tail = root.applyVector(new Vector((float) (currentLength * Math.cos(Math.toRadians(currentAngle))),
 				(float) (currentLength * Math.sin(Math.toRadians(currentAngle)))));
 		if (attached != null) {
-			attached.setPosition(tail);
+			attached.setPosition(tail); 
 		}
 		for (Bone bone : children) {
 			int drawType = (bone.name.equals(selectedBone)) ? 2 : ((bone.name.equals(hoveredBone)) ? 1 : 0);
@@ -417,7 +435,9 @@ public class Bone {
 	 */
 	public void restore() {
 		angle = originalAngle;
+		interpolatedAngle = 0;
 		length = originalLength;
+		interpolatedLength = 0;
 		width = originalWidth;
 		visible = originalVisibility;
 		for (Bone child : children) {
@@ -425,23 +445,28 @@ public class Bone {
 		}
 	}
 	
-	public Map<String, Map<KeyframeType, Keyframe>> getDefaultStartPositions() {
+	public Map<String, Map<KeyframeType, Keyframe>> getStartPositions() {
 		Map<String, Map<KeyframeType, Keyframe>> instructionSet = new HashMap<>();
-		addDefaultStartInstructions(instructionSet);
+		addStartInstructions(instructionSet);
 		return instructionSet;
 	}
+	
+	public Map<String, Map<KeyframeType, Keyframe>> getDefaultStartPositions() {
+		restore();
+		return getStartPositions();
+	}
 
-	private void addDefaultStartInstructions(Map<String, Map<KeyframeType, Keyframe>> list) {
+	private void addStartInstructions(Map<String, Map<KeyframeType, Keyframe>> list) {
 		Map<KeyframeType, Keyframe> instructions = new HashMap<>();
 		instructions.put(KeyframeType.LENGTH,
-				new Keyframe(0, name, originalLength, KeyframeType.LENGTH, Interpolation.NONE));
+				new Keyframe(0, name, length + interpolatedLength, KeyframeType.LENGTH, Interpolation.NONE));
 		instructions.put(KeyframeType.ROTATE,
-				new Keyframe(0, name, originalAngle, KeyframeType.ROTATE, Interpolation.NONE));
+				new Keyframe(0, name, angle + interpolatedAngle, KeyframeType.ROTATE, Interpolation.NONE));
 		instructions.put(KeyframeType.VISIBLE,
-				new Keyframe(0, name, originalVisibility ? 1 : 0, KeyframeType.VISIBLE, Interpolation.NONE));
+				new Keyframe(0, name, visible ? 1 : 0, KeyframeType.VISIBLE, Interpolation.NONE));
 		list.put(name, instructions);
 		for (Bone child : children) {
-			child.addDefaultStartInstructions(list);
+			child.addStartInstructions(list);
 		}
 	}
 
