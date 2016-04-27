@@ -53,7 +53,7 @@ public class Fighter {
 	/**
 	 * Map of all of the fighter's animations with identifiers
 	 */
-	private Map<String, Animation> animations;
+	private List<Animation> animations;
 	
 	/**
 	 * Current animation of the fighter
@@ -98,9 +98,8 @@ public class Fighter {
 		this.health = health;
 		this.skeleton = skeleton;
 		this.editorSkeletons = new Bone[3];
-		this.editorSkeletons[0] = new Bone(this.skeleton);
-		//updateEditorSkeletons();
-		animations = new HashMap<>();
+		updateEditorSkeletons();
+		animations = new ArrayList<>();
 	}
 	
 	/**
@@ -129,7 +128,11 @@ public class Fighter {
 	 * @param newAnim - Identifier of the new animation
 	 */
 	public void setAnimation(String newAnim) {
-		animation = animations.get(newAnim);
+		for (Animation anim : animations) {
+			if (anim.getName().equals(newAnim)) {
+				animation = anim;
+			}
+		}
 	}
 	
 	/**
@@ -299,46 +302,54 @@ public class Fighter {
 	
 	public void updateUIAnimationList(JComboBox<String> animationSelector) {
 		animationSelector.removeAllItems();
-		for (String key : animations.keySet()) {
-			animationSelector.addItem(key);
+		for (Animation anim : animations) {
+			animationSelector.addItem(anim.getName());
 		}
 	}
 	
 	public Animation getAnimation(String animName) {
-		return animations.get(animName);
-	}
-	
-	public void changeAnimationName(String oldName, String newName) {
-		animations.put(newName, animations.get(oldName));
-		animations.remove(oldName);
+		for (Animation anim : animations) {
+			if (anim.getName().equals(animName)) {
+				return anim;
+			}
+		}
+		return null;
 	}
 
-	public Animation newAnimation() {
+	public String newAnimation() {
 		for (int i = 0;; i++) {
-			if (!animations.containsKey("animation_" + i)) {
-				animations.put("animation_" + i, new Animation(skeleton.getDefaultStartPositions(), new ArrayList<>(),
-						new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
-				return animations.get("animation_" + i);
+			String name = "animation_" + i;
+			for (Animation anim : animations) {
+				if (!anim.getName().equals(name)) {
+					animations.add(new Animation(name, editorSkeletons[0].getDefaultStartPositions(), new ArrayList<>(),
+							new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
+					return name;
+				}
 			}
 		}
 	}
 
-	public Animation newAnimation(Animation copy) {
+	public String newAnimation(Animation copy) {
 		for (int i = 0;; i++) {
-			if (!animations.containsKey("animation_" + i)) {
-				animations.put("animation_" + i, new Animation(copy));
-				return animations.get("animation_" + i);
+			String name = "animation_" + i;
+			for (Animation anim : animations) {
+				if (!anim.getName().equals(name)) {
+					animations.add(new Animation(copy));
+					return animations.get(animations.size() - 1).getName();
+				}
 			}
 		}
 	}
 
-	public Animation newAnimationFrom(Animation startFrom, int startFrame) {
+	public String newAnimationFrom(Animation startFrom, int startFrame) {
 		for (int i = 0;; i++) {
-			if (!animations.containsKey("animation_" + i)) {
-				animations.put("animation_" + i,
-						new Animation(startFrom.getBonePositions(this, editorSkeletons[0], startFrame),
-								new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
-				return animations.get("animation_" + i);
+			String name = "animation_" + i;
+			for (Animation anim : animations) {
+				if (!anim.getName().equals(name)) {
+					animations.add(new Animation(name, startFrom.getBonePositions(this, editorSkeletons[0], startFrame),
+							new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
+					return name;
+				}
 			}
 		}
 	}
@@ -376,7 +387,7 @@ public class Fighter {
 		if (animDir.exists()) {
 			for (File animFile : animDir.listFiles()) {
 				try {
-					fighter.animations.put(animFile.getName().replace(".json", ""), Animation.load(animFile));
+					fighter.animations.add(Animation.load(animFile));
 				} catch (Exception e) {
 					System.out.println("Error loading animation " + animFile.getName());
 					e.printStackTrace();

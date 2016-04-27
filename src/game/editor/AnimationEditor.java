@@ -20,6 +20,10 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import game.Game;
 import game.states.fight.animation.Animation;
@@ -28,7 +32,6 @@ import game.util.Position;
 
 public class AnimationEditor {
 
-	private static JCheckBox play;
 	private static JSpinner speed;
 	private static JButton newAnimation;
 	private static JButton copyAnimation;
@@ -41,6 +44,9 @@ public class AnimationEditor {
 	private static JCheckBox specialCancelable;
 	private static Position animLoc = new Position(0.5f, 0f);
 
+	static boolean updateFrame;
+	static boolean updateFields;
+	static JCheckBox play;
 	static JComboBox<String> animationSelector;
 	static Animation currentAnimation;
 	static String oldName;
@@ -55,26 +61,26 @@ public class AnimationEditor {
 				g.setColor(Color.BLACK);
 				g.drawRect(-1, 0, getWidth() - 1, getHeight() - 1);
 				if (currentAnimation != null) {
-					currentAnimation.draw(animLoc, Editor.fighter, Editor.fighter.getEditorSkeleton(0), (Graphics2D) g,
-							Editor.camera, Editor.stage);
-					currentFrame.setValue((int) currentAnimation.getCurrentFrame());
-					g.drawString("Frame: " + currentAnimation.getCurrentFrame(), 5, 15);
 					if (play.isSelected()) {
 						currentAnimation.stepAnimation(Editor.fighter, Editor.fighter.getEditorSkeleton(0),
 								Editor.camera.getSpeed());
+						updateFrame = true;
+						currentFrame.setValue((int) currentAnimation.getCurrentFrame());
+						updateFrame = false;
 					} else {
-						currentAnimation.setFrame(Editor.fighter, Editor.fighter.getEditorSkeleton(0), 0);
+						currentAnimation.setFrame(Editor.fighter, Editor.fighter.getEditorSkeleton(0), (int) currentFrame.getValue());
 					}
+					currentAnimation.draw(animLoc, Editor.fighter, Editor.fighter.getEditorSkeleton(0), (Graphics2D) g,
+							Editor.camera, Editor.stage);
+					g.drawString("Frame: " + Math.round(currentAnimation.getCurrentFrame() * 100d) / 100d, 5, 15);
 				}
 			}
 		};
 		Runnable gameLoop = new Runnable() {
-
 			@Override
 			public void run() {
 				Editor.animationViewPanel.repaint();
 			}
-			
 		};
 		ScheduledExecutorService loopExecutor = Executors.newScheduledThreadPool(1);
 		loopExecutor.scheduleAtFixedRate(gameLoop, 0, 1000 / Game.LOOP_SPEED, TimeUnit.MILLISECONDS);
@@ -87,55 +93,137 @@ public class AnimationEditor {
 		play.setHorizontalTextPosition(SwingConstants.LEFT);
 		JPanel speedPanel = new JPanel(new GridLayout(0, 2));
 		speed = new JSpinner(new SpinnerNumberModel(1d, 0.1, 2d, 0.1));
+		speed.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				Editor.camera.setSpeed((double) speed.getValue());
+			}
+		});
 		speedPanel.add(new JLabel("Speed:", SwingConstants.CENTER));
 		speedPanel.add(speed);
 		animationSelector = new JComboBox<>();
 		animationSelector.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				currentAnimation = Editor.fighter.getAnimation((String) animationSelector.getSelectedItem());
-				updateFields();
-				currentFrame.setValue(0);
-				name.setText((String) animationSelector.getSelectedItem());
-				currentAnimation.setFrame(Editor.fighter, Editor.fighter.getEditorSkeleton(0), 0);
+				if (!updateFields) {
+					currentAnimation = Editor.fighter.getAnimation((String) animationSelector.getSelectedItem());
+					updateFields();
+					currentFrame.setValue(0);
+					currentAnimation.setFrame(Editor.fighter, Editor.fighter.getEditorSkeleton(0), 0);
+				}
 			}
 		});
 		newAnimation = new JButton("New");
 		newAnimation.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				currentAnimation = Editor.fighter.newAnimation();
-				updateFields();
+				String newAnim = Editor.fighter.newAnimation();
+				updateFields = true;
+				Editor.fighter.updateUIAnimationList(animationSelector);
+				sharedAnimation.setSelectedIndex(0);
+				updateFields = false;
+				animationSelector.setSelectedItem(newAnim);
 			}
 		});
 		copyAnimation = new JButton("Copy");
-		newAnimation.addActionListener(new ActionListener() {
+		copyAnimation.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				currentAnimation = Editor.fighter.newAnimation(currentAnimation);
-				updateFields();
+				String newAnim = Editor.fighter.newAnimation(currentAnimation);
+				updateFields = true;
+				Editor.fighter.updateUIAnimationList(animationSelector);
+				updateNameComboBox();
+				updateFields = false;
+				animationSelector.setSelectedItem(newAnim);
 			}
 		});
 		newAnimationFrom = new JButton("New from");
 		newAnimationFrom.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				currentAnimation = Editor.fighter.newAnimationFrom(currentAnimation, (int) frameToCopy.getValue());
-				updateFields();
+				String newAnim = Editor.fighter.newAnimationFrom(currentAnimation, (int) frameToCopy.getValue());
+				updateFields = true;
+				Editor.fighter.updateUIAnimationList(animationSelector);
+				sharedAnimation.setSelectedIndex(0);
+				updateFields = false;
+				animationSelector.setSelectedItem(newAnim);
 			}
 		});
 		frameToCopy = new JSpinner(new SpinnerNumberModel(0, 0, 10000, 1));
 		JPanel namePanel = new JPanel(new GridLayout(0, 2));
 		name = new JTextField();
+		name.getDocument().addDocumentListener(new DocumentListener() {
+			public void changedUpdate(DocumentEvent e) {
+				if (!updateFields) {
+					updateFields = true;
+					currentAnimation.setName(name.getText());
+					Editor.fighter.updateUIAnimationList(animationSelector);
+					animationSelector.setSelectedItem(name.getText());
+					updateNameComboBox();
+					updateFields = false;
+				}
+			}
+
+			public void removeUpdate(DocumentEvent e) {
+				if (!updateFields) {
+					updateFields = true;
+					currentAnimation.setName(name.getText());
+					Editor.fighter.updateUIAnimationList(animationSelector);
+					animationSelector.setSelectedItem(name.getText());
+					updateNameComboBox();
+					updateFields = false;
+				}
+			}
+
+			public void insertUpdate(DocumentEvent e) {
+				if (!updateFields) {
+					updateFields = true;
+					currentAnimation.setName(name.getText());
+					Editor.fighter.updateUIAnimationList(animationSelector);
+					animationSelector.setSelectedItem(name.getText());
+					updateNameComboBox();
+					updateFields = false;
+				}
+			}
+		});
 		sharedAnimation = new JComboBox<>(SharedAnimation.values());
+		sharedAnimation.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (!updateFields && (SharedAnimation.forString(name.getText()) != null
+						&& sharedAnimation.getSelectedItem() == SharedAnimation.UNSHARED
+						|| sharedAnimation.getSelectedItem() != SharedAnimation.UNSHARED)) {
+					name.setText(sharedAnimation.getSelectedItem().toString().toLowerCase());
+				}
+				name.setEnabled(sharedAnimation.getSelectedItem() == SharedAnimation.UNSHARED);
+			}
+		});
 		namePanel.add(name);
 		namePanel.add(sharedAnimation);
 		currentFrame = new JSpinner(new SpinnerNumberModel(0, 0, 10000, 1));
+		currentFrame.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				if (!updateFrame) {
+					play.setSelected(false);
+				}
+			}
+		});
 		loop = new JCheckBox("Loop: ");
 		loop.setHorizontalAlignment(SwingConstants.CENTER);
 		loop.setHorizontalTextPosition(SwingConstants.LEFT);
+		loop.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				updateValues();
+			}
+		});
 		specialCancelable = new JCheckBox("Special Cancelable: ");
 		specialCancelable.setHorizontalAlignment(SwingConstants.CENTER);
 		specialCancelable.setHorizontalTextPosition(SwingConstants.LEFT);
+		specialCancelable.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				updateValues();
+			}
+		});
 		
 		Editor.animationsPanel.add(play);
 		Editor.animationsPanel.add(speedPanel);
+		Editor.animationsPanel.add(new JLabel("Current Frame:", SwingConstants.CENTER));
+		Editor.animationsPanel.add(currentFrame);
 		Editor.animationsPanel.add(newAnimation);
 		Editor.animationsPanel.add(copyAnimation);
 		Editor.animationsPanel.add(newAnimationFrom);
@@ -144,14 +232,27 @@ public class AnimationEditor {
 		Editor.animationsPanel.add(animationSelector);
 		Editor.animationsPanel.add(new JLabel("Name:", SwingConstants.CENTER));
 		Editor.animationsPanel.add(namePanel);
-		Editor.animationsPanel.add(new JLabel("Current Frame:", SwingConstants.CENTER));
-		Editor.animationsPanel.add(currentFrame);
 		Editor.animationsPanel.add(loop);
 		Editor.animationsPanel.add(specialCancelable);
 	}
 	
 	public static void updateFields() {
-		currentAnimation.updateUIFields(loop, specialCancelable);
+		if (!updateFields && currentAnimation != null) {
+			currentAnimation.updateUIFields(name, loop, specialCancelable);
+			updateNameComboBox();
+		}
+	}
+	
+	public static void updateValues() {
+		currentAnimation.updateValues(name.getText(), loop.isSelected(), specialCancelable.isSelected());
+	}
+	
+	public static void updateNameComboBox() {
+		if (SharedAnimation.forString(name.getText()) != null) {
+			sharedAnimation.setSelectedItem(SharedAnimation.forString(name.getText()));
+		} else {
+			sharedAnimation.setSelectedIndex(0);
+		}
 	}
 	
 }

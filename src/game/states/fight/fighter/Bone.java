@@ -192,8 +192,8 @@ public class Bone {
 	 * @param selected - Selected bone
 	 */
 	public void draw(Graphics2D g, Position root, Camera camera, boolean drawHidden, String selectedBone, String hoveredBone, int selectType) {
-		double currentAngle = (interpolatedAngle != 0) ? interpolatedAngle : angle;
-		double currentLength = (interpolatedLength != 0) ? interpolatedLength : length;
+		double currentAngle = angle + interpolatedAngle;
+		double currentLength = length + interpolatedLength;
 		if (selectedBone.equals("root")) {
 			selectType = 2;
 			selectedBone = "";
@@ -284,15 +284,9 @@ public class Bone {
 	public void interpolate(double data, KeyframeType type, Interpolation interpolation, double completion) {
 		switch (type) {
 			case LENGTH:
-				if (data == length) {
-					break;
-				}
 				interpolatedLength = interpolation.getInterpolatedValue(length, data, completion);
 				break;
 			case ROTATE:
-				if (data == angle) {
-					break;
-				}
 				interpolatedAngle = interpolation.getInterpolatedValue(angle, data, completion);
 				break;
 			case VISIBLE:
@@ -410,6 +404,10 @@ public class Bone {
 		this.width = width;
 		this.angle = angle;
 		this.visible = visible;
+		this.originalAngle = angle;
+		this.originalLength = length;
+		this.originalVisibility = visible;
+		this.originalWidth = width;
 	}
 
 	/**

@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Scanner;
 
 import javax.swing.JCheckBox;
-import javax.swing.JSpinner;
+import javax.swing.JTextField;
 
 import game.states.fight.Camera;
 import game.states.fight.Fighter;
@@ -27,6 +27,8 @@ import game.util.Vector;
  *
  */
 public class Animation {
+	
+	private String name;
 
 	/**
 	 * List of all the animation steps
@@ -84,8 +86,9 @@ public class Animation {
 	 * 
 	 * @param filePath - File path to load the animation from
 	 */
-	public Animation(Map<String, Map<KeyframeType, Keyframe>> initialPose, List<HitBox> hitboxes,
+	public Animation(String name, Map<String, Map<KeyframeType, Keyframe>> initialPose, List<HitBox> hitboxes,
 			List<HurtBox> hurtboxes, List<Keyframe> keyframes, List<ECB> ecbs) {
+		this.name = name;
 		this.initialPose = initialPose;
 		this.ecbs = ecbs;
 		this.hitboxes = hitboxes;
@@ -101,9 +104,11 @@ public class Animation {
 	}
 	
 	public Animation(Animation copy) {
+		this.name = copy.name + "_copy";
 		this.loop = copy.loop;
 		this.specialCancelable = copy.specialCancelable;
 		this.initialPose = new HashMap<>();
+		this.queuedInterpolations = new HashMap<>();
 		this.length = copy.length;
 		for (String bone : copy.initialPose.keySet()) {
 			this.initialPose.put(bone, new HashMap<>());
@@ -145,6 +150,7 @@ public class Animation {
 	 * @param root - Skeleton of the fighter
 	 */
 	public void stepAnimation(Fighter fighter, Bone root, double speed) {
+		currentFrame += speed;
 		if (currentFrame > length) {
 			setFrame(fighter, root, 0);
 			return;
@@ -175,17 +181,17 @@ public class Animation {
 				keyframe.interpolate(fighter, root, currentFrame);
 			}
 		}
-		currentFrame += speed;
 	}
 	
-	public void setFrame(Fighter fighter, Bone root,double frame) {
-		currentFrame = frame;
+	public void setFrame(Fighter fighter, Bone root, double frame) {
+		currentFrame = 0;
 		queuedInterpolations.clear();
 		for (String boneId : initialPose.keySet()) {
 			for (KeyframeType instruction : initialPose.get(boneId).keySet()) {
 				initialPose.get(boneId).get(instruction).apply(root);
 			}
 		}
+		stepAnimation(fighter, root, 0);
 		for (int i = 0; i < frame; i++) {
 			stepAnimation(fighter, root, 1);
 		}
@@ -258,12 +264,22 @@ public class Animation {
 		return hitboxes;
 	}
 
-	public void updateValues(boolean loop, boolean specialCancelable) {
+	public void setName(String newName) {
+		name = newName;
+	}
+	
+	public String getName() {
+		return name;
+	}
+
+	public void updateValues(String name, boolean loop, boolean specialCancelable) {
+		this.name = name;
 		this.loop = loop;
 		this.specialCancelable = specialCancelable;
 	}
 	
-	public void updateUIFields(JCheckBox loop, JCheckBox specialCancelable) {
+	public void updateUIFields(JTextField name, JCheckBox loop, JCheckBox specialCancelable) {
+		name.setText(this.name);
 		loop.setSelected(this.loop);
 		specialCancelable.setSelected(this.specialCancelable);
 	}
@@ -312,7 +328,6 @@ public class Animation {
 						bonePose.put(KeyframeType.VISIBLE, new Keyframe(0, bone, boneVisible ? 1 : 0, KeyframeType.VISIBLE, Interpolation.NONE));
 						initialPose.put(bone, bonePose);
 						i++;
-						System.out.println(bone + " visible: " + boneVisible);
 					}
 					break;
 				case "steps":
@@ -377,7 +392,8 @@ public class Animation {
 					break;
 			}
 		}
-		Animation anim = new Animation(initialPose, hitboxes, hurtboxes, keyframes, ecbs);
+		Animation anim = new Animation(f.getName().replace(".json", ""), initialPose, hitboxes, hurtboxes, keyframes,
+				ecbs);
 		anim.loop = loop;
 		anim.specialCancelable = specialCancelable;
 		return anim;

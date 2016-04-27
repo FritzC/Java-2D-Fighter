@@ -108,7 +108,7 @@ public class Keyframe {
 		}
 		beginInterpolatingFrame = currentFrame;
 		table.get(boneId).put(type, this);
-		System.out.println("Successfully added instruction: " + type.toString() + "[" + data + "] for " + boneId);
+		//System.out.println("Successfully added instruction: " + type.toString() + "[" + data + "] for " + boneId);
 		return true;
 	}
 	

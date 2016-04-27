@@ -11,34 +11,34 @@ public enum Interpolation {
 	LINEAR {
 		@Override
 		public double getInterpolatedValue(double begin, double end, double completion) {
-			return (1 - completion) * begin + completion * end;
+			return (1 - completion) * begin + completion * end - begin;
 		}
 	}, 
 	COS {
 		@Override
 		public double getInterpolatedValue(double begin, double end, double completion) {
 			double c = (1 - Math.cos(completion * Math.PI)) / 2d;
-			return  (float) (begin * (1 - c) + end * c);
+			return  (float) (begin * (1 - c) + end * c) - begin;
 		}
 	},
 	SMOOTH_OUT {
 		@Override
 		public double getInterpolatedValue(double begin, double end, double completion) {
 			double c = (1 - Math.cos(completion * Math.PI / 2d));
-			return  (float) (begin * (1 - c) + end * c);
+			return  (float) (begin * (1 - c) + end * c) - begin;
 		}
 	},
 	SMOOTH_IN {
 		@Override
 		public double getInterpolatedValue(double begin, double end, double completion) {
 			double c = Math.sin(completion * Math.PI / 2d);
-			return  (float) (begin * (1 - c) + end * c);
+			return  (float) (begin * (1 - c) + end * c) - begin;
 		}
 	},
 	NONE {
 		@Override
 		public double getInterpolatedValue(double begin, double end, double completion) {
-			return begin;
+			return 0;
 		}
 	};
 	

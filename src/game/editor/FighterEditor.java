@@ -90,6 +90,7 @@ public class FighterEditor {
 		Editor.skeletonViewPanel.addMouseMotionListener(new MouseMotionListener() {
 			@Override
 			public void mouseDragged(MouseEvent e) {
+				AnimationEditor.play.setSelected(false);
 				if (boneSelected != null && Editor.fighter != null && Editor.fighter.getSkeleton() != null) {
 					Position pos = Editor.fighter.getSkeleton().getPosition(boneSelected.getName(), skeletonLoc, Editor.camera);
 					if (pos == null) {
@@ -134,6 +135,7 @@ public class FighterEditor {
 
 			@Override
 			public void mousePressed(MouseEvent e) {
+				AnimationEditor.play.setSelected(false);
 				if (boneSelected != null && Editor.fighter != null && Editor.fighter.getSkeleton() != null) {
 					Position pos = Editor.fighter.getSkeleton().getPosition(boneSelected.getName(), skeletonLoc, Editor.camera);
 					if (pos == null) {
