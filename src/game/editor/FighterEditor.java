@@ -78,7 +78,8 @@ public class FighterEditor {
 				g.fillRect(0, 0, 1000, 1000);
 				g.setColor(Color.BLACK);
 				g.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
-				g.drawRect(0, Editor.camera.getScreenY(new Position(0f, 0f)), 1000, 1000);
+				int groundY = Editor.camera.getScreenY(new Position(0f, 0f));
+				g.drawLine(0, groundY, getWidth() - 1, groundY);
 				String selected = (boneSelected != null) ? boneSelected.getName() : "";
 				String hovered = (boneHovered != null) ? boneHovered.getName() : "";
 				if (Editor.fighter != null) {

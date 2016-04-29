@@ -8,7 +8,11 @@ import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.List;
@@ -39,6 +43,7 @@ import game.states.fight.animation.Interpolation;
 import game.states.fight.animation.Keyframe;
 import game.states.fight.animation.KeyframeType;
 import game.states.fight.fighter.Bone;
+import game.util.Position;
 
 public class KeyframeEditor {
 
@@ -47,6 +52,7 @@ public class KeyframeEditor {
 	private static JButton newKeyframe;
 	private static JButton deleteKeyframe;
 	private static JButton refresh;
+	private final static int SHIFT = 16;
 	
 	static JComboBox<String> bones;
 	static Keyframe currentKeyframe;
@@ -60,6 +66,9 @@ public class KeyframeEditor {
 				g.setColor(Color.WHITE);
 				g.fillRect(0, 0, 1000, 1000);
 				g.setColor(Color.BLACK);
+				g.drawRect(-1, 0, getWidth() - 1, getHeight() - 1);
+				int groundY = Editor.camera.getScreenY(new Position(0f, 0f));
+				g.drawLine(0, groundY, getWidth() - 1, groundY);
 				if (currentKeyframe != null) {
 					double oldVal = AnimationEditor.currentAnimation.getCurrentFrame();
 					AnimationEditor.currentAnimation.setFrame(Editor.fighter, Editor.fighter.getEditorSkeleton(1),
@@ -79,19 +88,111 @@ public class KeyframeEditor {
 		};
 		ScheduledExecutorService loopExecutor = Executors.newScheduledThreadPool(1);
 		loopExecutor.scheduleAtFixedRate(gameLoop, 0, 1000 / Game.LOOP_SPEED, TimeUnit.MILLISECONDS);
+		Editor.keyframeViewPanel.setFocusable(true);
+		Editor.keyframeViewPanel.addMouseMotionListener(new MouseMotionListener() {
+			@Override
+			public void mouseDragged(MouseEvent e) {
+				if (currentKeyframe != null && Editor.fighter != null && Editor.fighter.getEditorSkeleton(1) != null) {
+					Position pos = Editor.fighter.getSkeleton().getPosition((String) currentKeyframe.getInfo()[1], Editor.defaultLoc, Editor.camera);
+					if (pos == null) {
+						return;
+					}
+					int boneX = Editor.camera.getScreenX(pos);
+					int boneY = Editor.camera.getScreenY(pos);
+					double difX = e.getX() - boneX;
+					double difY = boneY - e.getY();
+					double angle = Math.toDegrees(Math.atan(difY / difX));
+					double length = Math.sqrt(Math.pow(difX, 2) + Math.pow(difY, 2));
+					if (difX < 0) {
+						angle += 180;
+					}
+					if (difX > 0 && difY < 0) {
+						angle += 360;
+					}
+					if (Editor.keysDown.contains(SHIFT)) {
+						angle = angle - (angle % 5);
+					}
+					if ((KeyframeType) currentKeyframe.getInfo()[2] == KeyframeType.ROTATE) {
+						currentKeyframe.setData(angle);
+						keyframes.setValueAt(angle, keyframes.getSelectedRow(), 4);
+					} else if ((KeyframeType) currentKeyframe.getInfo()[2] == KeyframeType.LENGTH) {
+						currentKeyframe.setData(Editor.camera.toGameDistance(length));
+						keyframes.setValueAt(Editor.camera.toGameDistance(length), keyframes.getSelectedRow(), 4);
+					}
+				}
+			}
+
+			@Override
+			public void mouseMoved(MouseEvent arg0) {
+				Editor.skeletonViewPanel.requestFocus();
+			}
+		});
+		Editor.keyframeViewPanel.addMouseListener(new MouseListener() {
+			@Override
+			public void mouseClicked(MouseEvent e) {}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {}
+
+			@Override
+			public void mouseExited(MouseEvent e) {}
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+				if (currentKeyframe != null && Editor.fighter != null && Editor.fighter.getEditorSkeleton(1) != null) {
+					Position pos = Editor.fighter.getSkeleton().getPosition((String) currentKeyframe.getInfo()[1], Editor.defaultLoc, Editor.camera);
+					if (pos == null) {
+						return;
+					}
+					int boneX = Editor.camera.getScreenX(pos);
+					int boneY = Editor.camera.getScreenY(pos);
+					double difX = e.getX() - boneX;
+					double difY = boneY - e.getY();
+					double angle = Math.toDegrees(Math.atan(difY / difX));
+					double length = Math.sqrt(Math.pow(difX, 2) + Math.pow(difY, 2));
+					if (difX < 0) {
+						angle += 180;
+					}
+					if (difX > 0 && difY < 0) {
+						angle += 360;
+					}
+					if (Editor.keysDown.contains(SHIFT)) {
+						angle = angle - (angle % 5);
+					}
+					if ((KeyframeType) currentKeyframe.getInfo()[2] == KeyframeType.ROTATE) {
+						currentKeyframe.setData(angle);
+						keyframes.setValueAt(angle, keyframes.getSelectedRow(), 4);
+					} else if ((KeyframeType) currentKeyframe.getInfo()[2] == KeyframeType.LENGTH) {
+						currentKeyframe.setData(Editor.camera.toGameDistance(length));
+						keyframes.setValueAt(Editor.camera.toGameDistance(length), keyframes.getSelectedRow(), 4);
+					}
+				}
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {}
+			
+		});
+		Editor.keyframeViewPanel.addKeyListener(new KeyListener() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				Editor.keysDown.add(e.getKeyCode());
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+				Editor.keysDown.remove((Integer) e.getKeyCode());
+			}
+
+			@Override
+			public void keyTyped(KeyEvent arg0) {}
+		});
 	}
 
 	public static void initKeyframeEditPanel() {
 		Editor.keyframePanel = new JPanel(new BorderLayout());
 		model = new DefaultTableModel(new String[] {"Frame", "Bone", "Type", "Interpolation", "Data"}, 0);
-		keyframes = new JTable(model) {
-			public Class getColumnClass(int column) {
-				if (column == 0) {
-					return Integer.class;
-				}
-				return Object.class;
-			}
-		};
+		keyframes = new JTable(model);
 		keyframes.setSelectionMode(0);
 		keyframes.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
 		keyframes.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
@@ -237,12 +338,6 @@ public class KeyframeEditor {
 			}
 		}
 		updateData = false;
-		for (Keyframe key : AnimationEditor.currentAnimation.getKeyframes()) {
-			for (Object o : key.getInfo()) {
-				System.out.print(o.toString() + " ");
-			}
-			System.out.println();
-		}
 	}
 
 	static class SpinnerEditor extends AbstractCellEditor implements TableCellEditor {

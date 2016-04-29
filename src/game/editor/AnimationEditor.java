@@ -59,6 +59,8 @@ public class AnimationEditor {
 				g.fillRect(0, 0, 1000, 1000);
 				g.setColor(Color.BLACK);
 				g.drawRect(-1, 0, getWidth() - 1, getHeight() - 1);
+				int groundY = Editor.camera.getScreenY(new Position(0f, 0f));
+				g.drawLine(0, groundY, getWidth() - 1, groundY);
 				if (currentAnimation != null) {
 					if (play.isSelected()) {
 						currentAnimation.stepAnimation(Editor.fighter, Editor.fighter.getEditorSkeleton(0),
