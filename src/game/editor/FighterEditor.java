@@ -204,6 +204,7 @@ public class FighterEditor {
 						skeletonTreeDiagram.repaint();
 						Editor.fighter.updateUIAnimationList(AnimationEditor.animationSelector);
 						Editor.fighterDirectory = fighterFileChooser.getSelectedFile().getParentFile();
+						KeyframeEditor.updateBones();
 					} catch (FileNotFoundException e1) {
 						e1.printStackTrace();
 					}
@@ -485,6 +486,7 @@ public class FighterEditor {
 					boneVisible.isSelected());
 			Editor.fighter.updateEditorSkeletons();
 			Editor.skeletonViewPanel.repaint();
+			KeyframeEditor.updateBones();
 			skeletonTreeDiagram.repaint();
 		}
 	}

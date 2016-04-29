@@ -25,30 +25,23 @@ import game.util.Position;
 
 public class Editor {
 
+	static JFrame frame;
 	static File fighterDirectory;
 	static Fighter fighter;
 	static Stage stage;
 	static Camera camera;
+	static Position defaultLoc = new Position(0.5f, 0f);
 	
 	private static JPanel viewPort;
 	static JPanel skeletonViewPanel;
 	static JPanel animationViewPanel;
+	static JPanel keyframeViewPanel;
 	
 	private static JPanel editPanel;
-	private static JPanel keyframePanel;
-	private static JPanel collisionBoxPanel;
 	static JPanel fighterPanel;
 	static JPanel animationsPanel;
-
-	private static JSpinner stepSelecter;
-	private static JButton newStep;
-	private static JButton deleteStep;
-	private static JButton duplicateStep;
-	private static JButton setSprite;
-	private static JSpinner stepDuration;
-	private static JCheckBox stepMovesSelf;
-	private static JSpinner stepVelocityX;
-	private static JSpinner stepVelocityY;
+	static JPanel keyframePanel;
+	static JPanel collisionBoxPanel;
 	
 	static List<Integer> keysDown;
 	
@@ -67,7 +60,7 @@ public class Editor {
 	}
 
 	public static void main(String args[]) {
-		final JFrame frame = new JFrame();
+		frame = new JFrame();
 		stage = new Stage() {
 			@Override
 			public double getWidth() {
@@ -102,8 +95,10 @@ public class Editor {
 		viewPort = new JPanel(new GridLayout(0, 4));
 		FighterEditor.initSkeletonViewPanel();
 		AnimationEditor.initAnimationViewPanel();
+		KeyframeEditor.initKeyframeViewPanel();
 		viewPort.add(skeletonViewPanel);
 		viewPort.add(animationViewPanel);
+		viewPort.add(keyframeViewPanel);
 	}
 	
 	public static void initEditPanel() {
@@ -111,42 +106,12 @@ public class Editor {
 		editPanel.setLayout(new GridLayout(1, 4));
 		FighterEditor.initFighterPanel();
 		AnimationEditor.initAnimationsPanel();
-		initKeyframePanel();
+		KeyframeEditor.initKeyframeEditPanel();
 		collisionBoxPanel = new JPanel();
 		editPanel.add(fighterPanel);
 		editPanel.add(animationsPanel);
 		editPanel.add(keyframePanel);
 		editPanel.add(collisionBoxPanel);
-	}
-	
-	public static void initKeyframePanel() {
-		keyframePanel = new JPanel(new GridLayout(0, 2));
-		stepSelecter = new JSpinner(new SpinnerNumberModel(0, 0, 1, 1));
-		JPanel addRemove = new JPanel(new GridLayout(0, 2));
-		newStep = new JButton("+");
-		deleteStep = new JButton("-");
-		addRemove.add(newStep);
-		addRemove.add(deleteStep);
-		duplicateStep = new JButton("Copy");
-		setSprite = new JButton("Choose...");
-		stepDuration = new JSpinner(new SpinnerNumberModel(1, 1, 100, 1));
-		stepMovesSelf = new JCheckBox("   Velocity:");
-		JPanel velocity = new JPanel(new GridLayout(0, 2));
-		stepVelocityX = new JSpinner(new SpinnerNumberModel(0, -100, 100, 0.05));
-		stepVelocityY = new JSpinner(new SpinnerNumberModel(0, -100, 100, 0.05));
-		velocity.add(stepVelocityX);
-		velocity.add(stepVelocityY);
-		
-		keyframePanel.add(new JLabel("Step:", SwingConstants.CENTER));
-		keyframePanel.add(stepSelecter);
-		keyframePanel.add(addRemove);
-		keyframePanel.add(duplicateStep);
-		keyframePanel.add(new JLabel("Sprite:", SwingConstants.CENTER));
-		keyframePanel.add(setSprite);
-		keyframePanel.add(new JLabel("Duration:", SwingConstants.CENTER));
-		keyframePanel.add(stepDuration);
-		keyframePanel.add(stepMovesSelf);
-		keyframePanel.add(velocity);
 	}
 
 }

@@ -100,7 +100,8 @@ public class Keyframe {
 	 * @return - Whether registration was successful
 	 */
 	public boolean attemptToRegister(double currentFrame, Map<String, Map<KeyframeType, Keyframe>> table) {
-		if (table.containsKey(boneId) && table.get(boneId).containsKey(type) || getCompletion(currentFrame) >= 1) {
+		if (table.containsKey(boneId) && table.get(boneId).containsKey(type)
+				&& table.get(boneId).get(type).endFrame <= endFrame || getCompletion(currentFrame) >= 1) {
 			return false;
 		}
 		if (table.get(boneId) == null) {
@@ -108,7 +109,6 @@ public class Keyframe {
 		}
 		beginInterpolatingFrame = currentFrame;
 		table.get(boneId).put(type, this);
-		//System.out.println("Successfully added instruction: " + type.toString() + "[" + data + "] for " + boneId);
 		return true;
 	}
 	
@@ -129,6 +129,35 @@ public class Keyframe {
 	 */
 	public int getEndFrame() {
 		return endFrame;
+	}
+
+	public boolean matchesInfo(Object[] info) {
+		return (int) info[0] == endFrame && ((String) info[1]).equals(boneId)
+				&& (KeyframeType) info[2] == type;
+	}
+	
+	public Object[] getInfo() {
+		return new Object[] {endFrame, boneId, type, interpolation, data};
+	}
+
+	public void setEndFrame(int value) {
+		endFrame = value;
+	}
+	
+	public void setData(double value) {
+		data = value;
+	}
+
+	public void setBone(String bone) {
+		boneId = bone;
+	}
+
+	public void setType(KeyframeType type) {
+		this.type = type;
+	}
+
+	public void setInterpolation(Interpolation interp) {
+		this.interpolation = interp;
 	}
 
 }

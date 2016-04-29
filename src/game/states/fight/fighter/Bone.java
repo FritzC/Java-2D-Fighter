@@ -467,6 +467,15 @@ public class Bone {
 			child.addStartInstructions(list);
 		}
 	}
+	
+	public List<String> getIdentifiers() {
+		List<String> ids = new ArrayList<>();
+		ids.add(name);
+		for (Bone child : children) {
+			ids.addAll(child.getIdentifiers());
+		}
+		return ids;
+	}
 
 	/**
 	 * Loads a bone from a fighter file

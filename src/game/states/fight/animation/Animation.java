@@ -77,11 +77,6 @@ public class Animation {
 	private boolean specialCancelable;
 	
 	/**
-	 * Length in frames of the animation
-	 */
-	private int length;
-	
-	/**
 	 * Loads an animation from a file
 	 * 
 	 * @param filePath - File path to load the animation from
@@ -95,12 +90,7 @@ public class Animation {
 		this.hurtboxes = hurtboxes;
 		this.steps = new ArrayList<>();
 		this.queuedInterpolations = new HashMap<>();
-		for (Keyframe frame : keyframes) {
-			steps.add(frame);
-			if (frame.getEndFrame() > length) {
-				length = frame.getEndFrame();
-			}
-		}
+		this.steps = keyframes;
 	}
 	
 	public Animation(Animation copy) {
@@ -109,7 +99,6 @@ public class Animation {
 		this.specialCancelable = copy.specialCancelable;
 		this.initialPose = new HashMap<>();
 		this.queuedInterpolations = new HashMap<>();
-		this.length = copy.length;
 		for (String bone : copy.initialPose.keySet()) {
 			this.initialPose.put(bone, new HashMap<>());
 			for (KeyframeType type : copy.initialPose.get(bone).keySet()) {
@@ -151,7 +140,7 @@ public class Animation {
 	 */
 	public void stepAnimation(Fighter fighter, Bone root, double speed) {
 		currentFrame += speed;
-		if (currentFrame > length) {
+		if (currentFrame > getLength()) {
 			setFrame(fighter, root, 0);
 			return;
 		}
@@ -192,7 +181,7 @@ public class Animation {
 			}
 		}
 		stepAnimation(fighter, root, 0);
-		for (int i = 0; i < frame; i++) {
+		for (int i = 0; i < (int) frame; i++) {
 			stepAnimation(fighter, root, 1);
 		}
 		if (frame % 1 != 0) {
@@ -251,6 +240,15 @@ public class Animation {
 	public List<Keyframe> getKeyframes() {
 		return steps;
 	}
+
+	public Keyframe getKeyframe(Object[] info) {
+		for (Keyframe frame : steps) {
+			if (frame.matchesInfo(info)) {
+				return frame;
+			}
+		}
+		return null;
+	}
 	
 	public List<HurtBox> getHurtboxes() {
 		return hurtboxes;
@@ -287,6 +285,16 @@ public class Animation {
 	public Map<String, Map<KeyframeType, Keyframe>> getBonePositions(Fighter fighter, Bone root, int startFrame) {
 		setFrame(fighter, root, startFrame);
 		return root.getStartPositions();
+	}
+	
+	public int getLength() {
+		int length = 0;
+		for (Keyframe step : steps) {
+			if (step.getEndFrame() > length) {
+				length = step.getEndFrame();
+			}
+		}
+		return length;
 	}
 	
 	public static Animation load(File f) throws FileNotFoundException {

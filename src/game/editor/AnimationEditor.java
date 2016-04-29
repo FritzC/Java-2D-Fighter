@@ -42,7 +42,6 @@ public class AnimationEditor {
 	private static JSpinner currentFrame;
 	private static JCheckBox loop;
 	private static JCheckBox specialCancelable;
-	private static Position animLoc = new Position(0.5f, 0f);
 
 	static boolean updateFrame;
 	static boolean updateFields;
@@ -70,7 +69,7 @@ public class AnimationEditor {
 					} else {
 						currentAnimation.setFrame(Editor.fighter, Editor.fighter.getEditorSkeleton(0), (int) currentFrame.getValue());
 					}
-					currentAnimation.draw(animLoc, Editor.fighter, Editor.fighter.getEditorSkeleton(0), (Graphics2D) g,
+					currentAnimation.draw(Editor.defaultLoc, Editor.fighter, Editor.fighter.getEditorSkeleton(0), (Graphics2D) g,
 							Editor.camera, Editor.stage);
 					g.drawString("Frame: " + Math.round(currentAnimation.getCurrentFrame() * 100d) / 100d, 5, 15);
 				}
@@ -108,6 +107,8 @@ public class AnimationEditor {
 					updateFields();
 					currentFrame.setValue(0);
 					currentAnimation.setFrame(Editor.fighter, Editor.fighter.getEditorSkeleton(0), 0);
+					KeyframeEditor.updateKeyframeTable();
+					KeyframeEditor.currentKeyframe = null;
 				}
 			}
 		});
