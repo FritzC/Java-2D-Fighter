@@ -204,7 +204,7 @@ public class KeyframeEditor {
 				}
 			}
 		});
-		JSpinner frame = new JSpinner(new SpinnerNumberModel(1, 0, 10000, 1));
+		final JSpinner frame = new JSpinner(new SpinnerNumberModel(1, 0, 10000, 1));
 		frame.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
@@ -214,7 +214,7 @@ public class KeyframeEditor {
 			}
 		});
 		keyframes.getColumnModel().getColumn(0).setCellEditor(new SpinnerEditor(frame));
-		JSpinner data = new JSpinner(new SpinnerNumberModel(0d, -360d, 360d, 0.01d));
+		final JSpinner data = new JSpinner(new SpinnerNumberModel(0d, -360d, 360d, 0.01d));
 		data.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
@@ -233,7 +233,7 @@ public class KeyframeEditor {
 			}
 		});
 		keyframes.getColumnModel().getColumn(1).setCellEditor(new DefaultCellEditor(bones));
-		JComboBox<KeyframeType> type = new JComboBox<>(KeyframeType.values());
+		final JComboBox<KeyframeType> type = new JComboBox<>(KeyframeType.values());
 		type.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (!updateData && currentKeyframe != null) {
@@ -242,7 +242,7 @@ public class KeyframeEditor {
 			}
 		});
 		keyframes.getColumnModel().getColumn(2).setCellEditor(new DefaultCellEditor(type));
-		JComboBox<Interpolation> interpolation = new JComboBox<>(Interpolation.values());
+		final JComboBox<Interpolation> interpolation = new JComboBox<>(Interpolation.values());
 		interpolation.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (!updateData && currentKeyframe != null) {

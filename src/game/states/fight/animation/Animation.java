@@ -108,7 +108,7 @@ public class Animation {
 		this.initialPose = new HashMap<>();
 		this.queuedInterpolations = new HashMap<>();
 		for (String bone : copy.initialPose.keySet()) {
-			this.initialPose.put(bone, new HashMap<>());
+			this.initialPose.put(bone, new HashMap<KeyframeType, Keyframe>());
 			for (KeyframeType type : copy.initialPose.get(bone).keySet()) {
 				this.initialPose.get(bone).put(type, new Keyframe(copy.initialPose.get(bone).get(type)));
 			}

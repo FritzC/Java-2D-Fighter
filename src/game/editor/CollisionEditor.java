@@ -184,7 +184,7 @@ public class CollisionEditor {
 		collisionBoxes.getTableHeader().setReorderingAllowed(false);
 		collisionBoxes.setSelectionMode(0);
 		collisionBoxes.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
-		JSpinner startFrame = new JSpinner(new SpinnerNumberModel(1, 0, 10000, 1));
+		final JSpinner startFrame = new JSpinner(new SpinnerNumberModel(1, 0, 10000, 1));
 		startFrame.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
@@ -195,7 +195,7 @@ public class CollisionEditor {
 			}
 		});
 		collisionBoxes.getColumnModel().getColumn(0).setCellEditor(new SpinnerEditor(startFrame));
-		JSpinner endFrame = new JSpinner(new SpinnerNumberModel(1, 0, 10000, 1));
+		final JSpinner endFrame = new JSpinner(new SpinnerNumberModel(1, 0, 10000, 1));
 		endFrame.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
@@ -205,7 +205,7 @@ public class CollisionEditor {
 			}
 		});
 		collisionBoxes.getColumnModel().getColumn(1).setCellEditor(new SpinnerEditor(endFrame));
-		JSpinner topX = new JSpinner(new SpinnerNumberModel(0d, -2d, 2d, 0.01));
+		final JSpinner topX = new JSpinner(new SpinnerNumberModel(0d, -2d, 2d, 0.01));
 		topX.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
@@ -215,7 +215,7 @@ public class CollisionEditor {
 			}
 		});
 		collisionBoxes.getColumnModel().getColumn(2).setCellEditor(new SpinnerEditor(topX));
-		JSpinner topY = new JSpinner(new SpinnerNumberModel(0d, -2d, 2d, 0.01));
+		final JSpinner topY = new JSpinner(new SpinnerNumberModel(0d, -2d, 2d, 0.01));
 		topY.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
@@ -225,7 +225,7 @@ public class CollisionEditor {
 			}
 		});
 		collisionBoxes.getColumnModel().getColumn(3).setCellEditor(new SpinnerEditor(topY));
-		JSpinner botX = new JSpinner(new SpinnerNumberModel(0d, -2d, 2d, 0.01));
+		final JSpinner botX = new JSpinner(new SpinnerNumberModel(0d, -2d, 2d, 0.01));
 		botX.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
@@ -235,7 +235,7 @@ public class CollisionEditor {
 			}
 		});
 		collisionBoxes.getColumnModel().getColumn(4).setCellEditor(new SpinnerEditor(botX));
-		JSpinner botY = new JSpinner(new SpinnerNumberModel(0d, -2d, 2d, 0.01));
+		final JSpinner botY = new JSpinner(new SpinnerNumberModel(0d, -2d, 2d, 0.01));
 		botY.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
@@ -334,7 +334,7 @@ public class CollisionEditor {
 		JPanel ecbs = new JPanel(new GridLayout(0, 2));
 		JPanel hurtboxes = new JPanel(new GridLayout(0, 2));
 		JPanel hitboxes = new JPanel(new GridLayout(0, 2));
-		JTextField group = new JTextField();
+		final JTextField group = new JTextField();
 		group.getDocument().addDocumentListener(new DocumentListener() {
 			public void changedUpdate(DocumentEvent e) {
 				if (!updateData && tabbedPane.getSelectedIndex() == 2 && selectedCollision != null) {
@@ -354,7 +354,7 @@ public class CollisionEditor {
 				}
 			}
 		});
-		JSpinner damage = new JSpinner(new SpinnerNumberModel(1, 0, 1000, 1));
+		final JSpinner damage = new JSpinner(new SpinnerNumberModel(1, 0, 1000, 1));
 		damage.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
@@ -363,7 +363,7 @@ public class CollisionEditor {
 				}
 			}
 		});
-		JSpinner hitstun = new JSpinner(new SpinnerNumberModel(1, 0, 1000, 1));
+		final JSpinner hitstun = new JSpinner(new SpinnerNumberModel(1, 0, 1000, 1));
 		hitstun.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
@@ -372,7 +372,7 @@ public class CollisionEditor {
 				}
 			}
 		});
-		JSpinner blockstun = new JSpinner(new SpinnerNumberModel(1, 0, 1000, 1));
+		final JSpinner blockstun = new JSpinner(new SpinnerNumberModel(1, 0, 1000, 1));
 		blockstun.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
@@ -381,7 +381,7 @@ public class CollisionEditor {
 				}
 			}
 		});
-		JSpinner pushback = new JSpinner(new SpinnerNumberModel(0d, -2d, 2d, 0.01));
+		final JSpinner pushback = new JSpinner(new SpinnerNumberModel(0d, -2d, 2d, 0.01));
 		pushback.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
@@ -391,7 +391,7 @@ public class CollisionEditor {
 			}
 		});
 		JPanel launchVelocity = new JPanel(new GridLayout(0, 2));
-		JSpinner launchX = new JSpinner(new SpinnerNumberModel(0d, -2d, 2d, 0.01));
+		final JSpinner launchX = new JSpinner(new SpinnerNumberModel(0d, -2d, 2d, 0.01));
 		launchX.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
@@ -400,7 +400,7 @@ public class CollisionEditor {
 				}
 			}
 		});
-		JSpinner launchY = new JSpinner(new SpinnerNumberModel(0d, -2d, 2d, 0.01));
+		final JSpinner launchY = new JSpinner(new SpinnerNumberModel(0d, -2d, 2d, 0.01));
 		launchY.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
@@ -411,7 +411,7 @@ public class CollisionEditor {
 		});
 		launchVelocity.add(launchX);
 		launchVelocity.add(launchY);
-		JCheckBox grab = new JCheckBox("   Grab With:");
+		final JCheckBox grab = new JCheckBox("   Grab With:");
 		grab.setHorizontalAlignment(SwingConstants.CENTER);
 		grab.addActionListener(new ActionListener() {
 			@Override
@@ -436,7 +436,7 @@ public class CollisionEditor {
 				}
 			}
 		});
-		JComboBox<HitBoxType> hitboxType = new JComboBox<>(HitBoxType.values());
+		final JComboBox<HitBoxType> hitboxType = new JComboBox<>(HitBoxType.values());
 		hitboxType.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -445,7 +445,7 @@ public class CollisionEditor {
 				}
 			}
 		});
-		JCheckBox releaseGrab = new JCheckBox("Releases Grabs");
+		final JCheckBox releaseGrab = new JCheckBox("Releases Grabs");
 		releaseGrab.setHorizontalAlignment(SwingConstants.CENTER);
 		releaseGrab.setHorizontalTextPosition(SwingConstants.LEFT);
 		releaseGrab.addActionListener(new ActionListener() {
@@ -456,7 +456,7 @@ public class CollisionEditor {
 				}
 			}
 		});
-		JCheckBox knockdown = new JCheckBox("Knocks Down");
+		final JCheckBox knockdown = new JCheckBox("Knocks Down");
 		knockdown.setHorizontalAlignment(SwingConstants.CENTER);
 		knockdown.setHorizontalTextPosition(SwingConstants.LEFT);
 		knockdown.addActionListener(new ActionListener() {
@@ -476,7 +476,7 @@ public class CollisionEditor {
 				}
 			}
 		});
-		JTextField triggerOtherAnim = new JTextField();
+		final JTextField triggerOtherAnim = new JTextField();
 		triggerOtherAnim.getDocument().addDocumentListener(new DocumentListener() {
 			public void changedUpdate(DocumentEvent e) {
 				if (!updateData && tabbedPane.getSelectedIndex() == 2 && selectedCollision != null) {

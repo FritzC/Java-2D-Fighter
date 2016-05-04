@@ -1,6 +1,5 @@
 package game.states.fight;
 
-import java.awt.Container;
 import java.awt.Graphics2D;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -8,9 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 
 import javax.swing.JComboBox;
@@ -20,6 +17,7 @@ import javax.swing.JTextField;
 import game.Game;
 import game.states.fight.animation.Animation;
 import game.states.fight.animation.Interpolation;
+import game.states.fight.animation.Keyframe;
 import game.states.fight.animation.KeyframeType;
 import game.states.fight.animation.collisions.ECB;
 import game.states.fight.animation.collisions.HitBox;
@@ -101,6 +99,7 @@ public class Fighter {
 		this.editorSkeletons = new Bone[3];
 		updateEditorSkeletons();
 		animations = new ArrayList<>();
+		velocity = new Vector(0, 0);
 	}
 	
 	/**
@@ -310,16 +309,16 @@ public class Fighter {
 
 	public String newAnimation() {
 		if (animations.size() == 0) {
-			animations.add(new Animation("animation_0", skeleton.getDefaultStartPositions(), new ArrayList<>(),
-					new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
+			animations.add(new Animation("animation_0", skeleton.getDefaultStartPositions(), new ArrayList<HitBox>(),
+					new ArrayList<HurtBox>(), new ArrayList<Keyframe>(), new ArrayList<ECB>()));
 			return "animation_0";
 		}
 		for (int i = 0;; i++) {
 			String name = "animation_" + i;
 			for (Animation anim : animations) {
 				if (!anim.getName().equals(name)) {
-					animations.add(new Animation(name, skeleton.getDefaultStartPositions(), new ArrayList<>(),
-							new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
+					animations.add(new Animation(name, skeleton.getDefaultStartPositions(), new ArrayList<HitBox>(),
+							new ArrayList<HurtBox>(), new ArrayList<Keyframe>(), new ArrayList<ECB>()));
 					return name;
 				}
 			}
@@ -344,7 +343,8 @@ public class Fighter {
 			for (Animation anim : animations) {
 				if (!anim.getName().equals(name)) {
 					animations.add(new Animation(name, startFrom.getBonePositions(this, editorSkeletons[0], startFrame),
-							new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
+							new ArrayList<HitBox>(), new ArrayList<HurtBox>(), new ArrayList<Keyframe>(),
+							new ArrayList<ECB>()));
 					return name;
 				}
 			}
