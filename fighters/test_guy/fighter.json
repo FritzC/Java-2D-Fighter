@@ -7,7 +7,7 @@
 			"drawMode": LINE,
 			"length": 0.5,
 			"width": 0.05,
-			"angle": 60,
+			"angle": 60.0,
 			"visible": false,
 			"sprite": "",
 			"children": {

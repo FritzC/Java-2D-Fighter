@@ -36,12 +36,13 @@ public class Editor {
 	static JPanel skeletonViewPanel;
 	static JPanel animationViewPanel;
 	static JPanel keyframeViewPanel;
+	static JPanel collisionViewPanel;
 	
 	private static JPanel editPanel;
 	static JPanel fighterPanel;
 	static JPanel animationsPanel;
 	static JPanel keyframePanel;
-	static JPanel collisionBoxPanel;
+	static JPanel collisionPanel;
 	
 	static List<Integer> keysDown;
 	
@@ -96,9 +97,11 @@ public class Editor {
 		FighterEditor.initSkeletonViewPanel();
 		AnimationEditor.initAnimationViewPanel();
 		KeyframeEditor.initKeyframeViewPanel();
+		CollisionEditor.initCollisionViewPanel();
 		viewPort.add(skeletonViewPanel);
 		viewPort.add(animationViewPanel);
 		viewPort.add(keyframeViewPanel);
+		viewPort.add(collisionViewPanel);
 	}
 	
 	public static void initEditPanel() {
@@ -107,11 +110,11 @@ public class Editor {
 		FighterEditor.initFighterPanel();
 		AnimationEditor.initAnimationsPanel();
 		KeyframeEditor.initKeyframeEditPanel();
-		collisionBoxPanel = new JPanel();
+		CollisionEditor.initCollisionPanel();
 		editPanel.add(fighterPanel);
 		editPanel.add(animationsPanel);
 		editPanel.add(keyframePanel);
-		editPanel.add(collisionBoxPanel);
+		editPanel.add(collisionPanel);
 	}
 
 }

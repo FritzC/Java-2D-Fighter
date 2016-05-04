@@ -53,6 +53,7 @@ public class KeyframeEditor {
 	private static JButton deleteKeyframe;
 	private static JButton refresh;
 	private final static int SHIFT = 16;
+	private static double frame;
 	
 	static JComboBox<String> bones;
 	static Keyframe currentKeyframe;
@@ -70,11 +71,8 @@ public class KeyframeEditor {
 				int groundY = Editor.camera.getScreenY(new Position(0f, 0f));
 				g.drawLine(0, groundY, getWidth() - 1, groundY);
 				if (currentKeyframe != null) {
-					double oldVal = AnimationEditor.currentAnimation.getCurrentFrame();
 					AnimationEditor.currentAnimation.setFrame(Editor.fighter, Editor.fighter.getEditorSkeleton(1),
 							currentKeyframe.getEndFrame());
-					AnimationEditor.currentAnimation.setFrame(Editor.fighter, Editor.fighter.getEditorSkeleton(0),
-							oldVal);
 					Editor.fighter.getEditorSkeleton(1).draw((Graphics2D) g, Editor.defaultLoc, Editor.camera, true,
 							(String) currentKeyframe.getInfo()[1], "", 0);
 				}
@@ -193,6 +191,7 @@ public class KeyframeEditor {
 		Editor.keyframePanel = new JPanel(new BorderLayout());
 		model = new DefaultTableModel(new String[] {"Frame", "Bone", "Type", "Interpolation", "Data"}, 0);
 		keyframes = new JTable(model);
+		keyframes.getTableHeader().setReorderingAllowed(false);
 		keyframes.setSelectionMode(0);
 		keyframes.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
 		keyframes.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
@@ -302,9 +301,11 @@ public class KeyframeEditor {
 	
 	public static void updateBones() {
 		bones.removeAllItems();
+		CollisionEditor.grabWith.removeAllItems();
 		if (Editor.fighter != null) {
 			for (String bone : Editor.fighter.getEditorSkeleton(1).getIdentifiers()) {
 				bones.addItem(bone);
+				CollisionEditor.grabWith.addItem(bone);
 			}
 		}
 	}
@@ -314,55 +315,31 @@ public class KeyframeEditor {
 	    DefaultTableModel model = (DefaultTableModel) keyframes.getModel();
 	    model.setRowCount(0);
 		List<Keyframe> temp = new ArrayList<>();
-		for(Keyframe keyframe : AnimationEditor.currentAnimation.getKeyframes()) {
-			temp.add(keyframe);
-		}
-		while (temp.size() > 0) {
-			Keyframe first = null;
-			for (int i = 0; i < temp.size(); i++) {
-				if (first == null || temp.get(i).getEndFrame() < first.getEndFrame()) {
-					first = temp.get(i);
-				}
+		if (AnimationEditor.currentAnimation != null) {
+			for(Keyframe keyframe : AnimationEditor.currentAnimation.getKeyframes()) {
+				temp.add(keyframe);
 			}
-			model.addRow(first.getInfo());
-			temp.remove(first);
-		}
-		keyframes.revalidate();
-		for (int i = 0; i < model.getRowCount(); i++) {
-			Object[] info = {keyframes.getValueAt(i, 0), keyframes.getValueAt(i, 1),
-					keyframes.getValueAt(i, 2), keyframes.getValueAt(i, 3)};
-			if (AnimationEditor.currentAnimation.getKeyframe(info).equals(currentKeyframe)) {
-				keyframes.setRowSelectionInterval(i, i);
-				keyframes.requestFocus();
-				break;
+			while (temp.size() > 0) {
+				Keyframe first = null;
+				for (int i = 0; i < temp.size(); i++) {
+					if (first == null || temp.get(i).getEndFrame() < first.getEndFrame()) {
+						first = temp.get(i);
+					}
+				}
+				model.addRow(first.getInfo());
+				temp.remove(first);
+			}
+			keyframes.revalidate();
+			for (int i = 0; i < model.getRowCount(); i++) {
+				Object[] info = {keyframes.getValueAt(i, 0), keyframes.getValueAt(i, 1),
+						keyframes.getValueAt(i, 2), keyframes.getValueAt(i, 3)};
+				if (AnimationEditor.currentAnimation.getKeyframe(info).equals(currentKeyframe)) {
+					keyframes.setRowSelectionInterval(i, i);
+					keyframes.requestFocus();
+					break;
+				}
 			}
 		}
 		updateData = false;
-	}
-
-	static class SpinnerEditor extends AbstractCellEditor implements TableCellEditor {
-		
-		JSpinner spinner;
-
-		public SpinnerEditor(JSpinner spinner) {
-			this.spinner = spinner;
-		}
-
-		public boolean isCellEditable(EventObject evt) {
-			if (evt instanceof MouseEvent) {
-				return ((MouseEvent) evt).getClickCount() >= 2;
-			}
-			return true;
-		}
-
-		public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row,
-				int column) {
-			spinner.setValue(value);
-			return spinner;
-		}
-
-		public Object getCellEditorValue() {
-			return spinner.getValue();
-		}
 	}
 }

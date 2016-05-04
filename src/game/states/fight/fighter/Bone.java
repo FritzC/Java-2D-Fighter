@@ -314,6 +314,10 @@ public class Bone {
 			case VISIBLE:
 				visible = (data == 1);
 				break;
+			case VELOCITY_X:
+				break;
+			case VELOCITY_Y:
+				break;
 		}
 	}
 
@@ -462,6 +466,10 @@ public class Bone {
 				new Keyframe(0, name, angle + interpolatedAngle, KeyframeType.ROTATE, Interpolation.NONE));
 		instructions.put(KeyframeType.VISIBLE,
 				new Keyframe(0, name, visible ? 1 : 0, KeyframeType.VISIBLE, Interpolation.NONE));
+		instructions.put(KeyframeType.VELOCITY_X,
+				new Keyframe(0, name, 0, KeyframeType.VELOCITY_X, Interpolation.NONE));
+		instructions.put(KeyframeType.VELOCITY_Y,
+				new Keyframe(0, name, 0, KeyframeType.VELOCITY_Y, Interpolation.NONE));
 		list.put(name, instructions);
 		for (Bone child : children) {
 			child.addStartInstructions(list);
@@ -548,5 +556,15 @@ public class Bone {
 		} else {
 			pw.print(whiteSpace + "},");
 		}
+	}
+
+	public double getAngle() {
+		// TODO Auto-generated method stub
+		return angle;
+	}
+
+	public double getOriginalAngle() {
+		// TODO Auto-generated method stub
+		return originalAngle;
 	}
 }

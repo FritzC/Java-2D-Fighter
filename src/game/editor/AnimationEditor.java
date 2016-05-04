@@ -36,12 +36,13 @@ public class AnimationEditor {
 	private static JButton newAnimation;
 	private static JButton copyAnimation;
 	private static JButton newAnimationFrom;
-	private static JSpinner frameToCopy;
+	private static JButton deleteAnimation;
 	private static JTextField name;
 	private static JComboBox<SharedAnimation> sharedAnimation;
 	private static JSpinner currentFrame;
 	private static JCheckBox loop;
 	private static JCheckBox specialCancelable;
+	private static double frame;
 
 	static boolean updateFrame;
 	static boolean updateFields;
@@ -63,16 +64,20 @@ public class AnimationEditor {
 				g.drawLine(0, groundY, getWidth() - 1, groundY);
 				if (currentAnimation != null) {
 					if (play.isSelected()) {
+						currentAnimation.setFrame(Editor.fighter, Editor.fighter.getEditorSkeleton(0), frame);
 						currentAnimation.stepAnimation(Editor.fighter, Editor.fighter.getEditorSkeleton(0),
 								Editor.camera.getSpeed());
+						frame = currentAnimation.getCurrentFrame();
 						updateFrame = true;
-						currentFrame.setValue((int) currentAnimation.getCurrentFrame());
+						currentFrame.setValue((int) frame);
 						updateFrame = false;
 					} else {
+						frame = (int) currentFrame.getValue();
 						currentAnimation.setFrame(Editor.fighter, Editor.fighter.getEditorSkeleton(0), (int) currentFrame.getValue());
 					}
 					currentAnimation.draw(Editor.defaultLoc, Editor.fighter, Editor.fighter.getEditorSkeleton(0), (Graphics2D) g,
-							Editor.camera, Editor.stage);
+							Editor.camera, Editor.stage, true);
+					g.setColor(Color.BLACK);
 					g.drawString("Frame: " + Math.round(currentAnimation.getCurrentFrame() * 100d) / 100d, 5, 15);
 				}
 			}
@@ -104,12 +109,13 @@ public class AnimationEditor {
 		animationSelector = new JComboBox<>();
 		animationSelector.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (!updateFields) {
+				if (!updateFields && animationSelector.getSelectedItem() != null) {
 					currentAnimation = Editor.fighter.getAnimation((String) animationSelector.getSelectedItem());
 					updateFields();
 					currentFrame.setValue(0);
 					currentAnimation.setFrame(Editor.fighter, Editor.fighter.getEditorSkeleton(0), 0);
 					KeyframeEditor.updateKeyframeTable();
+					CollisionEditor.updateTable();
 					KeyframeEditor.currentKeyframe = null;
 				}
 			}
@@ -120,34 +126,54 @@ public class AnimationEditor {
 				String newAnim = Editor.fighter.newAnimation();
 				updateFields = true;
 				Editor.fighter.updateUIAnimationList(animationSelector);
+				Editor.fighter.updateUIAnimationList(CollisionEditor.triggerAnim);
 				sharedAnimation.setSelectedIndex(0);
 				updateFields = false;
 				animationSelector.setSelectedItem(newAnim);
 			}
 		});
-		copyAnimation = new JButton("Copy");
+		copyAnimation = new JButton("Clone");
 		copyAnimation.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String newAnim = Editor.fighter.newAnimation(currentAnimation);
 				updateFields = true;
 				Editor.fighter.updateUIAnimationList(animationSelector);
+				Editor.fighter.updateUIAnimationList(CollisionEditor.triggerAnim);
 				updateNameComboBox();
 				updateFields = false;
 				animationSelector.setSelectedItem(newAnim);
 			}
 		});
-		newAnimationFrom = new JButton("New from");
+		newAnimationFrom = new JButton("New from current frame");
 		newAnimationFrom.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String newAnim = Editor.fighter.newAnimationFrom(currentAnimation, (int) frameToCopy.getValue());
+				String newAnim = Editor.fighter.newAnimationFrom(currentAnimation, (int) currentFrame.getValue());
 				updateFields = true;
 				Editor.fighter.updateUIAnimationList(animationSelector);
+				Editor.fighter.updateUIAnimationList(CollisionEditor.triggerAnim);
 				sharedAnimation.setSelectedIndex(0);
 				updateFields = false;
 				animationSelector.setSelectedItem(newAnim);
 			}
 		});
-		frameToCopy = new JSpinner(new SpinnerNumberModel(0, 0, 10000, 1));
+		deleteAnimation = new JButton("Delete");
+		deleteAnimation.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Editor.fighter.getAnimations().remove(currentAnimation);
+				currentAnimation = null;
+				KeyframeEditor.currentKeyframe = null;
+				CollisionEditor.selectedCollision = null;
+				KeyframeEditor.updateKeyframeTable();
+				CollisionEditor.updateTable();
+				updateFields = true;
+				Editor.fighter.updateUIAnimationList(animationSelector);
+				Editor.fighter.updateUIAnimationList(CollisionEditor.triggerAnim);
+				updateFields = false;
+				if (animationSelector.getItemCount() > 0) {
+					animationSelector.setSelectedIndex(0);
+				}
+			}
+		});
 		JPanel namePanel = new JPanel(new GridLayout(0, 2));
 		name = new JTextField();
 		name.getDocument().addDocumentListener(new DocumentListener() {
@@ -156,6 +182,7 @@ public class AnimationEditor {
 					updateFields = true;
 					currentAnimation.setName(name.getText());
 					Editor.fighter.updateUIAnimationList(animationSelector);
+					Editor.fighter.updateUIAnimationList(CollisionEditor.triggerAnim);
 					animationSelector.setSelectedItem(name.getText());
 					updateNameComboBox();
 					updateFields = false;
@@ -167,6 +194,7 @@ public class AnimationEditor {
 					updateFields = true;
 					currentAnimation.setName(name.getText());
 					Editor.fighter.updateUIAnimationList(animationSelector);
+					Editor.fighter.updateUIAnimationList(CollisionEditor.triggerAnim);
 					animationSelector.setSelectedItem(name.getText());
 					updateNameComboBox();
 					updateFields = false;
@@ -178,6 +206,7 @@ public class AnimationEditor {
 					updateFields = true;
 					currentAnimation.setName(name.getText());
 					Editor.fighter.updateUIAnimationList(animationSelector);
+					Editor.fighter.updateUIAnimationList(CollisionEditor.triggerAnim);
 					animationSelector.setSelectedItem(name.getText());
 					updateNameComboBox();
 					updateFields = false;
@@ -230,7 +259,7 @@ public class AnimationEditor {
 		Editor.animationsPanel.add(newAnimation);
 		Editor.animationsPanel.add(copyAnimation);
 		Editor.animationsPanel.add(newAnimationFrom);
-		Editor.animationsPanel.add(frameToCopy);
+		Editor.animationsPanel.add(deleteAnimation);
 		Editor.animationsPanel.add(new JLabel("Animation:", SwingConstants.CENTER));
 		Editor.animationsPanel.add(animationSelector);
 		Editor.animationsPanel.add(new JLabel("Name:", SwingConstants.CENTER));

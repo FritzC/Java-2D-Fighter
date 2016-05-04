@@ -17,12 +17,12 @@ public class Box {
 	/**
 	 * Top left coordinate
 	 */
-	private Position topLeft;
+	protected Position topLeft;
 	
 	/**
 	 * Bottom right coordinate
 	 */
-	private Position bottomRight;
+	protected Position bottomRight;
 	
 	/**
 	 * Initializes a box
@@ -71,11 +71,11 @@ public class Box {
 	public boolean intersects(Box box) {
 		int multiplier = 10000;
 		Rectangle r1 = new Rectangle((int) (topLeft.getX() * multiplier), (int) (topLeft.getY() * multiplier),
-				(int) ((bottomRight.getX() - topLeft.getX()) * multiplier),
-				(int) ((topLeft.getY() - bottomRight.getY()) * multiplier));
+				(int) (Math.abs(bottomRight.getX() - topLeft.getX()) * multiplier),
+				(int) (Math.abs(topLeft.getY() - bottomRight.getY()) * multiplier));
 		Rectangle r2 = new Rectangle((int) (box.topLeft.getX() * multiplier), (int) (box.topLeft.getY() * multiplier),
-				(int) ((box.bottomRight.getX() - box.topLeft.getX()) * multiplier),
-				(int) ((box.topLeft.getY() - box.bottomRight.getY()) * multiplier));
+				(int) (Math.abs(box.bottomRight.getX() - box.topLeft.getX()) * multiplier),
+				(int) (Math.abs(box.topLeft.getY() - box.bottomRight.getY()) * multiplier));
 		return r1.intersects(r2);
 	}
 	
@@ -86,13 +86,16 @@ public class Box {
 	 * @param camera - Camera on the scene
 	 * @param color - Color of the box
 	 */
-	public void draw(Graphics2D g, Camera camera, Color color) {
+	public void draw(Graphics2D g, Camera camera, Color color, boolean selected) {
 		int x = camera.getScreenX(topLeft);
 		int y = camera.getScreenY(topLeft);
-		int width = camera.toPixels(topLeft.getX() - bottomRight.getX());
-		int height = camera.toPixels(topLeft.getY() - bottomRight.getY());
-		//Color outter = new Color(color.getRed(), color.getGreen(), color.getBlue());
-		g.setColor(color);
+		int width = camera.toPixels(Math.abs(bottomRight.getX() - topLeft.getX()));
+		int height = camera.toPixels(Math.abs(topLeft.getY() - bottomRight.getY()));
+		g.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), 100));
+		g.fillRect(x + 1, y + 1, width - 1, height - 1);
+		g.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), 200));
+		if (selected)
+			g.setColor(Color.BLACK);
 		g.drawRect(x, y, width, height);
 	}
 }

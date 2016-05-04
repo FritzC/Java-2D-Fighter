@@ -48,6 +48,7 @@ public class FighterEditor {
 
 	private static Bone boneSelected;
 	private static Bone boneHovered;
+	private static JButton newFighter;
 	private static JButton loadFighter;
 	private static JButton saveFighter;
 	private static JTextField fighterName;
@@ -190,11 +191,25 @@ public class FighterEditor {
 		Editor.fighterPanel = new JPanel(new GridLayout(0, 2));
 		JPanel rightPanel = new JPanel(new GridLayout(0, 2));
 		fighterFileChooser = new JFileChooser(".");
-		loadFighter = new JButton("Load");
+		newFighter = new JButton("+");
+		newFighter.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Editor.fighterDirectory = null;
+				boneSelected = null;
+				Editor.fighter = new Fighter("", 1000, new Bone("root", 0.1, 0.05, 90, false));
+				updateFighterFields();
+				Editor.skeletonViewPanel.repaint();
+				skeletonTreeDiagram.repaint();
+				Editor.fighter.updateUIAnimationList(AnimationEditor.animationSelector);
+				KeyframeEditor.updateBones();
+			}
+		});
+		loadFighter = new JButton("...");
 		loadFighter.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				FileNameExtensionFilter filter = new FileNameExtensionFilter("Fighter files", "json");
 				fighterFileChooser.setFileFilter(filter);
+				fighterFileChooser.setCurrentDirectory(new File("./fighters"));
 				int returnVal = fighterFileChooser.showOpenDialog(null);
 				if (returnVal == JFileChooser.APPROVE_OPTION) {
 					try {
@@ -216,25 +231,21 @@ public class FighterEditor {
 		saveFighter.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					Editor.fighter.save(new File(
-							Editor.fighterDirectory.getAbsolutePath() + "/fighter.json"));
-					File animDir = new File(Editor.fighterDirectory.getAbsolutePath() + "/animations");
-					if (!animDir.exists()) {
-						animDir.mkdir();
+					if (Editor.fighterDirectory != null
+							&& !Editor.fighterDirectory.getName().equalsIgnoreCase(fighterName.getText())) {
+						(new File(Editor.fighterDirectory.getAbsolutePath() + "/fighter.json")).delete();
+						for (File f : new File(Editor.fighterDirectory.getAbsolutePath() + "/animations/")
+								.listFiles()) {
+							f.delete();
+						}
+						(new File(Editor.fighterDirectory.getAbsolutePath() + "/animations/")).delete();
+						Editor.fighterDirectory.delete();
 					}
+					Editor.fighter.save(new File("./fighters/" + fighterName.getText() + "/fighter.json"));
+					Editor.fighterDirectory = new File("./fighters/" + fighterName.getText());
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-				/*
-				 * FileNameExtensionFilter filter = new FileNameExtensionFilter(
-				 * "Fighter files", "json");
-				 * fighterFileChooser.setFileFilter(filter); int returnVal =
-				 * fighterFileChooser.showSaveDialog(null); if (returnVal ==
-				 * JFileChooser.APPROVE_OPTION) { try {
-				 * Editor.fighter.save(fighterFileChooser.getSelectedFile()); }
-				 * catch (IOException e1) { e1.printStackTrace(); } }
-				 */
 			}
 		});
 		fighterName = new JTextField();
@@ -272,10 +283,18 @@ public class FighterEditor {
 		addBone.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Bone newBone = new Bone(boneName.getText() + "_2", (double) boneLength.getValue(),
-						(double) boneWidth.getValue(), (double) boneAngle.getValue(), boneVisible.isSelected());
-				boneSelected.addChild(newBone);
-				boneSelected = newBone;
+				if (boneSelected != null) {
+					Bone newBone = new Bone(boneName.getText() + "_2", (double) boneLength.getValue(),
+							(double) boneWidth.getValue(), (double) boneAngle.getValue(), boneVisible.isSelected());
+					boneSelected.addChild(newBone);
+					expandedBones.add(boneSelected);
+					boneSelected = newBone;
+					updateBoneFields();
+					Editor.fighter.updateEditorSkeletons();
+					Editor.skeletonViewPanel.repaint();
+					KeyframeEditor.updateBones();
+					skeletonTreeDiagram.repaint();
+				}
 			}
 		});
 		removeBone = new JButton("Delete");
@@ -284,6 +303,10 @@ public class FighterEditor {
 			public void actionPerformed(ActionEvent e) {
 				if (boneSelected != null && Editor.fighter != null && Editor.fighter.getSkeleton() != null) {
 					Editor.fighter.getSkeleton().removeBone(boneSelected.getName());
+					Editor.fighter.updateEditorSkeletons();
+					Editor.skeletonViewPanel.repaint();
+					KeyframeEditor.updateBones();
+					skeletonTreeDiagram.repaint();
 				}
 			}
 		});
@@ -393,7 +416,10 @@ public class FighterEditor {
 				skeletonTreeDiagram.repaint();
 			}
 		});
-		rightPanel.add(loadFighter);
+		JPanel newLoad = new JPanel(new GridLayout(0, 2));
+		newLoad.add(newFighter);
+		newLoad.add(loadFighter);
+		rightPanel.add(newLoad);
 		rightPanel.add(saveFighter);
 		rightPanel.add(new JLabel("Name:", SwingConstants.CENTER));
 		rightPanel.add(fighterName);
@@ -490,10 +516,6 @@ public class FighterEditor {
 			KeyframeEditor.updateBones();
 			skeletonTreeDiagram.repaint();
 		}
-	}
-	
-	public void saveFighter(File f) {
-		
 	}
 
 }

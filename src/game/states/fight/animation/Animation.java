@@ -3,6 +3,9 @@ package game.states.fight.animation;
 import java.awt.Graphics2D;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +18,11 @@ import javax.swing.JTextField;
 import game.states.fight.Camera;
 import game.states.fight.Fighter;
 import game.states.fight.Stage;
+import game.states.fight.animation.collisions.CollisionBox;
+import game.states.fight.animation.collisions.ECB;
+import game.states.fight.animation.collisions.HitBox;
+import game.states.fight.animation.collisions.HitBoxType;
+import game.states.fight.animation.collisions.HurtBox;
 import game.states.fight.fighter.Bone;
 import game.util.Box;
 import game.util.Position;
@@ -129,8 +137,30 @@ public class Animation {
 	 * @param position - Position to draw the animation at
 	 * @param g - Graphics2D object to draw
 	 */
-	public void draw(Position position, Fighter fighter, Bone root, Graphics2D g, Camera camera, Stage stage) {
+	public void draw(Position position, Fighter fighter, Bone root, Graphics2D g, Camera camera, Stage stage, boolean debug) {
+		draw(position, fighter, root, g, camera, stage, debug, null);
+	}
+
+	/**
+	 * Draws the animation's current step at a position
+	 * 
+	 * @param position - Position to draw the animation at
+	 * @param g - Graphics2D object to draw
+	 */
+	public void draw(Position position, Fighter fighter, Bone root, Graphics2D g, Camera camera, Stage stage,
+			boolean debug, CollisionBox selected) {
 		root.draw(g, position, camera);
+		if (debug) {
+			if (getActiveECB() != null) {
+				getActiveECB().draw(position, camera, g, getActiveECB().equals(selected));
+			}
+			for (HurtBox hurtbox : getActiveHurtBoxes()) {
+				hurtbox.draw(position, camera, g, hurtbox.equals(selected));
+			}
+			for (HitBox hitbox : getActiveHitBoxes()) {
+				hitbox.draw(position, camera, g, hitbox.equals(selected));
+			}
+		}
 	}
 	
 	/**
@@ -297,6 +327,33 @@ public class Animation {
 		return length;
 	}
 	
+	public CollisionBox getCollisionBox(String type, Object[] data) {
+		switch (type) {
+			case "ECBs":
+				for (ECB ecb : ecbs) {
+					if (ecb.isEqual(data)) {
+						return ecb;
+					}
+				}
+				break;
+			case "Hurtboxes":
+				for (HurtBox hurtbox : hurtboxes) {
+					if (hurtbox.isEqual(data)) {
+						return hurtbox;
+					}
+				}
+				break;
+			case "Hitboxes":
+				for (HitBox hitbox : hitboxes) {
+					if (hitbox.isEqual(data)) {
+						return hitbox;
+					}
+				}
+				break;
+		}
+		return null;
+	}
+	
 	public static Animation load(File f) throws FileNotFoundException {
 		Scanner s = new Scanner(f);
 		List<String> lines = new ArrayList<>();
@@ -305,7 +362,6 @@ public class Animation {
 		}
 		boolean loop = false;
 		boolean specialCancelable = false;
-		double center = 0;
 		Map<String, Map<KeyframeType, Keyframe>> initialPose = new HashMap<>();
 		List<Keyframe> keyframes = new ArrayList<>();
 		List<ECB> ecbs = new ArrayList<>();
@@ -359,7 +415,7 @@ public class Animation {
 						double botX = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", ""));
 						double botY = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", ""));
 						ecbs.add(new ECB(startFrame, endFrame, new Box(new Position(topX, topY), new Position(botX, botY))));
-						i+=2;
+						i+=3;
 					}
 					break;
 				case "hurtboxes":
@@ -372,7 +428,7 @@ public class Animation {
 						double botX = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", ""));
 						double botY = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", ""));
 						hurtboxes.add(new HurtBox(startFrame, endFrame, new Box(new Position(topX, topY), new Position(botX, botY))));
-						i+=2;
+						i+=3;
 					}
 					break;
 				case "hitboxes":
@@ -380,11 +436,16 @@ public class Animation {
 						String group = lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", "").replaceAll("\"", "");
 						int startFrame = Integer.parseInt(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", ""));
 						int endFrame = Integer.parseInt(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", ""));
-						double damage = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", ""));
+						int damage = Integer.parseInt(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", ""));
 						int blockStun = Integer.parseInt(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", ""));
 						int hitStun = Integer.parseInt(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", ""));
 						double pushBack = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", ""));
-						boolean knockDown = Boolean.parseBoolean(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2));
+						boolean knockDown = Boolean.parseBoolean(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", ""));
+						HitBoxType type = HitBoxType.forString(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", ""));
+						boolean release = Boolean.parseBoolean(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", ""));
+						String attachTo = lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", "").replaceAll("\"", "");
+						String triggerAnim = lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", "").replaceAll("\"", "");
+						String triggerTargetAnim = lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", "").replaceAll("\"", "");
 						i+=2;
 						double topX = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", ""));
 						double topY = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", ""));
@@ -393,9 +454,11 @@ public class Animation {
 						i+=4;
 						double velX = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", ""));
 						double velY = Double.parseDouble(lines.get(++i).substring(lines.get(i).indexOf(": ") + 2).replace(",", ""));
-						hitboxes.add(new HitBox(startFrame, endFrame, group, new Box(new Position(topX, topY), new Position(botX, botY)),
-								damage, hitStun, blockStun, pushBack, new Vector(velX, velY), knockDown));
-						i+=3;
+						hitboxes.add(new HitBox(startFrame, endFrame, group,
+								new Box(new Position(topX, topY), new Position(botX, botY)), damage, hitStun, blockStun,
+								pushBack, new Vector(velX, velY), knockDown, type, release, attachTo, triggerAnim,
+								triggerTargetAnim));
+						i += 3;
 					}
 					break;
 			}
@@ -404,10 +467,78 @@ public class Animation {
 				ecbs);
 		anim.loop = loop;
 		anim.specialCancelable = specialCancelable;
+		s.close();
 		return anim;
 	}
 	
-	public void save(File f) {
-		
+	public void save(File f) throws IOException {
+		if (!f.exists()) {
+			f.getParentFile().mkdirs();
+			f.createNewFile();
+		}
+		PrintWriter pw = new PrintWriter(new FileWriter(f));
+		pw.println("{");
+		pw.println("\t\"loop\": " + loop + ",");
+		pw.println("\t\"specialCancelable\": " + specialCancelable + ",");
+		pw.println("\t\"initialPose\": {");
+		for (String bone : initialPose.keySet()) {
+			pw.println("\t\t\"bonePose\": {");
+			pw.println("\t\t\t\"name\": \"" + bone + "\",");
+			pw.println("\t\t\t\"length\": " + initialPose.get(bone).get(KeyframeType.LENGTH).getInfo()[4] + ",");
+			pw.println("\t\t\t\"angle\": " + initialPose.get(bone).get(KeyframeType.ROTATE).getInfo()[4] + ",");
+			pw.println("\t\t\t\"visible\": " + ((double) initialPose.get(bone).get(KeyframeType.VISIBLE).getInfo()[4] == 1));
+			pw.println("\t\t},");
+		}
+		pw.println("\t},");
+		pw.println("\t\"steps\": {");
+		for (Keyframe keyframe : steps) {
+			pw.println("\t\t\"keyframe\": {");
+			pw.println("\t\t\t\"bone\": \"" + keyframe.getInfo()[1] + "\",");
+			pw.println("\t\t\t\"frame\": " + keyframe.getInfo()[0] + ",");
+			pw.println("\t\t\t\"type\": " + keyframe.getInfo()[2] + ",");
+			pw.println("\t\t\t\"interpolation\": " + keyframe.getInfo()[3] + ",");
+			pw.println("\t\t\t\"data\": " + keyframe.getInfo()[4]);
+			pw.println("\t\t},");
+		}
+		pw.println("\t},");
+		pw.println("\t\"ecbs\": {");
+		for (ECB ecb : ecbs) {
+			pw.println("\t\t\"ecb\": {");
+			pw.println("\t\t\t\"startFrame\": " + ecb.getStartFrame() + ",");
+			pw.println("\t\t\t\"endFrame\": " + ecb.getEndFrame() + ",");
+			pw.println("\t\t\t\"collision\": {");
+			pw.println("\t\t\t\t\"box\": {");
+			pw.println("\t\t\t\t\t\"top_l x\": " + ecb.getTopLeft().getX() + ",");
+			pw.println("\t\t\t\t\t\"top_l y\": " + ecb.getTopLeft().getY() + ",");
+			pw.println("\t\t\t\t\t\"bottom_r x\": " + ecb.getBottomRight().getX() + ",");
+			pw.println("\t\t\t\t\t\"bottom_r y\": " + ecb.getBottomRight().getY());
+			pw.println("\t\t\t\t}");
+			pw.println("\t\t\t}");
+			pw.println("\t\t},");
+		}
+		pw.println("\t},");
+		pw.println("\t\"hurtboxes\": {");
+		for (HurtBox hurtbox : hurtboxes) {
+			pw.println("\t\t\"hurtbox\": {");
+			pw.println("\t\t\t\"startFrame\": " + hurtbox.getStartFrame() + ",");
+			pw.println("\t\t\t\"endFrame\": " + hurtbox.getEndFrame() + ",");
+			pw.println("\t\t\t\"collision\": {");
+			pw.println("\t\t\t\t\"box\": {");
+			pw.println("\t\t\t\t\t\"top_l x\": " + hurtbox.getTopLeft().getX() + ",");
+			pw.println("\t\t\t\t\t\"top_l y\": " + hurtbox.getTopLeft().getY() + ",");
+			pw.println("\t\t\t\t\t\"bottom_r x\": " + hurtbox.getBottomRight().getX() + ",");
+			pw.println("\t\t\t\t\t\"bottom_r y\": " + hurtbox.getBottomRight().getY());
+			pw.println("\t\t\t\t}");
+			pw.println("\t\t\t}");
+			pw.println("\t\t},");
+		}
+		pw.println("\t},");
+		pw.println("\t\"hitboxes\": {");
+		for (HitBox hitbox : hitboxes) {
+			hitbox.save(f, pw);
+		}
+		pw.println("\t},");
+		pw.println("}");
+		pw.close();
 	}
 }

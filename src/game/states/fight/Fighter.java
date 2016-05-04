@@ -1,5 +1,6 @@
 package game.states.fight;
 
+import java.awt.Container;
 import java.awt.Graphics2D;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -18,11 +19,11 @@ import javax.swing.JTextField;
 
 import game.Game;
 import game.states.fight.animation.Animation;
-import game.states.fight.animation.ECB;
-import game.states.fight.animation.HitBox;
-import game.states.fight.animation.HurtBox;
 import game.states.fight.animation.Interpolation;
 import game.states.fight.animation.KeyframeType;
+import game.states.fight.animation.collisions.ECB;
+import game.states.fight.animation.collisions.HitBox;
+import game.states.fight.animation.collisions.HurtBox;
 import game.states.fight.fighter.Bone;
 import game.util.Position;
 import game.util.Vector;
@@ -109,16 +110,7 @@ public class Fighter {
 	 */
 	public void draw(Graphics2D g, Camera camera, Stage stage) {
 		if (animation != null) {
-			animation.draw(position, this, skeleton, g, camera, stage);
-			if (Game.DEBUG) {
-				getECB().draw(position, camera, g);
-				for (HurtBox hurtbox : getHurtBoxes()) {
-					hurtbox.draw(position, camera, g);
-				}
-				for (HitBox hitbox : getHitBoxes()) {
-					hitbox.draw(position, camera, g);
-				}
-			}
+			animation.draw(position, this, skeleton, g, camera, stage, Game.DEBUG);
 		}
 	}
 	
@@ -317,11 +309,16 @@ public class Fighter {
 	}
 
 	public String newAnimation() {
+		if (animations.size() == 0) {
+			animations.add(new Animation("animation_0", skeleton.getDefaultStartPositions(), new ArrayList<>(),
+					new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
+			return "animation_0";
+		}
 		for (int i = 0;; i++) {
 			String name = "animation_" + i;
 			for (Animation anim : animations) {
 				if (!anim.getName().equals(name)) {
-					animations.add(new Animation(name, editorSkeletons[0].getDefaultStartPositions(), new ArrayList<>(),
+					animations.add(new Animation(name, skeleton.getDefaultStartPositions(), new ArrayList<>(),
 							new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
 					return name;
 				}
@@ -352,6 +349,10 @@ public class Fighter {
 				}
 			}
 		}
+	}
+
+	public List<Animation> getAnimations() {
+		return animations;
 	}
 
 	/**
@@ -407,6 +408,7 @@ public class Fighter {
 	 */
 	public void save(File f) throws IOException {
 		if (!f.exists()) {
+			f.getParentFile().mkdirs();
 			f.createNewFile();
 		}
 		PrintWriter pw = new PrintWriter(new FileWriter(f));
@@ -418,6 +420,9 @@ public class Fighter {
 		pw.println("\t}");
 		pw.print("}");
 		pw.close();
+		for (Animation animation : animations) {
+			animation.save(new File(f.getParent() + "/animations/" + animation.getName() + ".json"));
+		}
 	}
 	
 }

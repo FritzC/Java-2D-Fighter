@@ -4,8 +4,8 @@ import java.awt.Graphics2D;
 import java.util.List;
 
 import game.states.fight.animation.Animation;
-import game.states.fight.animation.HitBox;
-import game.states.fight.animation.HurtBox;
+import game.states.fight.animation.collisions.HitBox;
+import game.states.fight.animation.collisions.HurtBox;
 import game.util.Position;
 import game.util.Vector;
 
