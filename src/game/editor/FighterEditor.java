@@ -200,7 +200,7 @@ public class FighterEditor {
 				updateFighterFields();
 				Editor.skeletonViewPanel.repaint();
 				skeletonTreeDiagram.repaint();
-				Editor.fighter.updateUIAnimationList(AnimationEditor.animationSelector);
+				Editor.fighter.updateUIAnimationList(AnimationEditor.animationSelector, false);
 				KeyframeEditor.updateBones();
 			}
 		});
@@ -218,7 +218,7 @@ public class FighterEditor {
 						updateFighterFields();
 						Editor.skeletonViewPanel.repaint();
 						skeletonTreeDiagram.repaint();
-						Editor.fighter.updateUIAnimationList(AnimationEditor.animationSelector);
+						Editor.fighter.updateUIAnimationList(AnimationEditor.animationSelector, false);
 						Editor.fighterDirectory = fighterFileChooser.getSelectedFile().getParentFile();
 						KeyframeEditor.updateBones();
 					} catch (FileNotFoundException e1) {

@@ -3,6 +3,9 @@ package game.input;
 import java.util.ArrayList;
 import java.util.List;
 
+import game.input.sources.DummySource;
+import game.input.sources.KeyboardSource;
+
 /**
  * Handles different types of inputs and polls the sources
  * 
@@ -24,9 +27,11 @@ public class InputHandler {
 	/**
 	 * Initializes variables
 	 */
-	static {
+	public static void initialize() {
 		devices = new ArrayList<>();
 		mouse = new Mouse();
+		devices.add(new KeyboardSource());
+		devices.add(new DummySource());
 	}
 	
 	/**
@@ -36,5 +41,9 @@ public class InputHandler {
 		for (InputSource source : devices) {
 			source.poll();
 		}
+	}
+	
+	public static InputSource getSource(int i) {
+		return devices.get(i);
 	}
 }

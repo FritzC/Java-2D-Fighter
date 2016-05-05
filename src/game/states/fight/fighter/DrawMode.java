@@ -9,7 +9,8 @@ package game.states.fight.fighter;
 public enum DrawMode {
 
 	SPRITE,
-	LINE;
+	LINE,
+	CIRCLE;
 	
 	/**
 	 * Gets a value for a string

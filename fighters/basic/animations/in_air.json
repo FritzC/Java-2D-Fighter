@@ -1,0 +1,116 @@
+{
+	"loop": true,
+	"specialCancelable": false,
+	"initialPose": {
+		"bonePose": {
+			"name": "l_upper_arm",
+			"length": 0.12081830674324856,
+			"angle": 315.0,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "l_lower_arm",
+			"length": 0.03341323756304445,
+			"angle": 40.0,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "neck",
+			"length": 0.040088790342327756,
+			"angle": 85.0,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "r_upper_leg",
+			"length": 0.06798692684790379,
+			"angle": 270.0,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "r_lower_leg",
+			"length": 0.13775406425074146,
+			"angle": 240.0,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "head",
+			"length": 0.10881176406988355,
+			"angle": 70.0,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "l_lower_leg",
+			"length": 0.13611816022765766,
+			"angle": 245.0,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "l_upper_leg",
+			"length": 0.11436584616227231,
+			"angle": 335.0,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "upper_body",
+			"length": 0.09113603995005366,
+			"angle": 80.0,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "root",
+			"length": 0.18980223625892528,
+			"angle": 90.0,
+			"visible": false
+		},
+		"bonePose": {
+			"name": "lower_body",
+			"length": 0.08061982110843187,
+			"angle": 85.0,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "r_upper_arm",
+			"length": 0.13874718172649397,
+			"angle": 215.0,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "r_lower_arm",
+			"length": 0.06225396015962001,
+			"angle": 335.0,
+			"visible": true
+		},
+	},
+	"steps": {
+	},
+	"ecbs": {
+		"ecb": {
+			"startFrame": 0,
+			"endFrame": 1,
+			"collision": {
+				"box": {
+					"top_l x": -0.074,
+					"top_l y": 0.549,
+					"bottom_r x": 0.13,
+					"bottom_r y": 0.01
+				}
+			}
+		},
+	},
+	"hurtboxes": {
+		"hurtbox": {
+			"startFrame": 0,
+			"endFrame": 1,
+			"collision": {
+				"box": {
+					"top_l x": -0.133,
+					"top_l y": 0.573,
+					"bottom_r x": 0.178,
+					"bottom_r y": -0.002
+				}
+			}
+		},
+	},
+	"hitboxes": {
+	},
+}

@@ -14,7 +14,7 @@ public abstract class InputSource {
 	/**
 	 * List of all previous inputs
 	 */
-	private List<Input> inputs;
+	protected List<Input> inputs;
 	
 	/**
 	 * Whether there is a new input since last checked
@@ -40,6 +40,9 @@ public abstract class InputSource {
 	 */
 	public Input getLastInput() {
 		newInput = false;
+		if (inputs.size() == 0) {
+			return null;
+		}
 		return inputs.get(inputs.size() - 1);
 	}
 	

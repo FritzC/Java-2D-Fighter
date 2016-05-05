@@ -1,5 +1,5 @@
 {
-	"loop": false,
+	"loop": true,
 	"specialCancelable": false,
 	"initialPose": {
 		"bonePose": {
@@ -298,7 +298,7 @@
 			"bone": "r_lower_arm",
 			"frame": 120,
 			"type": ROTATE,
-			"interpolation": LINEAR,
+			"interpolation": SMOOTH_OUT,
 			"data": 17.744670867919922
 		},
 		"keyframe": {
@@ -336,6 +336,27 @@
 			"interpolation": SMOOTH_OUT,
 			"data": 302.275634765625
 		},
+		"keyframe": {
+			"bone": "root",
+			"frame": 0,
+			"type": VELOCITY_X,
+			"interpolation": NONE,
+			"data": 0.0
+		},
+		"keyframe": {
+			"bone": "root",
+			"frame": 0,
+			"type": VELOCITY_Y,
+			"interpolation": NONE,
+			"data": 0.0
+		},
+		"keyframe": {
+			"bone": "l_upper_arm",
+			"frame": 120,
+			"type": ROTATE,
+			"interpolation": SMOOTH_OUT,
+			"data": 302.275634765625
+		},
 	},
 	"ecbs": {
 		"ecb": {
@@ -343,10 +364,10 @@
 			"endFrame": 120,
 			"collision": {
 				"box": {
-					"top_l x": -0.163,
-					"top_l y": 0.524,
-					"bottom_r x": 0.193,
-					"bottom_r y": 0.002
+					"top_l x": -0.133,
+					"top_l y": 0.584,
+					"bottom_r x": 0.112,
+					"bottom_r y": -0.013
 				}
 			}
 		},

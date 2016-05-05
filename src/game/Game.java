@@ -1,12 +1,16 @@
 package game;
 
+import java.io.FileNotFoundException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import game.input.InputHandler;
 import game.states.FightState;
 import game.states.GameState;
 import game.states.fight.Stage;
+import game.states.fight.fighters.BasicFighter;
+import game.util.Position;
 
 /**
  * Main class of the game
@@ -56,9 +60,12 @@ public class Game {
 	 * Main method, runs on startup
 	 * 
 	 * @param args
+	 * @throws FileNotFoundException 
 	 */
-	public static void main(String[] args) {
-		state = new FightState(null, null, new Stage());
+	public static void main(String[] args) throws FileNotFoundException {
+		InputHandler.initialize();
+		state = new FightState(new BasicFighter(InputHandler.getSource(0), new Position(1, 0)),
+				new BasicFighter(InputHandler.getSource(1), new Position(2, 0)), new Stage());
 		window = new Window();
 		window.setState(state);
 		gameLoop = new Runnable() {
@@ -66,6 +73,7 @@ public class Game {
 			@Override
 			public void run() {
 				tick++;
+				InputHandler.poll();
 				state.logic();
 				window.repaint();
 			}

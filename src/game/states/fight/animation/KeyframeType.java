@@ -9,11 +9,14 @@ import game.states.fight.fighter.DrawMode;
  *
  */
 public enum KeyframeType {
-	VELOCITY_X,
-	VELOCITY_Y,
+	
 	ROTATE, 
 	LENGTH, 
-	VISIBLE;
+	VISIBLE,
+	VELOCITY_X,
+	VELOCITY_Y,
+	IGNORE_VELOCITY_X,
+	IGNORE_VELOCITY_Y;
 	
 	public static KeyframeType forString(String s) {
 		for (KeyframeType mode : values()) {

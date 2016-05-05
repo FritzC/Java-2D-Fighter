@@ -112,6 +112,27 @@
 											"children": {}
 										}
 									}
+								},
+								"bone": {
+									"name": "neck",
+									"drawMode": LINE,
+									"length": 0.040088790342327756,
+									"width": 0.05,
+									"angle": 85.0,
+									"visible": true,
+									"sprite": "",
+									"children": {
+										"bone": {
+											"name": "head",
+											"drawMode": CIRCLE,
+											"length": 0.10881176406988355,
+											"width": 0.05,
+											"angle": 70.0,
+											"visible": true,
+											"sprite": "",
+											"children": {}
+										}
+									}
 								}
 							}
 						}

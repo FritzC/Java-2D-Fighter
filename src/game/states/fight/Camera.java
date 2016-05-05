@@ -14,12 +14,14 @@ public class Camera {
 	public Position focus;
 	public double zoom;
 	public double speed;
+	public double viewportSize;
 	public Stage stage;
 	
 	public Camera(Stage stage) {
 		this.stage = stage;
-		focus = new Position(0.5f, 0.25f);
-		zoom = 1.0d;
+		focus = new Position(0.5f, 1.25);
+		zoom = 3d;
+		viewportSize = 3d;
 		speed = 1.0d;
 	}
 	
@@ -67,5 +69,13 @@ public class Camera {
 	
 	public double getSpeed() {
 		return speed;
+	}
+	
+	public double getViewportSize() {
+		return viewportSize;
+	}
+
+	public Position getFocus() {
+		return focus;
 	}
 }

@@ -88,7 +88,12 @@ public class Keyframe {
 	 * 
 	 * @param root - Fighter's root bone
 	 */
-	public void apply(Bone root) {
+	public void apply(Fighter fighter, Bone root) {
+		if (type == KeyframeType.VELOCITY_X || type == KeyframeType.VELOCITY_Y || type == KeyframeType.IGNORE_VELOCITY_X
+				|| type == KeyframeType.IGNORE_VELOCITY_Y) {
+			fighter.interpolateVelocity(data, type, interpolation, 1);
+			return;
+		}
 		root.getBone(boneId).applyInstruction(data, type);
 	}
 	
@@ -101,7 +106,8 @@ public class Keyframe {
 	 */
 	public boolean attemptToRegister(double currentFrame, Map<String, Map<KeyframeType, Keyframe>> table) {
 		if (table.containsKey(boneId) && table.get(boneId).containsKey(type)
-				&& table.get(boneId).get(type).endFrame <= endFrame || getCompletion(currentFrame) >= 1) {
+				&& table.get(boneId).get(type).endFrame <= endFrame
+				|| (getCompletion(currentFrame) >= 1 && currentFrame != 0)) {
 			return false;
 		}
 		if (table.get(boneId) == null) {
@@ -119,6 +125,9 @@ public class Keyframe {
 	 * @return - % complete
 	 */
 	public double getCompletion(double currentFrame) {
+		if (endFrame == 0) {
+			return 1;
+		}
 		return (currentFrame - beginInterpolatingFrame) / (double) (endFrame - beginInterpolatingFrame);
 	}
 	

@@ -15,10 +15,14 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 
 import game.Game;
+import game.input.InputSource;
+import game.input.InputType;
+import game.input.sources.DummySource;
 import game.states.fight.animation.Animation;
 import game.states.fight.animation.Interpolation;
 import game.states.fight.animation.Keyframe;
 import game.states.fight.animation.KeyframeType;
+import game.states.fight.animation.SharedAnimation;
 import game.states.fight.animation.collisions.ECB;
 import game.states.fight.animation.collisions.HitBox;
 import game.states.fight.animation.collisions.HurtBox;
@@ -85,6 +89,16 @@ public class Fighter {
 	 */
 	private List<String> hitBy;
 	
+	protected InputSource inputSource;
+	
+	private boolean hasSetVelocityX;
+	
+	private boolean hasSetVelocityY;
+	
+	protected double gravity;
+	
+	protected double maxFallSpeed;
+	
 	/**
 	 * Initializes a new fighter
 	 * 
@@ -100,8 +114,25 @@ public class Fighter {
 		updateEditorSkeletons();
 		animations = new ArrayList<>();
 		velocity = new Vector(0, 0);
+		position = new Position(0.25, 0);
+		setAnimation(SharedAnimation.IDLE.toString());
 	}
 	
+	public Fighter(Fighter copy) {
+		this.name = copy.name;
+		this.health = copy.health;
+		this.skeleton = new Bone(copy.skeleton);
+		this.editorSkeletons = new Bone[3];
+		updateEditorSkeletons();
+		animations = new ArrayList<>();
+		for (Animation animation : copy.animations) {
+			animations.add(new Animation(animation, false));
+		}
+		velocity = new Vector(0, 0);
+		position = new Position(0.25, 0);
+		setAnimation(SharedAnimation.IDLE.toString());
+	}
+
 	/**
 	 * Draws the fighter in the game window
 	 * 
@@ -109,6 +140,11 @@ public class Fighter {
 	 */
 	public void draw(Graphics2D g, Camera camera, Stage stage) {
 		if (animation != null) {
+			animation.stepAnimation(this, skeleton, camera.getSpeed());
+			if (animation.completed()) {
+				animation = null;
+				handleInputs();
+			}
 			animation.draw(position, this, skeleton, g, camera, stage, Game.DEBUG);
 		}
 	}
@@ -119,9 +155,15 @@ public class Fighter {
 	 * @param newAnim - Identifier of the new animation
 	 */
 	public void setAnimation(String newAnim) {
+		if (animation != null && animation.getName().equalsIgnoreCase(newAnim)) {
+			return;
+		}
 		for (Animation anim : animations) {
-			if (anim.getName().equals(newAnim)) {
+			if (anim.getName().equalsIgnoreCase(newAnim)) {
 				animation = anim;
+				hasSetVelocityX = false;
+				hasSetVelocityY = false;
+				animation.setFrame(this, skeleton, 0);
 			}
 		}
 	}
@@ -171,6 +213,47 @@ public class Fighter {
 		}
 	}
 	
+	public void handleInputs() {
+		String animName = "";
+		boolean hasInput = inputSource.getLastInput() != null;
+		if (animation != null) {
+			animName = animation.getName();
+		}
+		boolean groundMovement = animName.equalsIgnoreCase(SharedAnimation.WALK_F.toString())
+				|| animName.equalsIgnoreCase(SharedAnimation.WALK_B.toString())
+				|| animName.equalsIgnoreCase(SharedAnimation.IDLE.toString()) || animName.equalsIgnoreCase("")
+				|| animName.equalsIgnoreCase(SharedAnimation.IN_AIR.toString())
+				|| animName.equalsIgnoreCase(SharedAnimation.CROUCH.toString());
+		if (hasInput && groundMovement && inputSource.getLastInput().getTypes().contains(InputType.ATTACK_1)
+				&& !inputSource.getLastInput().hasBeenUsed()) {
+			setAnimation(SharedAnimation.PUNCH.toString());
+			inputSource.getLastInput().setUsed();
+		} else if (hasInput && groundMovement && inputSource.getLastInput().getTypes().contains(InputType.UP) && isGrounded()
+				&& !inputSource.getLastInput().hasBeenUsed()) {
+			if (inputSource.getLastInput().getTypes().contains(InputType.RIGHT)) {
+				setAnimation(SharedAnimation.JUMPSQUAT_F.toString());
+			} else if (inputSource.getLastInput().getTypes().contains(InputType.LEFT)) {
+				setAnimation(SharedAnimation.JUMPSQUAT_B.toString());
+			} else {
+				setAnimation(SharedAnimation.JUMPSQUAT_N.toString());
+			}
+			inputSource.getLastInput().setUsed();
+		} else if (hasInput && groundMovement && inputSource.getLastInput().getTypes().contains(InputType.DOWN) && isGrounded()) {
+			setAnimation(SharedAnimation.CROUCH.toString());
+		} else if (hasInput && groundMovement && inputSource.getLastInput().getTypes().contains(InputType.RIGHT) && isGrounded()) {
+			setAnimation(SharedAnimation.WALK_F.toString());
+		} else if (hasInput && groundMovement && inputSource.getLastInput().getTypes().contains(InputType.LEFT) && isGrounded()) {
+			setAnimation(SharedAnimation.WALK_B.toString());
+		} else if (hasInput && groundMovement && inputSource.getLastInput().getTypes().contains(InputType.LEFT) && isGrounded()) {
+			setAnimation(SharedAnimation.WALK_B.toString());
+		} else if (hasInput && groundMovement && isGrounded()
+				&& (inputSource.getLastInput().getTypes().size() == 0 || inputSource.getLastInput().hasBeenUsed())) {
+			setAnimation(SharedAnimation.IDLE.toString());
+		} else if (!isGrounded() && hitStun <= 0) {
+			setAnimation(SharedAnimation.IN_AIR.toString());
+		}
+	}
+	
 	/**
 	 * Gets the fighter's ECB
 	 * 
@@ -209,10 +292,22 @@ public class Fighter {
 	public void interpolateVelocity(double data, KeyframeType type, Interpolation interpolation, double completion) {
 		switch (type) {
 			case VELOCITY_X:
-				velocity.setX(interpolation.getInterpolatedValue(velocity.getX(), data, completion));
+				//velocity.setX(interpolation.getInterpolatedValue(velocity.getX(), data, completion));
+				if (completion >= 1) {
+					velocity.setX(data);
+				}
 				break;
 			case VELOCITY_Y:
-				velocity.setY(interpolation.getInterpolatedValue(velocity.getY(), data, completion));
+				//velocity.setY(interpolation.getInterpolatedValue(velocity.getY(), data, completion));
+				if (completion >= 1) {
+					velocity.setY(data);
+				}
+				break;
+			case IGNORE_VELOCITY_X:
+				hasSetVelocityX = data != 0;
+				break;
+			case IGNORE_VELOCITY_Y:
+				hasSetVelocityY = data != 0;
 				break;
 		}
 	}
@@ -291,8 +386,11 @@ public class Fighter {
 		this.health = health;
 	}
 	
-	public void updateUIAnimationList(JComboBox<String> animationSelector) {
+	public void updateUIAnimationList(JComboBox<String> animationSelector, boolean emptySlot) {
 		animationSelector.removeAllItems();
+		if (emptySlot) {
+			animationSelector.addItem("");
+		}
 		for (Animation anim : animations) {
 			animationSelector.addItem(anim.getName());
 		}
@@ -330,7 +428,7 @@ public class Fighter {
 			String name = "animation_" + i;
 			for (Animation anim : animations) {
 				if (!anim.getName().equals(name)) {
-					animations.add(new Animation(copy));
+					animations.add(new Animation(copy, true));
 					return animations.get(animations.size() - 1).getName();
 				}
 			}
@@ -350,9 +448,37 @@ public class Fighter {
 			}
 		}
 	}
+	
+	public boolean isGrounded() {
+		return position.getY() <= 0;
+	}
 
 	public List<Animation> getAnimations() {
 		return animations;
+	}
+	
+	public Vector getVelocity() {
+		return velocity;
+	}
+	
+	public Position getPosition() {
+		return position;
+	}
+	
+	public boolean hasSetVelocityX() {
+		return hasSetVelocityX;
+	}
+	
+	public boolean hasSetVelocityY() {
+		return hasSetVelocityY;
+	}
+	
+	public double getGravity() {
+		return gravity;
+	}
+	
+	public double getMaxFallSpeed() {
+		return maxFallSpeed;
 	}
 
 	/**

@@ -230,6 +230,24 @@ public class Bone {
 								lineWidth, lineWidth, lineWidth);
 					}
 					break;
+				case CIRCLE:
+					Graphics2D clone2 = (Graphics2D) g.create();
+					AffineTransform a2 = new AffineTransform();
+					a2.concatenate(AffineTransform.getRotateInstance(Math.toRadians(-currentAngle), screenX, screenY));
+					clone2.setTransform(a2);
+					int circleLength = camera.toPixels(currentLength);
+					int circleWidth = camera.toPixels(width);
+					if (selectType != 0) {
+						clone2.setColor((selectType == 1) ? Color.GREEN : Color.BLUE);
+					}
+					if (!visible) {
+						clone2.setStroke(new BasicStroke(1f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 10.0f, new float[] {5.0f}, 0.0f));
+						clone2.drawOval(screenX - circleLength / 2, screenY - circleWidth / 2, circleLength, circleLength);
+					} else {
+						clone2.setStroke(new BasicStroke(circleWidth, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+						clone2.drawOval(screenX, screenY - circleLength / 2, circleLength, circleLength);
+					}
+					break;
 			}
 		}
 		Position tail = root.applyVector(new Vector((float) (currentLength * Math.cos(Math.toRadians(currentAngle))),
@@ -287,6 +305,11 @@ public class Bone {
 				interpolatedLength = interpolation.getInterpolatedValue(length, data, completion);
 				break;
 			case ROTATE:
+				if (data - angle >= 180) {
+					data = (data - 360);
+				} else if (angle - data >= 180) {
+					data = (360 + data);
+				}
 				interpolatedAngle = interpolation.getInterpolatedValue(angle, data, completion);
 				break;
 			case VISIBLE:
@@ -470,6 +493,10 @@ public class Bone {
 				new Keyframe(0, name, 0, KeyframeType.VELOCITY_X, Interpolation.NONE));
 		instructions.put(KeyframeType.VELOCITY_Y,
 				new Keyframe(0, name, 0, KeyframeType.VELOCITY_Y, Interpolation.NONE));
+		instructions.put(KeyframeType.IGNORE_VELOCITY_X,
+				new Keyframe(0, name, 0, KeyframeType.IGNORE_VELOCITY_X, Interpolation.NONE));
+		instructions.put(KeyframeType.IGNORE_VELOCITY_Y,
+				new Keyframe(0, name, 0, KeyframeType.IGNORE_VELOCITY_Y, Interpolation.NONE));
 		list.put(name, instructions);
 		for (Bone child : children) {
 			child.addStartInstructions(list);

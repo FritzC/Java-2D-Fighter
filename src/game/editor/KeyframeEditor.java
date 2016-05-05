@@ -112,10 +112,14 @@ public class KeyframeEditor {
 					}
 					if ((KeyframeType) currentKeyframe.getInfo()[2] == KeyframeType.ROTATE) {
 						currentKeyframe.setData(angle);
-						keyframes.setValueAt(angle, keyframes.getSelectedRow(), 4);
+						if (keyframes.getSelectedRow() >= 0) {
+							keyframes.setValueAt(angle, keyframes.getSelectedRow(), 4);
+						}
 					} else if ((KeyframeType) currentKeyframe.getInfo()[2] == KeyframeType.LENGTH) {
 						currentKeyframe.setData(Editor.camera.toGameDistance(length));
-						keyframes.setValueAt(Editor.camera.toGameDistance(length), keyframes.getSelectedRow(), 4);
+						if (keyframes.getSelectedRow() >= 0) {
+							keyframes.setValueAt(Editor.camera.toGameDistance(length), keyframes.getSelectedRow(), 4);
+						}
 					}
 				}
 			}

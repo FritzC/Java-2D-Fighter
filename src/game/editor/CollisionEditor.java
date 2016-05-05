@@ -498,6 +498,8 @@ public class CollisionEditor {
 		});
 		hitboxes.add(new JLabel("Group:", SwingConstants.CENTER));
 		hitboxes.add(group);
+		hitboxes.add(new JLabel("Damage:", SwingConstants.CENTER));
+		hitboxes.add(damage);
 		hitboxes.add(new JLabel("Hit Stun:", SwingConstants.CENTER));
 		hitboxes.add(hitstun);
 		hitboxes.add(new JLabel("Block Stun:", SwingConstants.CENTER));
@@ -552,38 +554,40 @@ public class CollisionEditor {
 		model.setRowCount(0);
 		List<CollisionBox> temp = new ArrayList<>();
 		String tabName = tabNames[tabbedPane.getSelectedIndex()];
-		switch (tabbedPane.getSelectedIndex()) {
-			case 0: 
-				temp.addAll(AnimationEditor.currentAnimation.getECBs());
-				break;
-			case 1:
-				temp.addAll(AnimationEditor.currentAnimation.getHurtboxes());
-				break;
-			case 2:
-				temp.addAll(AnimationEditor.currentAnimation.getHitboxes());
-				break;
-		}
-		while (temp.size() > 0) {
-			CollisionBox first = null;
-			for (int i = 0; i < temp.size(); i++) {
-				if (first == null || temp.get(i).getStartFrame() < first.getStartFrame()
-						|| temp.get(i).getStartFrame() == first.getStartFrame()
-								&& temp.get(i).getEndFrame() < first.getEndFrame()) {
-					first = temp.get(i);
-				}
+		if (AnimationEditor.currentAnimation != null) {
+			switch (tabbedPane.getSelectedIndex()) {
+				case 0:
+					temp.addAll(AnimationEditor.currentAnimation.getECBs());
+					break;
+				case 1:
+					temp.addAll(AnimationEditor.currentAnimation.getHurtboxes());
+					break;
+				case 2:
+					temp.addAll(AnimationEditor.currentAnimation.getHitboxes());
+					break;
 			}
-			model.addRow(first.getInfo());
-			temp.remove(first);
-		}
-		collisionBoxes.revalidate();
-		for (int i = 0; i < model.getRowCount(); i++) {
-			Object[] info = {collisionBoxes.getValueAt(i, 0), collisionBoxes.getValueAt(i, 1),
-					collisionBoxes.getValueAt(i, 2), collisionBoxes.getValueAt(i, 3), collisionBoxes.getValueAt(i, 4),
-					collisionBoxes.getValueAt(i, 5)};
-			if (AnimationEditor.currentAnimation.getCollisionBox(tabName, info).equals(selectedCollision)) {
-				collisionBoxes.setRowSelectionInterval(i, i);
-				collisionBoxes.requestFocus();
-				break;
+			while (temp.size() > 0) {
+				CollisionBox first = null;
+				for (int i = 0; i < temp.size(); i++) {
+					if (first == null || temp.get(i).getStartFrame() < first.getStartFrame()
+							|| temp.get(i).getStartFrame() == first.getStartFrame()
+									&& temp.get(i).getEndFrame() < first.getEndFrame()) {
+						first = temp.get(i);
+					}
+				}
+				model.addRow(first.getInfo());
+				temp.remove(first);
+			}
+			collisionBoxes.revalidate();
+			for (int i = 0; i < model.getRowCount(); i++) {
+				Object[] info = {collisionBoxes.getValueAt(i, 0), collisionBoxes.getValueAt(i, 1),
+						collisionBoxes.getValueAt(i, 2), collisionBoxes.getValueAt(i, 3), collisionBoxes.getValueAt(i, 4),
+						collisionBoxes.getValueAt(i, 5)};
+				if (AnimationEditor.currentAnimation.getCollisionBox(tabName, info).equals(selectedCollision)) {
+					collisionBoxes.setRowSelectionInterval(i, i);
+					collisionBoxes.requestFocus();
+					break;
+				}
 			}
 		}
 		if (collisionBoxes.getSelectedRow() < 0) {

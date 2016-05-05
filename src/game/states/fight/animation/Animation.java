@@ -101,8 +101,8 @@ public class Animation {
 		this.steps = keyframes;
 	}
 	
-	public Animation(Animation copy) {
-		this.name = copy.name + "_copy";
+	public Animation(Animation copy, boolean flagName) {
+		this.name = copy.name + ((flagName) ? "_copy" : "");
 		this.loop = copy.loop;
 		this.specialCancelable = copy.specialCancelable;
 		this.initialPose = new HashMap<>();
@@ -162,6 +162,10 @@ public class Animation {
 			}
 		}
 	}
+
+	public boolean completed() {
+		return currentFrame > getLength();
+	}
 	
 	/**
 	 * Steps the animation forward one frame
@@ -170,15 +174,18 @@ public class Animation {
 	 */
 	public void stepAnimation(Fighter fighter, Bone root, double speed) {
 		currentFrame += speed;
-		if (currentFrame > getLength()) {
+		if (currentFrame > getLength() && loop) {
 			setFrame(fighter, root, 0);
 			return;
+		}
+		for (Keyframe keyframe : steps) {
+			keyframe.attemptToRegister(currentFrame, queuedInterpolations);
 		}
 		Map<String, List<KeyframeType>> toRemove = new HashMap<>();
 		for (String bone : queuedInterpolations.keySet()) {
 			for (KeyframeType instruction : queuedInterpolations.get(bone).keySet()) {
 				if (queuedInterpolations.get(bone).get(instruction).getCompletion(currentFrame) >= 1) {
-					queuedInterpolations.get(bone).get(instruction).apply(root);
+					queuedInterpolations.get(bone).get(instruction).apply(fighter, root);
 					if (!toRemove.containsKey(bone)) {
 						toRemove.put(bone, new ArrayList<KeyframeType>());
 					}
@@ -191,7 +198,6 @@ public class Animation {
 				queuedInterpolations.get(bone).remove(instruction);
 			}
 		}
-		
 		for (Keyframe keyframe : steps) {
 			keyframe.attemptToRegister(currentFrame, queuedInterpolations);
 		}
@@ -207,7 +213,9 @@ public class Animation {
 		queuedInterpolations.clear();
 		for (String boneId : initialPose.keySet()) {
 			for (KeyframeType instruction : initialPose.get(boneId).keySet()) {
-				initialPose.get(boneId).get(instruction).apply(root);
+				if (instruction != KeyframeType.VELOCITY_X && instruction != KeyframeType.VELOCITY_Y) {
+					initialPose.get(boneId).get(instruction).apply(fighter, root);
+				}
 			}
 		}
 		stepAnimation(fighter, root, 0);

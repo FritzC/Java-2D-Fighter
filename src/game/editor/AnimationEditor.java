@@ -7,6 +7,7 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -15,6 +16,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
@@ -125,8 +127,8 @@ public class AnimationEditor {
 			public void actionPerformed(ActionEvent e) {
 				String newAnim = Editor.fighter.newAnimation();
 				updateFields = true;
-				Editor.fighter.updateUIAnimationList(animationSelector);
-				Editor.fighter.updateUIAnimationList(CollisionEditor.triggerAnim);
+				Editor.fighter.updateUIAnimationList(animationSelector, false);
+				Editor.fighter.updateUIAnimationList(CollisionEditor.triggerAnim, true);
 				sharedAnimation.setSelectedIndex(0);
 				updateFields = false;
 				animationSelector.setSelectedItem(newAnim);
@@ -137,8 +139,8 @@ public class AnimationEditor {
 			public void actionPerformed(ActionEvent e) {
 				String newAnim = Editor.fighter.newAnimation(currentAnimation);
 				updateFields = true;
-				Editor.fighter.updateUIAnimationList(animationSelector);
-				Editor.fighter.updateUIAnimationList(CollisionEditor.triggerAnim);
+				Editor.fighter.updateUIAnimationList(animationSelector, false);
+				Editor.fighter.updateUIAnimationList(CollisionEditor.triggerAnim, true);
 				updateNameComboBox();
 				updateFields = false;
 				animationSelector.setSelectedItem(newAnim);
@@ -149,8 +151,8 @@ public class AnimationEditor {
 			public void actionPerformed(ActionEvent e) {
 				String newAnim = Editor.fighter.newAnimationFrom(currentAnimation, (int) currentFrame.getValue());
 				updateFields = true;
-				Editor.fighter.updateUIAnimationList(animationSelector);
-				Editor.fighter.updateUIAnimationList(CollisionEditor.triggerAnim);
+				Editor.fighter.updateUIAnimationList(animationSelector, false);
+				Editor.fighter.updateUIAnimationList(CollisionEditor.triggerAnim, true);
 				sharedAnimation.setSelectedIndex(0);
 				updateFields = false;
 				animationSelector.setSelectedItem(newAnim);
@@ -159,18 +161,22 @@ public class AnimationEditor {
 		deleteAnimation = new JButton("Delete");
 		deleteAnimation.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Editor.fighter.getAnimations().remove(currentAnimation);
-				currentAnimation = null;
-				KeyframeEditor.currentKeyframe = null;
-				CollisionEditor.selectedCollision = null;
-				KeyframeEditor.updateKeyframeTable();
-				CollisionEditor.updateTable();
-				updateFields = true;
-				Editor.fighter.updateUIAnimationList(animationSelector);
-				Editor.fighter.updateUIAnimationList(CollisionEditor.triggerAnim);
-				updateFields = false;
-				if (animationSelector.getItemCount() > 0) {
-					animationSelector.setSelectedIndex(0);
+				if (JOptionPane.showConfirmDialog(Editor.frame, "Are you sure you want to delete this?", "", 
+                        JOptionPane.YES_NO_OPTION) == 0) {
+					Editor.fighter.getAnimations().remove(currentAnimation);
+					(new File(Editor.fighterDirectory.getAbsolutePath() + "/animations/" + currentAnimation.getName() + ".json")).delete();
+					currentAnimation = null;
+					KeyframeEditor.currentKeyframe = null;
+					CollisionEditor.selectedCollision = null;
+					KeyframeEditor.updateKeyframeTable();
+					CollisionEditor.updateTable();
+					updateFields = true;
+					Editor.fighter.updateUIAnimationList(animationSelector, false);
+					Editor.fighter.updateUIAnimationList(CollisionEditor.triggerAnim, true);
+					updateFields = false;
+					if (animationSelector.getItemCount() > 0) {
+						animationSelector.setSelectedIndex(0);
+					}
 				}
 			}
 		});
@@ -181,8 +187,8 @@ public class AnimationEditor {
 				if (!updateFields) {
 					updateFields = true;
 					currentAnimation.setName(name.getText());
-					Editor.fighter.updateUIAnimationList(animationSelector);
-					Editor.fighter.updateUIAnimationList(CollisionEditor.triggerAnim);
+					Editor.fighter.updateUIAnimationList(animationSelector, false);
+					Editor.fighter.updateUIAnimationList(CollisionEditor.triggerAnim, true);
 					animationSelector.setSelectedItem(name.getText());
 					updateNameComboBox();
 					updateFields = false;
@@ -193,8 +199,8 @@ public class AnimationEditor {
 				if (!updateFields) {
 					updateFields = true;
 					currentAnimation.setName(name.getText());
-					Editor.fighter.updateUIAnimationList(animationSelector);
-					Editor.fighter.updateUIAnimationList(CollisionEditor.triggerAnim);
+					Editor.fighter.updateUIAnimationList(animationSelector, false);
+					Editor.fighter.updateUIAnimationList(CollisionEditor.triggerAnim, true);
 					animationSelector.setSelectedItem(name.getText());
 					updateNameComboBox();
 					updateFields = false;
@@ -205,8 +211,8 @@ public class AnimationEditor {
 				if (!updateFields) {
 					updateFields = true;
 					currentAnimation.setName(name.getText());
-					Editor.fighter.updateUIAnimationList(animationSelector);
-					Editor.fighter.updateUIAnimationList(CollisionEditor.triggerAnim);
+					Editor.fighter.updateUIAnimationList(animationSelector, false);
+					Editor.fighter.updateUIAnimationList(CollisionEditor.triggerAnim, true);
 					animationSelector.setSelectedItem(name.getText());
 					updateNameComboBox();
 					updateFields = false;
