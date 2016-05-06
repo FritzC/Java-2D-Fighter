@@ -1,17 +1,17 @@
 {
-	"loop": true,
+	"loop": false,
 	"specialCancelable": false,
 	"initialPose": {
 		"bonePose": {
 			"name": "l_upper_arm",
 			"length": 0.12081830674324856,
-			"angle": 315.0,
+			"angle": 307.6476206401076,
 			"visible": true
 		},
 		"bonePose": {
 			"name": "l_lower_arm",
 			"length": 0.03341323756304445,
-			"angle": 40.0,
+			"angle": 335.0952311919048,
 			"visible": true
 		},
 		"bonePose": {
@@ -22,14 +22,14 @@
 		},
 		"bonePose": {
 			"name": "r_upper_leg",
-			"length": 0.06798692684790379,
-			"angle": 270.0,
+			"length": 0.03882725274282943,
+			"angle": 340.6410058243053,
 			"visible": true
 		},
 		"bonePose": {
 			"name": "r_lower_leg",
 			"length": 0.13775406425074146,
-			"angle": 240.0,
+			"angle": 238.46520809481171,
 			"visible": true
 		},
 		"bonePose": {
@@ -46,8 +46,8 @@
 		},
 		"bonePose": {
 			"name": "l_upper_leg",
-			"length": 0.11436584616227231,
-			"angle": 335.0,
+			"length": 0.11049786322720352,
+			"angle": 1.5275254422129272,
 			"visible": true
 		},
 		"bonePose": {
@@ -70,14 +70,14 @@
 		},
 		"bonePose": {
 			"name": "r_upper_arm",
-			"length": 0.13874718172649397,
-			"angle": 215.0,
+			"length": 0.1085827897146791,
+			"angle": 238.7069610040798,
 			"visible": true
 		},
 		"bonePose": {
 			"name": "r_lower_arm",
-			"length": 0.06225396015962001,
-			"angle": 335.0,
+			"length": 0.04,
+			"angle": 317.9440463499876,
 			"visible": true
 		},
 	},
@@ -89,10 +89,10 @@
 			"endFrame": 1,
 			"collision": {
 				"box": {
-					"top_l x": -0.074,
-					"top_l y": 0.549,
-					"bottom_r x": 0.13,
-					"bottom_r y": 0.01
+					"top_l x": -0.133,
+					"top_l y": 0.578,
+					"bottom_r x": 0.202,
+					"bottom_r y": 0.029
 				}
 			}
 		},
@@ -103,10 +103,10 @@
 			"endFrame": 1,
 			"collision": {
 				"box": {
-					"top_l x": -0.133,
-					"top_l y": 0.573,
-					"bottom_r x": 0.178,
-					"bottom_r y": -0.002
+					"top_l x": -0.101,
+					"top_l y": 0.565,
+					"bottom_r x": 0.192,
+					"bottom_r y": 0.021
 				}
 			}
 		},

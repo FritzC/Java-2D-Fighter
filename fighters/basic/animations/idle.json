@@ -357,6 +357,20 @@
 			"interpolation": SMOOTH_OUT,
 			"data": 302.275634765625
 		},
+		"keyframe": {
+			"bone": "neck",
+			"frame": 0,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 85.0
+		},
+		"keyframe": {
+			"bone": "head",
+			"frame": 0,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 70.0
+		},
 	},
 	"ecbs": {
 		"ecb": {

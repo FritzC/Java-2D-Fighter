@@ -73,7 +73,7 @@ public class KeyframeEditor {
 				if (currentKeyframe != null) {
 					AnimationEditor.currentAnimation.setFrame(Editor.fighter, Editor.fighter.getEditorSkeleton(1),
 							currentKeyframe.getEndFrame());
-					Editor.fighter.getEditorSkeleton(1).draw((Graphics2D) g, Editor.defaultLoc, Editor.camera, true,
+					Editor.fighter.getEditorSkeleton(1).draw((Graphics2D) g, 1, Editor.defaultLoc, Editor.camera, true,
 							(String) currentKeyframe.getInfo()[1], "", 0);
 				}
 			}

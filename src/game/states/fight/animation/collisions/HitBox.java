@@ -107,7 +107,10 @@ public class HitBox extends CollisionBox {
 		this.launchVelocity = copy.launchVelocity;
 		this.knockDown = copy.knockDown;
 		this.type = copy.type;
+		this.release = copy.release;
 		this.attachTo = copy.attachTo;
+		this.triggerAnimation = copy.triggerAnimation;
+		this.triggerTargetAnimation = copy.triggerTargetAnimation;
 	}
 	
 	/**
@@ -118,8 +121,9 @@ public class HitBox extends CollisionBox {
 	 * @param hurtBox - The hurtbox being checked for collision
 	 * @return - Whether a collision is taking place
 	 */
-	public boolean isColliding(Position attackerPos, Position defenderPos, HurtBox hurtBox) {
-		return forOffset(attackerPos).intersects(hurtBox.forOffset(defenderPos));
+	public boolean isColliding(Fighter attacker, Fighter defender, HurtBox hurtBox) {
+		return forOffset(attacker.getFace(), attacker.getPosition())
+				.intersects(hurtBox.forOffset(defender.getFace(), defender.getPosition()));
 	}
 	
 	/**
@@ -130,16 +134,9 @@ public class HitBox extends CollisionBox {
 	 * @param defender - Fighter hit by the hitbox
 	 */
 	public void applyHit(Fighter source, Fighter defender) {
-		if (!attachTo.equals("")) {
-			source.attach(attachTo, defender);
-		}
-		if (!triggerAnimation.equals("")) {
-			source.setAnimation(triggerAnimation);
-		}
-		if (!triggerTargetAnimation.equals("")) {
-			source.setAnimation(triggerTargetAnimation);
-		}
-		defender.applyHit(damage, hitStun, blockStun, pushBack, launchVelocity, knockDown);
+		boolean success = defender.applyHit(source, group, type, damage, hitStun, blockStun, pushBack, launchVelocity, attachTo, triggerAnimation,
+				triggerTargetAnimation, release, knockDown);
+		source.dealHit(defender, pushBack, this, success);
 	}
 
 	@Override
@@ -218,6 +215,10 @@ public class HitBox extends CollisionBox {
 
 	public void setDamage(int value) {
 		damage = value;
+	}
+	
+	public int getDamage() {
+		return damage;
 	}
 
 	public void save(File f, PrintWriter pw) {

@@ -29,6 +29,11 @@ public class Position {
 		this.y = y;
 	}
 	
+	public Position(Position copy) {
+		this.x = copy.x;
+		this.y = copy.y;
+	}
+
 	/**
 	 * Gets a new position by applying a vector to the location
 	 * 

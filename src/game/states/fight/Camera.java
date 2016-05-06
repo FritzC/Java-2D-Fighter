@@ -59,6 +59,14 @@ public class Camera {
 		return size / (double) getScreenWidth() / (double) getScale();
 	}
 	
+	public int getRelativeScreenX(double percent) {
+		return (int) (getScreenWidth() * percent);
+	}
+	
+	public int getRelativeScreenY(double percent) {
+		return (int) (getScreenHeight() * percent);
+	}
+	
 	public int getScreenWidth() {
 		return Game.getScreenWidth();
 	}

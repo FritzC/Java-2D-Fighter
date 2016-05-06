@@ -5,6 +5,10 @@ import java.util.List;
 
 import game.input.sources.DummySource;
 import game.input.sources.KeyboardSource;
+import game.input.sources.XBoxControllerSource;
+import net.java.games.input.Controller;
+import net.java.games.input.Controller.Type;
+import net.java.games.input.ControllerEnvironment;
 
 /**
  * Handles different types of inputs and polls the sources
@@ -31,9 +35,19 @@ public class InputHandler {
 		devices = new ArrayList<>();
 		mouse = new Mouse();
 		devices.add(new KeyboardSource());
+		Controller[] ca = ControllerEnvironment.getDefaultEnvironment().getControllers();
+
+		for (int i = 0; i < ca.length; i++) {
+			if (ca[i].getName().toLowerCase().contains("xbox")) {
+				devices.add(new XBoxControllerSource(ca[i]));
+			}
+			/*if (ca[i].getType() == Type.GAMEPAD) {
+				devices.add(new XBoxControllerSource(ca[i]));
+			}*/
+		}
 		devices.add(new DummySource());
 	}
-	
+
 	/**
 	 * Polls all the input sources
 	 */

@@ -177,8 +177,8 @@ public class Bone {
 	 * @param root - Position of the last node to draw from
 	 * @param camera - Camera reference to get screen coordinates
 	 */
-	public void draw(Graphics2D g, Position root, Camera camera) {
-		draw(g, root, camera, false, "", "", 0);
+	public void draw(Graphics2D g, int face, Position pos, Camera camera) {
+		draw(g, face, pos, camera, false, "", "", 0);
 	}
 	
 	/**
@@ -186,14 +186,17 @@ public class Bone {
 	 *  - Call on the root of the structure to draw the entire fighter
 	 *  
 	 * @param g - Graphics object to draw with
-	 * @param root - Position of the last node to draw from
+	 * @param pos - Position of the last node to draw from
 	 * @param camera - Camera reference to get screen coordinates
 	 * @param drawHidden - Whether to draw hidden bones
 	 * @param selected - Selected bone
 	 */
-	public void draw(Graphics2D g, Position root, Camera camera, boolean drawHidden, String selectedBone, String hoveredBone, int selectType) {
+	public void draw(Graphics2D g, int face, Position pos, Camera camera, boolean drawHidden, String selectedBone, String hoveredBone, int selectType) {
 		double currentAngle = angle + interpolatedAngle;
 		double currentLength = length + interpolatedLength;
+		if (face < 0) {
+			currentAngle = 180 - currentAngle;
+		}
 		if (selectedBone.equals("root")) {
 			selectType = 2;
 			selectedBone = "";
@@ -203,8 +206,8 @@ public class Bone {
 		}
 		g.setColor(Color.BLACK);
 		if (visible || drawHidden) {
-			int screenX = camera.getScreenX(root);
-			int screenY = camera.getScreenY(root);
+			int screenX = camera.getScreenX(pos);
+			int screenY = camera.getScreenY(pos);
 			switch (drawMode) {
 				case SPRITE:
 					if (sprite != null) {
@@ -250,14 +253,14 @@ public class Bone {
 					break;
 			}
 		}
-		Position tail = root.applyVector(new Vector((float) (currentLength * Math.cos(Math.toRadians(currentAngle))),
+		Position tail = pos.applyVector(new Vector((float) (currentLength * Math.cos(Math.toRadians(currentAngle))),
 				(float) (currentLength * Math.sin(Math.toRadians(currentAngle)))));
 		if (attached != null) {
 			attached.setPosition(tail); 
 		}
 		for (Bone bone : children) {
 			int drawType = (bone.name.equals(selectedBone)) ? 2 : ((bone.name.equals(hoveredBone)) ? 1 : 0);
-			bone.draw(g, tail, camera, drawHidden, selectedBone, hoveredBone, drawType);
+			bone.draw(g, face, tail, camera, drawHidden, selectedBone, hoveredBone, drawType);
 		}
 	}
 	
@@ -358,6 +361,9 @@ public class Bone {
 	 */
 	public void release() {
 		attached = null;
+		for (Bone child : children) {
+			child.release();
+		}
 	}
 	
 	/**

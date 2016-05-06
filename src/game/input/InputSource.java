@@ -26,6 +26,9 @@ public abstract class InputSource {
 	 */
 	public InputSource() {
 		inputs = new ArrayList<>();
+		for (int i = 0; i < 10; i++) {
+			inputs.add(new Input(0, new ArrayList<>()));
+		}
 	}
 
 	/**
@@ -44,6 +47,13 @@ public abstract class InputSource {
 			return null;
 		}
 		return inputs.get(inputs.size() - 1);
+	}
+	
+	public Input getPreviousInput(int idx) {
+		if (idx > inputs.size()) {
+			idx = inputs.size();
+		}
+		return inputs.get(inputs.size() - 1 - idx);
 	}
 	
 	/**

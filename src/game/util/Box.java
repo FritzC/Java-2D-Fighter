@@ -57,7 +57,11 @@ public class Box {
 	 * @param offset - Position the box is to be offset
 	 * @return - New instance of the offset box
 	 */
-	public Box forOffset(Position offset) {
+	public Box forOffset(int face, Position offset) {
+		if (face < 0) {
+			return new Box(new Position(-bottomRight.getX() + offset.getX(), topLeft.getY() + offset.getY()),
+					new Position(-topLeft.getX() + offset.getX(), bottomRight.getY() + offset.getY()));
+		}
 		return new Box(new Position(topLeft.getX() + offset.getX(), topLeft.getY() + offset.getY()),
 				new Position(bottomRight.getX() + offset.getX(), bottomRight.getY() + offset.getY()));
 	}
@@ -91,11 +95,16 @@ public class Box {
 		int y = camera.getScreenY(topLeft);
 		int width = camera.toPixels(Math.abs(bottomRight.getX() - topLeft.getX()));
 		int height = camera.toPixels(Math.abs(topLeft.getY() - bottomRight.getY()));
-		g.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), 100));
-		g.fillRect(x + 1, y + 1, width - 1, height - 1);
+		//g.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), 100));
+		//g.fillRect(x + 1, y + 1, width - 1, height - 1);
 		g.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), 200));
 		if (selected)
 			g.setColor(Color.BLACK);
 		g.drawRect(x, y, width, height);
+	}
+
+	public String toString() {
+		return "[" + ((int) (1000 * topLeft.getX()) / 1000d) + ", " + ((int) (1000 * topLeft.getY()) / 1000d) + ", "
+				+ ((int) (1000 * bottomRight.getX()) / 1000d) + ", " + ((int) (1000 * bottomRight.getY()) / 1000d) + "]";
 	}
 }

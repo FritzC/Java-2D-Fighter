@@ -35,8 +35,8 @@ public abstract class CollisionBox extends Box {
 		return startFrame <= currentFrame && currentFrame <= endFrame;
 	}
 	
-	public void draw(Position position, Camera camera, Graphics2D g, boolean selected) {
-		forOffset(position).draw(g, camera, getColor(), selected);
+	public void draw(int face, Position position, Camera camera, Graphics2D g, boolean selected) {
+		forOffset(face, position).draw(g, camera, getColor(), selected);
 	}
 	
 	public int getStartFrame() {

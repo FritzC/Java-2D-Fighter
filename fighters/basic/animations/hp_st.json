@@ -1,0 +1,419 @@
+{
+	"loop": false,
+	"specialCancelable": false,
+	"initialPose": {
+		"bonePose": {
+			"name": "l_upper_arm",
+			"length": 0.12081830674324856,
+			"angle": 302.2756443145776,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "l_lower_arm",
+			"length": 0.08436749906707106,
+			"angle": 22.479434397103113,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "neck",
+			"length": 0.040088790342327756,
+			"angle": 85.0,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "r_upper_leg",
+			"length": 0.06842968850192395,
+			"angle": 225.0,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "r_lower_leg",
+			"length": 0.13775406425074146,
+			"angle": 252.97947438848013,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "head",
+			"length": 0.10881176406988355,
+			"angle": 70.0,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "l_lower_leg",
+			"length": 0.13611816022765766,
+			"angle": 279.09027692082236,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "l_upper_leg",
+			"length": 0.11436584616227231,
+			"angle": 336.44773632710536,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "upper_body",
+			"length": 0.11809614320692902,
+			"angle": 78.17851165939275,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "root",
+			"length": 0.18297350618539393,
+			"angle": 90.0,
+			"visible": false
+		},
+		"bonePose": {
+			"name": "lower_body",
+			"length": 0.09960756620241347,
+			"angle": 93.0940580589171,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "r_upper_arm",
+			"length": 0.13874718172649397,
+			"angle": 234.46232220802563,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "r_lower_arm",
+			"length": 0.07056131585164886,
+			"angle": 17.744671625056935,
+			"visible": true
+		},
+	},
+	"steps": {
+		"keyframe": {
+			"bone": "root",
+			"frame": 5,
+			"type": VELOCITY_Y,
+			"interpolation": LINEAR,
+			"data": 0.05
+		},
+		"keyframe": {
+			"bone": "l_upper_leg",
+			"frame": 5,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 32.47119229084849
+		},
+		"keyframe": {
+			"bone": "l_lower_leg",
+			"frame": 5,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 280.61965527615513
+		},
+		"keyframe": {
+			"bone": "r_upper_leg",
+			"frame": 5,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 171.2538377374448
+		},
+		"keyframe": {
+			"bone": "r_lower_leg",
+			"frame": 5,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 221.30861401354872
+		},
+		"keyframe": {
+			"bone": "r_upper_leg",
+			"frame": 5,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.013333333333333334
+		},
+		"keyframe": {
+			"bone": "r_upper_arm",
+			"frame": 5,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 223.43064519525103
+		},
+		"keyframe": {
+			"bone": "r_upper_arm",
+			"frame": 5,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.17407022848392095
+		},
+		"keyframe": {
+			"bone": "r_lower_arm",
+			"frame": 5,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 290.6469908249704
+		},
+		"keyframe": {
+			"bone": "l_upper_arm",
+			"frame": 5,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 273.70462744207714
+		},
+		"keyframe": {
+			"bone": "root",
+			"frame": 10,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.19297898561472668
+		},
+		"keyframe": {
+			"bone": "l_upper_leg",
+			"frame": 10,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 315.80692945510236
+		},
+		"keyframe": {
+			"bone": "l_lower_leg",
+			"frame": 10,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 261.70285503016316
+		},
+		"keyframe": {
+			"bone": "r_upper_leg",
+			"frame": 10,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 246.644435140714
+		},
+		"keyframe": {
+			"bone": "r_upper_leg",
+			"frame": 10,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.09790698533699103
+		},
+		"keyframe": {
+			"bone": "r_lower_leg",
+			"frame": 10,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 237.61932229343077
+		},
+		"keyframe": {
+			"bone": "r_upper_arm",
+			"frame": 10,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 288.71173787509974
+		},
+		"keyframe": {
+			"bone": "r_upper_arm",
+			"frame": 10,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.17160160579409248
+		},
+		"keyframe": {
+			"bone": "r_lower_arm",
+			"frame": 10,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 54.24611274556326
+		},
+		"keyframe": {
+			"bone": "r_lower_arm",
+			"frame": 10,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.08537498983243798
+		},
+		"keyframe": {
+			"bone": "upper_body",
+			"frame": 5,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 62.52556837372287
+		},
+		"keyframe": {
+			"bone": "upper_body",
+			"frame": 10,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 82.69424046668918
+		},
+		"keyframe": {
+			"bone": "r_upper_arm",
+			"frame": 15,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 20.897765498838858
+		},
+		"keyframe": {
+			"bone": "r_upper_arm",
+			"frame": 15,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.13665203173673554
+		},
+		"keyframe": {
+			"bone": "l_lower_arm",
+			"frame": 10,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 292.8905516562483
+		},
+		"keyframe": {
+			"bone": "l_upper_arm",
+			"frame": 10,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 237.89374404488217
+		},
+		"keyframe": {
+			"bone": "root",
+			"frame": 5,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.025
+		},
+		"keyframe": {
+			"bone": "root",
+			"frame": 1000,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.19297898561472668
+		},
+		"keyframe": {
+			"bone": "root",
+			"frame": 0,
+			"type": IGNORE_VELOCITY_Y,
+			"interpolation": LINEAR,
+			"data": 1.0
+		},
+		"keyframe": {
+			"bone": "root",
+			"frame": 6,
+			"type": IGNORE_VELOCITY_Y,
+			"interpolation": LINEAR,
+			"data": 0.0
+		},
+		"keyframe": {
+			"bone": "r_lower_arm",
+			"frame": 15,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.15388307249337077
+		},
+		"keyframe": {
+			"bone": "r_lower_arm",
+			"frame": 15,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 79.03661035367037
+		},
+		"keyframe": {
+			"bone": "root",
+			"frame": 5,
+			"type": VELOCITY_X,
+			"interpolation": LINEAR,
+			"data": 0.01
+		},
+		"keyframe": {
+			"bone": "l_upper_leg",
+			"frame": 15,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 280.09750438407525
+		},
+		"keyframe": {
+			"bone": "r_upper_leg",
+			"frame": 15,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 260.99149625797486
+		},
+	},
+	"ecbs": {
+		"ecb": {
+			"startFrame": 0,
+			"endFrame": 1000,
+			"collision": {
+				"box": {
+					"top_l x": -0.184,
+					"top_l y": 0.637,
+					"bottom_r x": 0.157,
+					"bottom_r y": -0.018
+				}
+			}
+		},
+	},
+	"hurtboxes": {
+		"hurtbox": {
+			"startFrame": 8,
+			"endFrame": 1000,
+			"collision": {
+				"box": {
+					"top_l x": -0.2,
+					"top_l y": 0.4,
+					"bottom_r x": 0.2,
+					"bottom_r y": 0.0
+				}
+			}
+		},
+	},
+	"hitboxes": {
+		"hitbox": {
+			"group": "1",
+			"startFrame": 5,
+			"endFrame": 8,
+			"damage": 100,
+			"blockstun": 15,
+			"hitstun": 20,
+			"pushback": 0.05,
+			"knockdown": true,
+			"type": MID,
+			"release": false,
+			"attach": "",
+			"triggerAnim": "",
+			"triggerTargetAnim": "",
+			"collision": {
+				"box": {
+					"top_l x": -0.056,
+					"top_l y": 0.272,
+					"bottom_r x": 0.317,
+					"bottom_r y": 0.01
+				},
+			},
+			"velocity": {
+				"vector": {
+					"x": 0.075,
+					"y": 0.02
+				}
+			}
+		},
+		"hitbox": {
+			"group": "1",
+			"startFrame": 9,
+			"endFrame": 15,
+			"damage": 100,
+			"blockstun": 15,
+			"hitstun": 20,
+			"pushback": 0.05,
+			"knockdown": true,
+			"type": MID,
+			"release": false,
+			"attach": "",
+			"triggerAnim": "",
+			"triggerTargetAnim": "",
+			"collision": {
+				"box": {
+					"top_l x": -0.018,
+					"top_l y": 0.736,
+					"bottom_r x": 0.338,
+					"bottom_r y": 0.205
+				},
+			},
+			"velocity": {
+				"vector": {
+					"x": 0.075,
+					"y": 0.02
+				}
+			}
+		},
+	},
+}

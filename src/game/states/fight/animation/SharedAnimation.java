@@ -7,18 +7,28 @@ public enum SharedAnimation {
 	CROUCH,
 	WALK_F,
 	WALK_B,
+	DASH_F,
+	DASH_B,
 	JUMPSQUAT_N,
 	JUMPSQUAT_F,
 	JUMPSQUAT_B,
 	IN_AIR,
 	HIT_ST,
 	HIT_CR,
+	HIT_AIR,
 	BLOCK_ST,
 	BLOCK_CR,
 	KNOCKED_DOWN_SLOW,
 	KNOCKED_DOWN_FAST,
-	PUNCH,
-	KICK;
+	LP_CR,
+	MP_CR,
+	HP_CR,
+	LP_ST,
+	MP_ST,
+	HP_ST,
+	LP_AIR,
+	MP_AIR,
+	HP_AIR;
 	
 	public static SharedAnimation forString(String s) {
 		for (SharedAnimation reqAnim : values()) {
