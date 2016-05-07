@@ -21,6 +21,7 @@ import game.states.fight.animation.SharedAnimation;
 import game.states.fight.animation.collisions.HitBox;
 import game.states.fight.animation.collisions.HurtBox;
 import game.util.Position;
+import game.util.Vector;
 
 /**
  * GameState where a fight is taking place
@@ -68,6 +69,8 @@ public class FightState extends GameState {
 	private boolean gameOver;
 	
 	private int[][] comboData;
+	
+	private int hitLag;
 	
 	/**
 	 * Initializes the fight state
@@ -121,31 +124,86 @@ public class FightState extends GameState {
 			player2.draw(g, camera, stage);
 		}
 		
-		/** Draw HP Bars **/
+		/** Draw HP Bars and Meters**/
 		Graphics2D g2 = (Graphics2D) g.create();
-		g2.setColor(Color.DARK_GRAY);
 		int hpBarX1 = camera.getRelativeScreenX(0.05);
 		int hpBarX2 = camera.getRelativeScreenX(0.6);
 		int hpBarY = camera.getRelativeScreenY(0.05);
 		int hpBarWidth = camera.getRelativeScreenX(0.35);
 		int hpBarHeight = camera.getRelativeScreenY(0.075);
-		for (int i = 0; i < 5; i++) {
-			g2.drawRect(hpBarX1 + i, hpBarY + i, hpBarWidth - i * 2, hpBarHeight - i * 2);
-			g2.drawRect(hpBarX2 + i, hpBarY + i, hpBarWidth - i * 2, hpBarHeight - i * 2);
-		}
+		int hpBarPadding = camera.getRelativeScreenX(0.004);
+		int meterWidth = camera.getRelativeScreenX(0.2);
+		int meterHeight = camera.getRelativeScreenY(0.04);
+		int meterCurve = hpBarPadding;
+		int meterX1 = hpBarX1;
+		int meterX2 = hpBarX2 + hpBarWidth - meterWidth;
+		int meterY = hpBarY + hpBarHeight - meterCurve;
 		g2.setColor(Color.GRAY);
-		g2.fillRect(hpBarX1 + 5, hpBarY + 5,
-				(int) ((hpBarWidth - 9) * (player1.getHealthPercent() + player1.getGreyHealthPercent())), hpBarHeight - 9);
-		g2.fillRect(hpBarX2 + 5, hpBarY + 5,
-				(int) ((hpBarWidth - 9) * (player2.getHealthPercent() + player2.getGreyHealthPercent())), hpBarHeight - 9);
-		g2.setColor(Color.RED);
-		g2.fillRect(hpBarX1 + 5, hpBarY + 5,
-				(int) ((hpBarWidth - 9) * (player1.getHealthPercent() + player1.getComboPercent())), hpBarHeight - 9);
-		g2.fillRect(hpBarX2 + 5, hpBarY + 5,
-				(int) ((hpBarWidth - 9) * (player2.getHealthPercent() + player2.getComboPercent())), hpBarHeight - 9);
-		g2.setColor(Color.GREEN);
-		g2.fillRect(hpBarX1 + 5, hpBarY + 5, (int) ((hpBarWidth - 9) * player1.getHealthPercent()), hpBarHeight - 9);
-		g2.fillRect(hpBarX2 + 5, hpBarY + 5, (int) ((hpBarWidth - 9) * player2.getHealthPercent()), hpBarHeight - 9);
+		g2.fillRoundRect(meterX1, meterY, (int) (meterWidth * 0.99), (int) (meterHeight * 0.92), meterCurve, meterCurve);
+		g2.fillRoundRect(meterX2, meterY, (int) (meterWidth * 0.99), (int) (meterHeight * 0.92), meterCurve, meterCurve);
+		GradientPaint darkBlueToBlue = new GradientPaint(meterX1, meterY, new Color(0, 128, 255), meterX1,
+				meterY + meterHeight, new Color(0, 102, 204));
+		GradientPaint lightBlueToBlue = new GradientPaint(meterX1, meterY, new Color(0, 255, 255), meterX1,
+				meterY + meterHeight, new Color(0, 204, 204));
+		for (int i = 1; i < 5; i++) {
+			g2.setPaint(darkBlueToBlue);
+			if (player1.getMeter() >= i * 0.25) {
+				g2.setPaint(lightBlueToBlue);
+			}
+			if (player1.getMeter() >= (i - 1) * 0.25) {
+				g2.fillRoundRect(meterX1 + (i - 1) * meterWidth / 4, meterY,
+						(int) ((meterWidth * 0.95) * (player1.getMeter() - ((i - 1) * 0.25))), (int) (meterHeight * 0.95),
+						meterCurve, meterCurve);
+			}
+			g2.setPaint(darkBlueToBlue);
+			if (player2.getMeter() >= i * 0.25) {
+				g2.setPaint(lightBlueToBlue);
+			}
+			if (player2.getMeter() >= (i - 1) * 0.25) {
+				g2.fillRoundRect(meterX2 + (i - 1) * meterWidth / 4, meterY,
+						(int) ((meterWidth * 0.95) * (player2.getMeter() - ((i - 1) * 0.25))), (int) (meterHeight * 0.95),
+						meterCurve, meterCurve);
+			}
+		}
+		g2.setColor(Color.DARK_GRAY);
+		g2.setStroke(new BasicStroke((float) hpBarPadding));
+		g2.drawRoundRect(meterX1 + hpBarPadding / 2, meterY + hpBarPadding / 2, meterWidth - hpBarPadding,
+				meterHeight - hpBarPadding, meterCurve / 2, meterCurve / 2);
+		g2.drawRoundRect(meterX2 + hpBarPadding / 2, meterY + hpBarPadding / 2, meterWidth - hpBarPadding,
+				meterHeight - hpBarPadding, meterCurve / 2, meterCurve / 2);
+		for (int i = 1; i < 4; i++) {
+			g2.drawLine(meterX1 + meterWidth / 4 * i, meterY + hpBarPadding / 2, meterX1 + meterWidth / 4 * i,
+					meterY + (int) (meterHeight * 0.90));
+			g2.drawLine(meterX2 + meterWidth / 4 * i, meterY + hpBarPadding / 2, meterX2 + meterWidth / 4 * i,
+					meterY + (int) (meterHeight * 0.90));
+		}
+		g2.setStroke(new BasicStroke(0f));
+		GradientPaint grayToGray = new GradientPaint(hpBarX1, hpBarY, new Color(150, 150, 150), hpBarX1,
+				hpBarY + hpBarHeight, new Color(100, 100, 100));
+		g2.setPaint(grayToGray);
+		g2.fillRect(hpBarX1 + hpBarPadding, hpBarY + hpBarPadding,
+				(int) ((hpBarWidth - hpBarPadding * 2 + 1) * (player1.getHealthPercent() + player1.getGreyHealthPercent())), hpBarHeight - hpBarPadding * 2 + 1);
+		g2.fillRect(hpBarX2 + hpBarPadding, hpBarY + hpBarPadding,
+				(int) ((hpBarWidth - hpBarPadding * 2 + 1) * (player2.getHealthPercent() + player2.getGreyHealthPercent())), hpBarHeight - hpBarPadding * 2 + 1);
+		GradientPaint redToRed = new GradientPaint(hpBarX1, hpBarY, new Color(204, 0, 0), hpBarX1,
+				hpBarY + hpBarHeight, new Color(153, 0, 0));
+		g2.setPaint(redToRed);
+		g2.fillRect(hpBarX1 + hpBarPadding, hpBarY + hpBarPadding,
+				(int) ((hpBarWidth - hpBarPadding * 2 + 1) * (player1.getHealthPercent() + player1.getComboPercent())), hpBarHeight - hpBarPadding * 2 + 1);
+		g2.fillRect(hpBarX2 + hpBarPadding, hpBarY + hpBarPadding,
+				(int) ((hpBarWidth - hpBarPadding * 2 + 1) * (player2.getHealthPercent() + player2.getComboPercent())), hpBarHeight - hpBarPadding * 2 + 1);
+		GradientPaint greenToGreen = new GradientPaint(hpBarX1, hpBarY, new Color(0, 204, 0), hpBarX1,
+				hpBarY + hpBarHeight, new Color(0, 153, 0));
+		g2.setPaint(greenToGreen);
+		g2.fillRect(hpBarX1 + hpBarPadding, hpBarY + hpBarPadding, (int) ((hpBarWidth - hpBarPadding * 2 + 1) * player1.getHealthPercent()), hpBarHeight - hpBarPadding * 2 + 1);
+		g2.fillRect(hpBarX2 + hpBarPadding, hpBarY + hpBarPadding, (int) ((hpBarWidth - hpBarPadding * 2 + 1) * player2.getHealthPercent()), hpBarHeight - hpBarPadding * 2 + 1);
+		g2.setColor(Color.DARK_GRAY);
+		g2.setStroke(new BasicStroke((float) hpBarPadding));
+		g2.drawRoundRect(hpBarX1 + hpBarPadding / 2, hpBarY + hpBarPadding / 2, hpBarWidth - hpBarPadding,
+				hpBarHeight - hpBarPadding, hpBarPadding / 2, hpBarPadding / 2);
+		g2.drawRoundRect(hpBarX2 + hpBarPadding / 2, hpBarY + hpBarPadding / 2, hpBarWidth - hpBarPadding,
+				hpBarHeight - hpBarPadding, hpBarPadding / 2, hpBarPadding / 2);
+		g2.setStroke(new BasicStroke((float) 0));
 		
 		/** Draw Combo Count **/
 		int comboX1 = camera.getRelativeScreenX(0.15);
@@ -208,7 +266,7 @@ public class FightState extends GameState {
 		/** Fighter Names **/
 		int nameX1 = hpBarX1 + camera.getRelativeScreenX(0.05);
 		int nameX2 = hpBarX2  + hpBarWidth - camera.getRelativeScreenX(0.05);
-		int nameY = hpBarY + hpBarHeight + camera.getRelativeScreenY(0.025);
+		int nameY = meterY + meterHeight + camera.getRelativeScreenY(0.021);
 		int nameSize = camera.getRelativeScreenX(0.015);
 		Window.coggersFont = Window.coggersFont.deriveFont((float) nameSize);
 		g2.setFont(Window.coggersFont);
@@ -260,6 +318,12 @@ public class FightState extends GameState {
 			if (getTime() == 0) {
 				endRound();
 			} else {
+				if (hitLag > 0) {
+					hitLag --;
+					return;
+				}
+				player1.blockInput(false);
+				player2.blockInput(false);
 				playerLogic(player1, player2);
 				playerLogic(player2, player1);
 				handleHitboxes(player1, player2);
@@ -267,9 +331,16 @@ public class FightState extends GameState {
 						|| player2.getHealthPercent() <= 0 && player2.getGreyHealthPercent() <= 0) {
 					endRound();
 				}
+				if (camera.getSpeed() < 1) {
+					camera.setSpeed(camera.getSpeed() + 0.1);
+				} else {
+					camera.setSpeed(1);
+				}
 			}
 		} else if (startRoundTick - Game.tick > 60 * 4) {
 			tickRoundStarted = Integer.MIN_VALUE;
+			player1.blockInput(true);
+			player2.blockInput(true);
 		} else {
 			tickRoundStarted = Game.tick;
 			player1.setPosition(new Position(stage.getWidth() / 4, 0));
@@ -278,7 +349,9 @@ public class FightState extends GameState {
 			player2.setFace(-1);
 			player1.reset();
 			player2.reset();
-			camera.setFocus(new Position(stage.getWidth() / 2, 1.25));
+			player1.blockInput(true);
+			player2.blockInput(true);
+			camera.setFocus(new Position(stage.getWidth() / 2, 1.35));
 		}
 	}
 	
@@ -315,11 +388,23 @@ public class FightState extends GameState {
 	}
 	
 	public void playerLogic(Fighter player, Fighter other) {
-		player.handleInputs();
+		/** Animations **/
+		player.stepAnimation(camera);
+		if (player.getAnimation() == null) {
+			if (player.isGrounded()) {
+				player.updateGroundAnim();
+			} else {
+				player.setAnimation(SharedAnimation.IN_AIR, true);
+			}
+		}
+		if (player.hasSlowDownActive()) {
+			camera.setSpeed(0.1);
+		}
+		
 		/** Gravity **/
 		if (!player.hasSetVelocityY()) {
 			if (!player.isGrounded() && player.getVelocity().getY() > player.getMaxFallSpeed()) {
-				player.getVelocity().setY(player.getVelocity().getY() - player.getGravity());
+				player.getVelocity().setY(player.getVelocity().getY() - player.getGravity() * camera.getSpeed());
 				if (player.getVelocity().getY() < player.getMaxFallSpeed()) {
 					player.getVelocity().setY(player.getMaxFallSpeed());
 				}
@@ -335,7 +420,7 @@ public class FightState extends GameState {
 		if (player.isGrounded()) {
 			player.getPosition().setY(0);
 			if (!player.hasSetVelocityX()) {
-				player.getVelocity().setX(player.getVelocity().getX() - 0.005 * Math.signum(player.getVelocity().getX()));
+				player.getVelocity().setX(player.getVelocity().getX() - 0.005 * camera.getSpeed() * Math.signum(player.getVelocity().getX()) );
 				if (Math.abs(player.getVelocity().getX()) < 0.005) {
 					player.getVelocity().setX(0);
 				}
@@ -362,10 +447,11 @@ public class FightState extends GameState {
 		
 		boolean inAir = !player.isGrounded();
 		/** Apply velocities **/
-		player.setPosition(player.getPosition().applyVector(player.getVelocity()));
-		
+		player.setPosition(player.getPosition().applyVector(new Vector(player.getVelocity().getX() * camera.getSpeed(),
+				player.getVelocity().getY() * camera.getSpeed())));
+
 		if (player.isGrounded() && inAir) {
-			player.setAnimation(SharedAnimation.IDLE.toString(), false);
+			player.updateGroundAnim();
 		}
 		
 		/** Knockdown **/
@@ -420,22 +506,24 @@ public class FightState extends GameState {
 		
 		/** Hitstun **/
 		if (player.getHitStun() > 0) {
-			player.setHitStun(player.getHitStun() - 1);
-			if (player.getHitStun() == 0) {
+			player.setHitStun(player.getHitStun() - camera.getSpeed());
+			if (player.getHitStun() <= 0) {
 				other.setComboCount(0);
 				player.resetCombo();
-				player.setAnimation(SharedAnimation.IDLE.toString(), false);
+				player.updateGroundAnim();
 			}
 		}
 		if (player.isGrounded() && player.getHitStun() < 0) {
 			player.setHitStun(0);
 			other.setComboCount(0);
 			player.resetCombo();
-			player.setAnimation(SharedAnimation.IDLE.toString(), false);
+			player.updateGroundAnim();
 		}
 		
 		/** Gray health **/
 		player.hpTick();
+		
+		player.normalizeColor();
 	}
 	
 	public void handleHitboxes(Fighter player1, Fighter player2) {
@@ -463,23 +551,27 @@ public class FightState extends GameState {
 				}
 			}
 		}
+		boolean appliedHit = false;
 		if (hitPlayer1 != null || hitPlayer2 != null) {
 			if (hitPlayer1 == null && hitPlayer2 != null) {
-				hitPlayer2.applyHit(player1, player2);
+				appliedHit = hitPlayer2.applyHit(player1, player2);
 			} else if (hitPlayer2 == null && hitPlayer1 != null) {
-				hitPlayer1.applyHit(player2, player1);
+				appliedHit = hitPlayer1.applyHit(player2, player1);
 			} else {
 				int damage1 = hitPlayer1.getDamage() / 10;
 				int damage2 = hitPlayer2.getDamage() / 10;
 				if (damage1 > damage2) {
-					hitPlayer1.applyHit(player2, player1);
+					appliedHit = hitPlayer1.applyHit(player2, player1);
 				} else if (damage1 < damage2) {
-					hitPlayer2.applyHit(player1, player2);
+					appliedHit = hitPlayer2.applyHit(player1, player2);
 				} else {
-					hitPlayer1.applyHit(player2, player1);
-					hitPlayer2.applyHit(player1, player2);
+					appliedHit = hitPlayer1.applyHit(player2, player1);
+					appliedHit = hitPlayer2.applyHit(player1, player2);
 				}
 			}
+		}
+		if (appliedHit) {
+			hitLag = 10;
 		}
 	}
 	

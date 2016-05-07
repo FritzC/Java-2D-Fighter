@@ -133,10 +133,11 @@ public class HitBox extends CollisionBox {
 	 * @param source - Fighter using the hitbox
 	 * @param defender - Fighter hit by the hitbox
 	 */
-	public void applyHit(Fighter source, Fighter defender) {
-		boolean success = defender.applyHit(source, group, type, damage, hitStun, blockStun, pushBack, launchVelocity, attachTo, triggerAnimation,
+	public boolean applyHit(Fighter source, Fighter defender) {
+		int success = defender.applyHit(source, group, type, damage, hitStun, blockStun, pushBack, launchVelocity, attachTo, triggerAnimation,
 				triggerTargetAnimation, release, knockDown);
-		source.dealHit(defender, pushBack, this, success);
+		source.dealHit(defender, group, pushBack, this, success);
+		return success > 0;
 	}
 
 	@Override

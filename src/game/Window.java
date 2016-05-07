@@ -33,7 +33,7 @@ public class Window extends JFrame {
 	 */
 	private GameState state;
 	
-	JPanel drawPanel = new JPanel() {
+	private JPanel drawPanel = new JPanel() {
 		
 		@Override
 		public void paintComponent(Graphics g) {
@@ -53,6 +53,10 @@ public class Window extends JFrame {
 		pack();
 		setLocationRelativeTo(null);
 		setVisible(true);
+	}
+	
+	public JPanel getDrawPanel() {
+		return drawPanel;
 	}
 	
 	public void setState(GameState state) {

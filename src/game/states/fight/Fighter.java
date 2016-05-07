@@ -1,5 +1,6 @@
 package game.states.fight;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -17,7 +18,10 @@ import javax.swing.JTextField;
 import game.Game;
 import game.Sounds;
 import game.input.InputSource;
+import game.input.InputTaker;
 import game.input.InputType;
+import game.input.StickInput;
+import game.input.StickInputType;
 import game.states.fight.animation.Animation;
 import game.states.fight.animation.Interpolation;
 import game.states.fight.animation.Keyframe;
@@ -28,7 +32,6 @@ import game.states.fight.animation.collisions.HitBox;
 import game.states.fight.animation.collisions.HitBoxType;
 import game.states.fight.animation.collisions.HurtBox;
 import game.states.fight.fighter.Bone;
-import game.util.MakeSound;
 import game.util.Position;
 import game.util.Vector;
 
@@ -38,7 +41,7 @@ import game.util.Vector;
  * @author Fritz
  *
  */
-public class Fighter {
+public class Fighter implements InputTaker {
 	
 	/**
 	 * Name of the fighter
@@ -96,7 +99,7 @@ public class Fighter {
 	/**
 	 * The number of frames the fighter is still in hitstun
 	 */
-	private int hitStun;
+	private double hitStun;
 	
 	/**
 	 * List of groups of hitboxes that the fighter has hit with
@@ -120,6 +123,18 @@ public class Fighter {
 	
 	private int comboCount;
 	
+	private Color fighterColor;
+	
+	private int[] decrementAmts;
+	
+	private int slowDownRemaining;
+	
+	private int juggleCount;
+	
+	private double meter;
+	
+	private boolean blockInput;
+	
 	/**
 	 * Initializes a new fighter
 	 * 
@@ -139,6 +154,8 @@ public class Fighter {
 		position = new Position(0.25, 0);
 		face = 1;
 		deadHitboxes = new ArrayList<>();
+		fighterColor = Color.BLACK;
+		decrementAmts = new int[3];
 		setAnimation(SharedAnimation.IDLE.toString(), false);
 	}
 	
@@ -157,6 +174,8 @@ public class Fighter {
 		position = new Position(0.25, 0);
 		face = copy.face;
 		deadHitboxes = new ArrayList<>();
+		fighterColor = Color.BLACK;
+		decrementAmts = new int[3];
 		setAnimation(SharedAnimation.IDLE.toString(), false);
 	}
 
@@ -167,13 +186,21 @@ public class Fighter {
 	 */
 	public void draw(Graphics2D g, Camera camera, Stage stage) {
 		if (animation != null) {
+			animation.draw(fighterColor, position, this, skeleton, g, camera, stage, Game.DEBUG);
+		}
+	}
+	
+	public void stepAnimation(Camera camera) {
+		if (animation != null) {
 			animation.stepAnimation(this, skeleton, camera.getSpeed());
 			if (animation.completed()) {
 				animation = null;
-				handleInputs();
 			}
-			animation.draw(position, this, skeleton, g, camera, stage, Game.DEBUG);
 		}
+	}
+	
+	public void setAnimation(SharedAnimation anim, boolean reset) {
+		setAnimation(anim.toString(), reset);
 	}
 	
 	/**
@@ -199,26 +226,26 @@ public class Fighter {
 		}
 	}
 
-	public void dealHit(Fighter defender, double pushBack, HitBox hitBox, boolean success) {
-		position = position.applyVector(new Vector(-face * pushBack / 2, 0));
-		if (success) {
-			comboCount ++;
+	public void dealHit(Fighter defender, String name, double pushBack, HitBox hitBox, int success) {
+		if (success > 0) {
+			position = position.applyVector(new Vector(-face * pushBack / 2, 0));
+			addMeter(success * 2 * hitBox.getDamage() / 4000D);
+			if (success == 2) {
+				comboCount ++;
+			}
 		}
 	}
 	
-	public boolean applyHit(Fighter attacker, String name, HitBoxType type, int damage, int hitStun, int blockStun, double pushBack,
+	public int applyHit(Fighter attacker, String name, HitBoxType type, int damage, int hitStun, int blockStun, double pushBack,
 			Vector launchVector, String attachTo, String triggerAnimation, String triggerTargetAnimation,
 			boolean release, boolean knockDown) {
 		if (attacker.deadHitboxes.contains(name)) {
-			return false;
+			return 0;
 		}
 		attacker.deadHitboxes.add(name);
 		if (release) {
 			grabbed = false;
 			attacker.skeleton.release();
-		}
-		if (knockDown) {
-			this.knockedDown = knockDown;
 		}
 		if (isGrounded()) {
 			position = position.applyVector(new Vector(-face * pushBack / 2, 0));
@@ -230,13 +257,16 @@ public class Fighter {
 					damage = (int) currentHealth;
 				}
 				Sounds.playSound(Sounds.BLOCK_PUNCH);
+				setColor(Color.BLUE);
 				currentHealth -= damage;
 				greyHealth += damage;
-				return false;
+				addMeter(damage / 4000D);
+				return 1;
 			} else {
 				if (hitStun != 0) {
 					comboDamage += damage;
 				}
+				this.knockedDown = knockDown;
 				if (!attachTo.equals("")) {
 					attacker.skeleton.getBone(attachTo).attachFighter(this);
 				}
@@ -246,112 +276,41 @@ public class Fighter {
 				} else {
 					setAnimation(isCrouching() ? SharedAnimation.HIT_CR.toString() : SharedAnimation.HIT_ST.toString(), true);
 				}
-				velocity.setX(launchVector.getX());
+				velocity.setX(-face * launchVector.getX());
 				velocity.setY(launchVector.getY());
-				position.applyVector(velocity);
-				if (position.getY() > 0) {
-					// setAnimation("air recoil")
-					// make character rotate with trajectory
+				if (velocity.getY() > 0) {
+					this.hitStun = -hitStun;
+					setAnimation(SharedAnimation.HIT_AIR.toString(), false);
 				}
+				setColor(Color.RED);
 				Sounds.playSound(Sounds.PUNCH);
 				currentHealth -= damage;
 				greyHealth = 0;
 				if (currentHealth < 0) {
 					currentHealth = 0;
 				}
-				return true;
+				addMeter(damage / 3000D);
+				return 2;
 			}
 		} else {
+			this.knockedDown = knockDown;
+			juggleCount ++;
 			if (hitStun != 0) {
 				comboDamage += damage;
 			}
 			this.hitStun = -hitStun;
-			velocity.setX(launchVector.getX());
-			velocity.setY(launchVector.getY());
-			// setAnimation("air recoil")
-			// make character rotate with trajectory
+			velocity.setX(-face * launchVector.getX());
+			velocity.setY(launchVector.getY() / (double) juggleCount);
+			setAnimation(SharedAnimation.HIT_AIR.toString(), false);
 			currentHealth -= damage;
 			greyHealth = 0;
 			if (currentHealth < 0) {
 				currentHealth = 0;
 			}
+			setColor(Color.RED);
 			Sounds.playSound(Sounds.PUNCH);
-			return true;
-		}
-	}
-
-	public void handleInputs() {
-		if (hitStun != 0) {
-			return;
-		}
-		String animName = "";
-		boolean hasInput = inputSource.getLastInput() != null;
-		InputType forward = (face == 1) ? InputType.RIGHT : InputType.LEFT;
-		InputType backward = (face == 1) ? InputType.LEFT : InputType.RIGHT;
-		if (animation != null) {
-			animName = animation.getName();
-		}
-		boolean groundMovement = animName.equalsIgnoreCase(SharedAnimation.WALK_F.toString())
-				|| animName.equalsIgnoreCase(SharedAnimation.WALK_B.toString())
-				|| animName.equalsIgnoreCase(SharedAnimation.IDLE.toString()) || animName.equalsIgnoreCase("")
-				|| animName.equalsIgnoreCase(SharedAnimation.IN_AIR.toString())
-				|| animName.equalsIgnoreCase(SharedAnimation.CROUCH.toString())
-				|| animName.equalsIgnoreCase(SharedAnimation.HIT_CR.toString())
-				|| animName.equalsIgnoreCase(SharedAnimation.HIT_ST.toString())
-				|| animName.equalsIgnoreCase(SharedAnimation.BLOCK_CR.toString())
-				|| animName.equalsIgnoreCase(SharedAnimation.BLOCK_ST.toString());
-		if (hasInput && groundMovement && inputSource.getLastInput().getTypes().contains(InputType.ATTACK_1)
-				&& !inputSource.getLastInput().hasBeenUsed() && isGrounded()) {
-			setAnimation(SharedAnimation.LP_ST.toString(), false);
-			inputSource.getLastInput().setUsed();
-		} else if (hasInput && groundMovement && inputSource.getLastInput().getTypes().contains(InputType.ATTACK_2)
-				&& !inputSource.getLastInput().hasBeenUsed() && isGrounded()) {
-			setAnimation(SharedAnimation.MP_ST.toString(), false);
-			inputSource.getLastInput().setUsed();
-		} else if (hasInput && (groundMovement || animation.isSpecialCancelable() && deadHitboxes.size() > 0)
-				&& inputSource.getLastInput().getTypes().contains(InputType.ATTACK_3)
-				&& !inputSource.getLastInput().hasBeenUsed() && isGrounded()) {
-			setAnimation(SharedAnimation.HP_ST.toString(), false);
-			inputSource.getLastInput().setUsed();
-		} else if (hasInput && groundMovement && inputSource.getPreviousInput(0).getTypes().contains(forward)
-				&& !inputSource.getPreviousInput(1).getTypes().contains(forward)
-				&& inputSource.getPreviousInput(2).getTypes().contains(forward)
-				&& inputSource.getPreviousInput(2).getDelay() < 30
-				&& !inputSource.getLastInput().hasBeenUsed() && isGrounded()) {
-			setAnimation(SharedAnimation.DASH_F.toString(), false);
-			inputSource.getLastInput().setUsed();
-		} else if (hasInput && groundMovement && inputSource.getPreviousInput(0).getTypes().contains(backward)
-				&& !inputSource.getPreviousInput(1).getTypes().contains(backward)
-				&& inputSource.getPreviousInput(2).getTypes().contains(backward)
-				&& inputSource.getPreviousInput(2).getDelay() < 30
-				&& !inputSource.getLastInput().hasBeenUsed() && isGrounded()) {
-			setAnimation(SharedAnimation.DASH_B.toString(), false);
-			inputSource.getLastInput().setUsed();
-		} else if (hasInput && groundMovement && inputSource.getLastInput().getTypes().contains(InputType.UP)
-				&& isGrounded() && !inputSource.getLastInput().hasBeenUsed()) {
-			if (inputSource.getLastInput().getTypes().contains(forward)) {
-				setAnimation(SharedAnimation.JUMPSQUAT_F.toString(), false);
-			} else if (inputSource.getLastInput().getTypes().contains(backward)) {
-				setAnimation(SharedAnimation.JUMPSQUAT_B.toString(), false);
-			} else {
-				setAnimation(SharedAnimation.JUMPSQUAT_N.toString(), false);
-			}
-			inputSource.getLastInput().setUsed();
-		} else if (hasInput && groundMovement && inputSource.getLastInput().getTypes().contains(InputType.DOWN) && isGrounded()) {
-			setAnimation(SharedAnimation.CROUCH.toString(), false);
-		} else if (hasInput && groundMovement && inputSource.getLastInput().getTypes().contains(forward) && isGrounded()) {
-			setAnimation(SharedAnimation.WALK_F.toString(), false);
-		} else if (hasInput && groundMovement && inputSource.getLastInput().getTypes().contains(backward) && isGrounded()) {
-			setAnimation(SharedAnimation.WALK_B.toString(), false);
-		} else if (hasInput && groundMovement && isGrounded()
-				&& (inputSource.getLastInput().getTypes().size() == 0 || inputSource.getLastInput().hasBeenUsed())) {
-			setAnimation(SharedAnimation.IDLE.toString(), false);
-		} else if (!isGrounded() && !animName.equalsIgnoreCase(SharedAnimation.HP_ST.toString())) {
-			if (inputSource.getLastInput().getTypes().contains(InputType.ATTACK_3)) {
-				setAnimation(SharedAnimation.HP_AIR.toString(), false);
-			} else if (!animName.equalsIgnoreCase(SharedAnimation.HP_AIR.toString())) {
-				setAnimation(SharedAnimation.IN_AIR.toString(), false);
-			}
+			addMeter(damage / 3000D);
+			return 2;
 		}
 	}
 
@@ -360,7 +319,10 @@ public class Fighter {
 		comboCount = 0;
 		comboDamage = 0;
 		greyHealth = 0;
+		juggleCount = 0;
+		slowDownRemaining = 0;
 		velocity = new Vector(0, 0);
+		setColor(Color.BLACK);
 		setAnimation(SharedAnimation.IDLE.toString(), true);
 	}
 	
@@ -496,6 +458,10 @@ public class Fighter {
 		return null;
 	}
 
+	public Animation getAnimation() {
+		return animation;
+	}
+
 	public String newAnimation() {
 		if (animations.size() == 0) {
 			animations.add(new Animation("animation_0", skeleton.getDefaultStartPositions(), new ArrayList<HitBox>(),
@@ -545,18 +511,14 @@ public class Fighter {
 	}
 
 	public boolean isBlocking(HitBoxType hitType) {
-		if (animation != null && inputSource != null && inputSource.getLastInput() != null
-				&& (animation.getName().equalsIgnoreCase(SharedAnimation.IDLE.toString())
-						|| animation.getName().equalsIgnoreCase(SharedAnimation.CROUCH.toString())
-						|| animation.getName().equalsIgnoreCase(SharedAnimation.BLOCK_ST.toString())
-						|| animation.getName().equalsIgnoreCase(SharedAnimation.BLOCK_CR.toString())
-						|| animation.getName().equalsIgnoreCase(SharedAnimation.WALK_B.toString()))) {
-			InputType direction = (face == 1) ? InputType.LEFT : InputType.RIGHT;
-			if (inputSource.getLastInput().getTypes().contains(direction)) {
-				return (isCrouching()) ? hitType != HitBoxType.HIGH : hitType != HitBoxType.LOW;
-			}
+		StickInput inputs = inputSource.getStickInputs(face, true);
+		if (animation != null && inputSource != null && inputs != null
+				&& (hasNeutralGroundState() || animation.getName().toLowerCase().contains("block"))
+				&& inputs.getValues().contains(StickInputType.BACKWARD)) {
+			return (inputs.getValues().contains(StickInputType.DOWN)) ? hitType != HitBoxType.HIGH
+					: hitType != HitBoxType.LOW;
 		}
-		return false;
+		return Math.random() < 0.5;
 	}
 
 	private boolean isCrouching() {
@@ -612,15 +574,11 @@ public class Fighter {
 		return knockedDown;
 	}
 	
-	public boolean usingQuickGetUp() {
-		return inputSource.getLastInput().getTypes().contains(InputType.UP);
-	}
-	
-	public int getHitStun() {
+	public double getHitStun() {
 		return hitStun;
 	}
 	
-	public void setHitStun(int newStun) {
+	public void setHitStun(double newStun) {
 		hitStun = newStun;
 	}
 	
@@ -656,10 +614,37 @@ public class Fighter {
 	
 	public void resetCombo() {
 		comboDamage = 0;
+		juggleCount = 0;
 	}
 	
 	public void resetFaceCheck() {
 		needFaceCheck = false;
+	}
+	
+	public void setColor(Color color) {
+		fighterColor = color;
+		decrementAmts[0] = color.getRed() / 30;
+		decrementAmts[1] = color.getGreen() / 30;
+		decrementAmts[2] = color.getBlue() / 30;
+	}
+	
+	public void normalizeColor() {
+		int newRed = fighterColor.getRed() - decrementAmts[0];
+		if (newRed < 0) {
+			newRed = 0;
+			decrementAmts[0] = 0;
+		}
+		int newGreen = fighterColor.getGreen() - decrementAmts[1];
+		if (newGreen < 0) {
+			newGreen = 0;
+			decrementAmts[1] = 0;
+		}
+		int newBlue = fighterColor.getBlue() - decrementAmts[2];
+		if (newBlue < 0) {
+			newBlue = 0;
+			decrementAmts[2] = 0;
+		}
+		fighterColor = new Color(newRed, newGreen, newBlue);
 	}
 
 	/**
@@ -736,5 +721,236 @@ public class Fighter {
 		knockedDown = false;
 
 	}
+	
+	public boolean hasNeutralGroundState() {
+		return isGrounded() && (doingAnim(SharedAnimation.IDLE) || doingAnim(SharedAnimation.WALK_B)
+				|| doingAnim(SharedAnimation.WALK_F) || doingAnim(SharedAnimation.CROUCH));
+	}
+	
+	public boolean doingAnim(SharedAnimation anim) {
+		return animation.getName().equalsIgnoreCase(anim.toString());
+	}
+	
+	public void updateGroundAnim() {
+		List<StickInputType> inputs = inputSource.getStickInputs(face, true).getValues();
+		if (inputs.isEmpty()) {
+			setAnimation(SharedAnimation.IDLE, false);
+		} else if (inputs.contains(StickInputType.UP)) {
+			if (inputs.contains(StickInputType.BACKWARD)) {
+				setAnimation(SharedAnimation.JUMPSQUAT_B, true);
+			} else if (inputs.contains(StickInputType.FORWARD)) {
+				setAnimation(SharedAnimation.JUMPSQUAT_F, true);
+			} else {
+				setAnimation(SharedAnimation.JUMPSQUAT_N, true);
+			}
+		} else if (inputs.contains(StickInputType.DOWN)) {
+			setAnimation(SharedAnimation.CROUCH, false);
+		} else if (inputs.contains(StickInputType.DOUBLE_TAP_F)) {
+			setAnimation(SharedAnimation.DASH_F, false);
+		} else if (inputs.contains(StickInputType.DOUBLE_TAP_B)) {
+			setAnimation(SharedAnimation.DASH_B, false);
+		} else if (inputs.contains(StickInputType.FORWARD)) {
+			setAnimation(SharedAnimation.WALK_F, false);
+		} else if (inputs.contains(StickInputType.BACKWARD)) {
+			setAnimation(SharedAnimation.WALK_B, false);
+		}
+	}
+
+	@Override
+	public void stickMoved(InputSource source) {
+		if (hitStun > 0 || blockInput) {
+			return;
+		}
+		List<StickInputType> inputs = source.getStickInputs(face, true).getValues();
+		if (hasNeutralGroundState()) {
+			updateGroundAnim();
+		}
+	}
+
+	@Override
+	public void lightPunchPressed(InputSource source) {
+		if (hitStun > 0 || blockInput) {
+			return;
+		}
+		if (hasNeutralGroundState() && !isCrouching()) {
+			setAnimation(SharedAnimation.LP_ST, true);
+		}
+	}
+
+	@Override
+	public void heavyPunchPressed(InputSource source) {
+		if (hitStun > 0 || blockInput) {
+			return;
+		}
+		if (isGrounded() && (hasNeutralGroundState() || deadHitboxes.size() > 0 && animation.isSpecialCancelable())) {
+			setAnimation(SharedAnimation.HP_ST, true);
+		}
+	}
+
+	@Override
+	public void lightKickPressed(InputSource source) {
+		if (hitStun > 0 || blockInput) {
+			return;
+		}
+	}
+
+	@Override
+	public void heavyKickPressed(InputSource source) {
+		if (hitStun > 0 || blockInput) {
+			return;
+		}
+	}
+
+	@Override
+	public void cancelPressed(InputSource source) {
+		if (meter >= 0.5 && !blockInput) {
+			addMeter(-0.5);
+			hitStun = 0;
+			setColor(Color.GREEN);
+			if (isGrounded()) {
+				updateGroundAnim();
+			} else {
+				setAnimation(SharedAnimation.IN_AIR, false);
+			}
+			slowDownRemaining = 180;
+		}
+	}
+
+	@Override
+	public void startPressed(InputSource source) {
+		
+		
+	}
+
+	@Override
+	public void grabPressed(InputSource source) {
+		if (hitStun > 0 || blockInput) {
+			return;
+		}
+		
+	}
+
+	@Override
+	public void exKickPressed(InputSource source) {
+		if (hitStun > 0 || blockInput) {
+			return;
+		}
+		
+	}
+
+	@Override
+	public void exPunchPressed(InputSource source) {
+		if (hitStun > 0 || blockInput) {
+			return;
+		}
+		
+	}
+
+	public boolean usingQuickGetUp() {
+		StickInput input = inputSource.getStickInputs(face, true, 10);
+		return input != null && input.getValues().contains(StickInputType.UP);
+	}
+	
+	public boolean hasSlowDownActive() {
+		return slowDownRemaining-- > 0;
+	}
+	
+	public void addMeter(double amt) {
+		meter += amt;
+		if (meter > 1) {
+			meter = 1;
+		}
+		if (meter < 0) {
+			meter = 0;
+		}
+	}
+
+	public double getMeter() {
+		return meter;
+	}
+	
+	public void blockInput(boolean value) {
+		blockInput = value;
+	}
+	
+
+
+/*	public void handleInputs() {
+		if (hitStun != 0) {
+			return;
+		}
+		String animName = "";
+		boolean hasInput = inputSource.getLastInput() != null;
+		InputType forward = (face == 1) ? InputType.RIGHT : InputType.LEFT;
+		InputType backward = (face == 1) ? InputType.LEFT : InputType.RIGHT;
+		if (animation != null) {
+			animName = animation.getName();
+		}
+		boolean groundMovement = animName.equalsIgnoreCase(SharedAnimation.WALK_F.toString())
+				|| animName.equalsIgnoreCase(SharedAnimation.WALK_B.toString())
+				|| animName.equalsIgnoreCase(SharedAnimation.IDLE.toString()) || animName.equalsIgnoreCase("")
+				|| animName.equalsIgnoreCase(SharedAnimation.IN_AIR.toString())
+				|| animName.equalsIgnoreCase(SharedAnimation.CROUCH.toString())
+				|| animName.equalsIgnoreCase(SharedAnimation.HIT_CR.toString())
+				|| animName.equalsIgnoreCase(SharedAnimation.HIT_ST.toString())
+				|| animName.equalsIgnoreCase(SharedAnimation.BLOCK_CR.toString())
+				|| animName.equalsIgnoreCase(SharedAnimation.BLOCK_ST.toString());
+		if (hasInput && groundMovement && inputSource.getLastInput().getTypes().contains(InputType.ATTACK_1)
+				&& !inputSource.getLastInput().hasBeenUsed() && isGrounded()) {
+			setAnimation(SharedAnimation.LP_ST.toString(), false);
+			inputSource.getLastInput().setUsed();
+		} else if (hasInput && groundMovement && inputSource.getLastInput().getTypes().contains(InputType.ATTACK_2)
+				&& !inputSource.getLastInput().hasBeenUsed() && isGrounded()) {
+			setAnimation(SharedAnimation.MP_ST.toString(), false);
+			inputSource.getLastInput().setUsed();
+		} else if (hasInput && (groundMovement || animation.isSpecialCancelable() && deadHitboxes.size() > 0)
+				&& inputSource.getLastInput().getTypes().contains(InputType.ATTACK_3)
+				&& !inputSource.getLastInput().hasBeenUsed() && isGrounded()) {
+			setAnimation(SharedAnimation.HP_ST.toString(), false);
+			inputSource.getLastInput().setUsed();
+		} else if (deadHitboxes.size() > 0 && inputSource.getLastInput().getTypes().contains(InputType.CANCEL)) {
+			setAnimation(SharedAnimation.IDLE, false);
+			setColor(Color.GREEN);
+		} else if (hasInput && groundMovement && inputSource.getPreviousInput(0).getTypes().contains(forward)
+				&& !inputSource.getPreviousInput(1).getTypes().contains(forward)
+				&& inputSource.getPreviousInput(2).getTypes().contains(forward)
+				&& inputSource.getPreviousInput(2).getAge() < 30
+				&& !inputSource.getLastInput().hasBeenUsed() && isGrounded()) {
+			setAnimation(SharedAnimation.DASH_F.toString(), false);
+			inputSource.getLastInput().setUsed();
+		} else if (hasInput && groundMovement && inputSource.getPreviousInput(0).getTypes().contains(backward)
+				&& !inputSource.getPreviousInput(1).getTypes().contains(backward)
+				&& inputSource.getPreviousInput(2).getTypes().contains(backward)
+				&& inputSource.getPreviousInput(2).getAge() < 30
+				&& !inputSource.getLastInput().hasBeenUsed() && isGrounded()) {
+			setAnimation(SharedAnimation.DASH_B.toString(), false);
+			inputSource.getLastInput().setUsed();
+		} else if (hasInput && groundMovement && inputSource.getLastInput().getTypes().contains(InputType.UP)
+				&& isGrounded() && !inputSource.getLastInput().hasBeenUsed()) {
+			if (inputSource.getLastInput().getTypes().contains(forward)) {
+				setAnimation(SharedAnimation.JUMPSQUAT_F.toString(), false);
+			} else if (inputSource.getLastInput().getTypes().contains(backward)) {
+				setAnimation(SharedAnimation.JUMPSQUAT_B.toString(), false);
+			} else {
+				setAnimation(SharedAnimation.JUMPSQUAT_N.toString(), false);
+			}
+			inputSource.getLastInput().setUsed();
+		} else if (hasInput && groundMovement && inputSource.getLastInput().getTypes().contains(InputType.DOWN) && isGrounded()) {
+			setAnimation(SharedAnimation.CROUCH.toString(), false);
+		} else if (hasInput && groundMovement && inputSource.getLastInput().getTypes().contains(forward) && isGrounded()) {
+			setAnimation(SharedAnimation.WALK_F.toString(), false);
+		} else if (hasInput && groundMovement && inputSource.getLastInput().getTypes().contains(backward) && isGrounded()) {
+			setAnimation(SharedAnimation.WALK_B.toString(), false);
+		} else if (hasInput && groundMovement && isGrounded()
+				&& (inputSource.getLastInput().getTypes().size() == 0 || inputSource.getLastInput().hasBeenUsed())) {
+			setAnimation(SharedAnimation.IDLE.toString(), false);
+		} else if (!isGrounded() && !animName.equalsIgnoreCase(SharedAnimation.HP_ST.toString())) {
+			if (inputSource.getLastInput().getTypes().contains(InputType.ATTACK_3)) {
+				setAnimation(SharedAnimation.HP_AIR.toString(), false);
+			} else if (!animName.equalsIgnoreCase(SharedAnimation.HP_AIR.toString())) {
+				setAnimation(SharedAnimation.IN_AIR.toString(), false);
+			}
+		}
+	}*/
 	
 }

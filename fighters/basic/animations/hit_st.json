@@ -152,20 +152,6 @@
 			"interpolation": LINEAR,
 			"data": 98.21278018928588
 		},
-		"keyframe": {
-			"bone": "root",
-			"frame": 0,
-			"type": VELOCITY_Y,
-			"interpolation": NONE,
-			"data": 0.0
-		},
-		"keyframe": {
-			"bone": "root",
-			"frame": 0,
-			"type": VELOCITY_X,
-			"interpolation": NONE,
-			"data": 0.0
-		},
 	},
 	"ecbs": {
 		"ecb": {

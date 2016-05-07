@@ -1,8 +1,8 @@
 package game.states.fight.animation;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -137,8 +137,8 @@ public class Animation {
 	 * @param position - Position to draw the animation at
 	 * @param g - Graphics2D object to draw
 	 */
-	public void draw(Position position, Fighter fighter, Bone root, Graphics2D g, Camera camera, Stage stage, boolean debug) {
-		draw(position, fighter, root, g, camera, stage, debug, null);
+	public void draw(Color fighterColor, Position position, Fighter fighter, Bone root, Graphics2D g, Camera camera, Stage stage, boolean debug) {
+		draw(fighterColor, position, fighter, root, g, camera, stage, debug, null);
 	}
 
 	/**
@@ -147,12 +147,14 @@ public class Animation {
 	 * @param position - Position to draw the animation at
 	 * @param g - Graphics2D object to draw
 	 */
-	public void draw(Position position, Fighter fighter, Bone root, Graphics2D g, Camera camera, Stage stage,
+	public void draw(Color fighterColor, Position position, Fighter fighter, Bone root, Graphics2D g, Camera camera, Stage stage,
 			boolean debug, CollisionBox selected) {
-		root.draw(g, fighter.getFace(), position, camera);
+		root.draw(fighterColor, g, fighter.getFace(), position, camera);
 		if (debug) {
 			if (getActiveECB() != null) {
 				getActiveECB().draw(fighter.getFace(), position, camera, g, getActiveECB().equals(selected));
+			} else {
+				System.out.println("WARNING: NO ECB");
 			}
 			for (HurtBox hurtbox : getActiveHurtBoxes()) {
 				hurtbox.draw(fighter.getFace(), position, camera, g, hurtbox.equals(selected));

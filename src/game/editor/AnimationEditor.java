@@ -77,7 +77,7 @@ public class AnimationEditor {
 						frame = (int) currentFrame.getValue();
 						currentAnimation.setFrame(Editor.fighter, Editor.fighter.getEditorSkeleton(0), (int) currentFrame.getValue());
 					}
-					currentAnimation.draw(Editor.defaultLoc, Editor.fighter, Editor.fighter.getEditorSkeleton(0), (Graphics2D) g,
+					currentAnimation.draw(Color.BLACK, Editor.defaultLoc, Editor.fighter, Editor.fighter.getEditorSkeleton(0), (Graphics2D) g,
 							Editor.camera, Editor.stage, true);
 					g.setColor(Color.BLACK);
 					g.drawString("Frame: " + Math.round(currentAnimation.getCurrentFrame() * 100d) / 100d, 5, 15);

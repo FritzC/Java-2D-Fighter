@@ -89,7 +89,7 @@ public class Game {
 	 * @return - Window's height
 	 */
 	public static int getScreenHeight() {
-		return window.getBounds().height;
+		return window.getDrawPanel().getHeight();
 	}
 	
 	/**
@@ -98,7 +98,7 @@ public class Game {
 	 * @return - Window's width
 	 */
 	public static int getScreenWidth() {
-		return window.getBounds().width;
+		return window.getDrawPanel().getWidth();
 	}
 	
 }

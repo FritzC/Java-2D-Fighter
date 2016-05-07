@@ -7,11 +7,13 @@ package game.input;
  *
  */
 public enum InputType {
-	UP,
-	DOWN,
-	RIGHT,
-	LEFT,
-	ATTACK_1,
-	ATTACK_2,
-	ATTACK_3;
+	LP,
+	HP,
+	LK,
+	HK, 
+	EX_P,
+	EX_K,
+	CANCEL, 
+	START, 
+	GRAB;
 }

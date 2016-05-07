@@ -1,5 +1,5 @@
 {
-	"loop": false,
+	"loop": true,
 	"specialCancelable": false,
 	"initialPose": {
 		"bonePose": {
@@ -191,7 +191,7 @@
 	"ecbs": {
 		"ecb": {
 			"startFrame": 0,
-			"endFrame": 1,
+			"endFrame": 23,
 			"collision": {
 				"box": {
 					"top_l x": -0.16,

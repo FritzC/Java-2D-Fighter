@@ -172,18 +172,20 @@ public class Bone {
 	/**
 	 * Draws the bone and all of its children
 	 *  - Call on the root of the structure to draw the entire fighter
+	 * @param fighterColor 
 	 *  
 	 * @param g - Graphics object to draw with
 	 * @param root - Position of the last node to draw from
 	 * @param camera - Camera reference to get screen coordinates
 	 */
-	public void draw(Graphics2D g, int face, Position pos, Camera camera) {
-		draw(g, face, pos, camera, false, "", "", 0);
+	public void draw(Color fighterColor, Graphics2D g, int face, Position pos, Camera camera) {
+		draw(fighterColor, g, face, pos, camera, false, "", "", 0);
 	}
 	
 	/**
 	 * Draws the bone and all of its children
 	 *  - Call on the root of the structure to draw the entire fighter
+	 * @param fighterColor 
 	 *  
 	 * @param g - Graphics object to draw with
 	 * @param pos - Position of the last node to draw from
@@ -191,7 +193,7 @@ public class Bone {
 	 * @param drawHidden - Whether to draw hidden bones
 	 * @param selected - Selected bone
 	 */
-	public void draw(Graphics2D g, int face, Position pos, Camera camera, boolean drawHidden, String selectedBone, String hoveredBone, int selectType) {
+	public void draw(Color fighterColor, Graphics2D g, int face, Position pos, Camera camera, boolean drawHidden, String selectedBone, String hoveredBone, int selectType) {
 		double currentAngle = angle + interpolatedAngle;
 		double currentLength = length + interpolatedLength;
 		if (face < 0) {
@@ -204,7 +206,7 @@ public class Bone {
 			selectType = 1;
 			hoveredBone = "";
 		}
-		g.setColor(Color.BLACK);
+		g.setColor(fighterColor);
 		if (visible || drawHidden) {
 			int screenX = camera.getScreenX(pos);
 			int screenY = camera.getScreenY(pos);
@@ -260,7 +262,7 @@ public class Bone {
 		}
 		for (Bone bone : children) {
 			int drawType = (bone.name.equals(selectedBone)) ? 2 : ((bone.name.equals(hoveredBone)) ? 1 : 0);
-			bone.draw(g, face, tail, camera, drawHidden, selectedBone, hoveredBone, drawType);
+			bone.draw(fighterColor, g, face, tail, camera, drawHidden, selectedBone, hoveredBone, drawType);
 		}
 	}
 	

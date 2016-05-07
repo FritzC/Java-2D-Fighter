@@ -1,6 +1,6 @@
 {
 	"loop": true,
-	"specialCancelable": false,
+	"specialCancelable": true,
 	"initialPose": {
 		"bonePose": {
 			"name": "l_upper_arm",

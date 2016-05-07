@@ -80,7 +80,7 @@ public class CollisionEditor {
 					AnimationEditor.currentAnimation.setFrame(Editor.fighter, Editor.fighter.getEditorSkeleton(2),
 							(int) currentFrame.getValue());
 					frame = AnimationEditor.currentAnimation.getCurrentFrame();
-					AnimationEditor.currentAnimation.draw(Editor.defaultLoc, Editor.fighter,
+					AnimationEditor.currentAnimation.draw(Color.BLACK, Editor.defaultLoc, Editor.fighter,
 							Editor.fighter.getEditorSkeleton(2), (Graphics2D) g, Editor.camera, Editor.stage, true,
 							selectedCollision);
 				}

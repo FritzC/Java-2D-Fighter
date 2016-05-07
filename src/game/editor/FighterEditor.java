@@ -84,7 +84,7 @@ public class FighterEditor {
 				String selected = (boneSelected != null) ? boneSelected.getName() : "";
 				String hovered = (boneHovered != null) ? boneHovered.getName() : "";
 				if (Editor.fighter != null) {
-					Editor.fighter.getSkeleton().draw((Graphics2D) g, 1, skeletonLoc, Editor.camera, true, selected, hovered, 0);
+					Editor.fighter.getSkeleton().draw(Color.BLACK, (Graphics2D) g, 1, skeletonLoc, Editor.camera, true, selected, hovered, 0);
 				}
 			}
 		};

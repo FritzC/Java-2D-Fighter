@@ -2,7 +2,6 @@ package game.editor;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
@@ -14,13 +13,12 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
-import java.util.EventObject;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import javax.swing.AbstractCellEditor;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -35,14 +33,12 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableModel;
 
 import game.Game;
 import game.states.fight.animation.Interpolation;
 import game.states.fight.animation.Keyframe;
 import game.states.fight.animation.KeyframeType;
-import game.states.fight.fighter.Bone;
 import game.util.Position;
 
 public class KeyframeEditor {
@@ -51,7 +47,10 @@ public class KeyframeEditor {
 	private static TableModel model;
 	private static JButton newKeyframe;
 	private static JButton deleteKeyframe;
+	private static JButton snapshot;
 	private static JButton refresh;
+	private static JSpinner pullFrom;
+	private static JSpinner pullTo;
 	private final static int SHIFT = 16;
 	private static double frame;
 	
@@ -73,7 +72,7 @@ public class KeyframeEditor {
 				if (currentKeyframe != null) {
 					AnimationEditor.currentAnimation.setFrame(Editor.fighter, Editor.fighter.getEditorSkeleton(1),
 							currentKeyframe.getEndFrame());
-					Editor.fighter.getEditorSkeleton(1).draw((Graphics2D) g, 1, Editor.defaultLoc, Editor.camera, true,
+					Editor.fighter.getEditorSkeleton(1).draw(Color.BLACK, (Graphics2D) g, 1, Editor.defaultLoc, Editor.camera, true,
 							(String) currentKeyframe.getInfo()[1], "", 0);
 				}
 			}
@@ -255,28 +254,28 @@ public class KeyframeEditor {
 			}
 		});
 		keyframes.getColumnModel().getColumn(3).setCellEditor(new DefaultCellEditor(interpolation));
-		JPanel bottom = new JPanel(new GridLayout(0, 3));
+		JPanel bottom = new JPanel(new GridLayout(0, 4));
+		final JSpinner pullFrom = new JSpinner(new SpinnerNumberModel(1, 0, 10000, 1));
+		final JSpinner pullTo = new JSpinner(new SpinnerNumberModel(1, 0, 10000, 1));
 		newKeyframe = new JButton("+");
 		newKeyframe.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				currentKeyframe = null;
 				JPanel panel = new JPanel();
-				panel.add(frame);
+				panel.add(pullFrom);
+				panel.add(pullTo);
 				panel.add(bones);
 				panel.add(type);
 				if (JOptionPane.showConfirmDialog(Editor.frame, panel, "Pull data from:",
 						JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE) == 0) {
-					double oldVal = AnimationEditor.currentAnimation.getCurrentFrame();
 					AnimationEditor.currentAnimation.setFrame(Editor.fighter, Editor.fighter.getEditorSkeleton(1),
-							(int) frame.getValue());
+							(int) pullFrom.getValue());
 					Keyframe copy = Editor.fighter.getEditorSkeleton(1).getStartPositions().get(bones.getSelectedItem()).get(type.getSelectedItem());
 					copy.setInterpolation(Interpolation.LINEAR);
-					copy.setEndFrame((int) frame.getValue()); 
-					AnimationEditor.currentAnimation.setFrame(Editor.fighter, Editor.fighter.getEditorSkeleton(0),
-							oldVal);
+					copy.setEndFrame((int) pullTo.getValue()); 
 					AnimationEditor.currentAnimation.getKeyframes().add(copy);
-					updateKeyframeTable();
 					currentKeyframe = copy;
+					updateKeyframeTable();
 				}
 			}
 		});
@@ -290,6 +289,36 @@ public class KeyframeEditor {
 				}
 			}
 		});
+		snapshot = new JButton("Snapshot");
+		snapshot.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JPanel panel = new JPanel();
+				panel.add(pullFrom);
+				panel.add(pullTo);
+				if (JOptionPane.showConfirmDialog(Editor.frame, panel, "Pull data from:", JOptionPane.OK_CANCEL_OPTION,
+						JOptionPane.PLAIN_MESSAGE) == 0) {
+					AnimationEditor.currentAnimation.setFrame(Editor.fighter, Editor.fighter.getEditorSkeleton(1),
+							(int) pullFrom.getValue());
+					Map<String, Map<KeyframeType, Keyframe>> pose = Editor.fighter.getEditorSkeleton(1)
+							.getStartPositions();
+					for (String bone : pose.keySet()) {
+						for (KeyframeType type : pose.get(bone).keySet())  {
+							if (type == KeyframeType.VELOCITY_X || type == KeyframeType.VELOCITY_Y
+									|| type == KeyframeType.IGNORE_VELOCITY_X || type == KeyframeType.IGNORE_VELOCITY_Y
+									|| type == KeyframeType.VISIBLE) {
+								continue;
+							}
+							Keyframe copy = new Keyframe(pose.get(bone).get(type));
+							copy.setEndFrame((int) pullTo.getValue());
+							copy.setInterpolation(Interpolation.LINEAR);
+							AnimationEditor.currentAnimation.getKeyframes().add(copy);
+						}
+					}
+					currentKeyframe = null;
+					updateKeyframeTable();
+				}
+			}
+		});
 		refresh = new JButton("Refresh");
 		refresh.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -298,6 +327,7 @@ public class KeyframeEditor {
 		});
 		bottom.add(newKeyframe);
 		bottom.add(deleteKeyframe);
+		bottom.add(snapshot);
 		bottom.add(refresh);
 		Editor.keyframePanel.add(new JScrollPane(keyframes), BorderLayout.CENTER);
 		Editor.keyframePanel.add(bottom, BorderLayout.SOUTH);

@@ -1,0 +1,199 @@
+{
+	"name": "Rob",
+	"health": 1000.0,
+	"skeleton": {
+		"bone": {
+			"name": "root",
+			"drawMode": LINE,
+			"length": 0.20110733205148812,
+			"width": 0.05,
+			"angle": 90.0,
+			"visible": false,
+			"sprite": "",
+			"children": {
+				"bone": {
+					"name": "l_hip",
+					"drawMode": LINE,
+					"length": 0.05232558139534884,
+					"width": 0.05,
+					"angle": 0.0,
+					"visible": true,
+					"sprite": "",
+					"children": {
+						"bone": {
+							"name": "l_thigh",
+							"drawMode": LINE,
+							"length": 0.1173281166895963,
+							"width": 0.05,
+							"angle": 310.0,
+							"visible": true,
+							"sprite": "",
+							"children": {
+								"bone": {
+									"name": "l_calf",
+									"drawMode": LINE,
+									"length": 0.1163154013008288,
+									"width": 0.05,
+									"angle": 265.0,
+									"visible": true,
+									"sprite": "",
+									"children": {}
+								}
+							}
+						}
+					}
+				},
+				"bone": {
+					"name": "r_hip",
+					"drawMode": LINE,
+					"length": 0.038235309412691584,
+					"width": 0.05,
+					"angle": 185.0,
+					"visible": true,
+					"sprite": "",
+					"children": {
+						"bone": {
+							"name": "r_thigh",
+							"drawMode": LINE,
+							"length": 0.10078451060092858,
+							"width": 0.05,
+							"angle": 235.0,
+							"visible": true,
+							"sprite": "",
+							"children": {
+								"bone": {
+									"name": "r_calf",
+									"drawMode": LINE,
+									"length": 0.134,
+									"width": 0.05,
+									"angle": 245.0,
+									"visible": true,
+									"sprite": "",
+									"children": {}
+								}
+							}
+						}
+					}
+				},
+				"bone": {
+					"name": "back_l",
+					"drawMode": LINE,
+					"length": 0.07982285010317432,
+					"width": 0.05,
+					"angle": 100.0,
+					"visible": true,
+					"sprite": "",
+					"children": {
+						"bone": {
+							"name": "back_m",
+							"drawMode": LINE,
+							"length": 0.072732534902307,
+							"width": 0.05,
+							"angle": 90.0,
+							"visible": true,
+							"sprite": "",
+							"children": {
+								"bone": {
+									"name": "back_u",
+									"drawMode": LINE,
+									"length": 0.06786405540656251,
+									"width": 0.05,
+									"angle": 80.0,
+									"visible": true,
+									"sprite": "",
+									"children": {
+										"bone": {
+											"name": "l_shoulder",
+											"drawMode": LINE,
+											"length": 0.03677067046707418,
+											"width": 0.05,
+											"angle": 340.0,
+											"visible": true,
+											"sprite": "",
+											"children": {
+												"bone": {
+													"name": "l_tricep",
+													"drawMode": LINE,
+													"length": 0.12340107719064607,
+													"width": 0.05,
+													"angle": 310.0,
+													"visible": true,
+													"sprite": "",
+													"children": {
+														"bone": {
+															"name": "l_bicep",
+															"drawMode": LINE,
+															"length": 0.1333729040343542,
+															"width": 0.05,
+															"angle": 70.0,
+															"visible": true,
+															"sprite": "",
+															"children": {}
+														}
+													}
+												}
+											}
+										},
+										"bone": {
+											"name": "r_shoulder",
+											"drawMode": LINE,
+											"length": 0.04427775061548784,
+											"width": 0.05,
+											"angle": 200.0,
+											"visible": true,
+											"sprite": "",
+											"children": {
+												"bone": {
+													"name": "r_tricep",
+													"drawMode": LINE,
+													"length": 0.11422606223481685,
+													"width": 0.05,
+													"angle": 255.0,
+													"visible": true,
+													"sprite": "",
+													"children": {
+														"bone": {
+															"name": "r_bicep",
+															"drawMode": LINE,
+															"length": 0.13466552118488917,
+															"width": 0.05,
+															"angle": 10.0,
+															"visible": true,
+															"sprite": "",
+															"children": {}
+														}
+													}
+												}
+											}
+										},
+										"bone": {
+											"name": "neck",
+											"drawMode": LINE,
+											"length": 0.041110859371310905,
+											"width": 0.05,
+											"angle": 95.0,
+											"visible": true,
+											"sprite": "",
+											"children": {
+												"bone": {
+													"name": "head",
+													"drawMode": CIRCLE,
+													"length": 0.12418610094938272,
+													"width": 0.05,
+													"angle": 65.0,
+													"visible": true,
+													"sprite": "",
+													"children": {}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
