@@ -9,8 +9,6 @@ public enum StickInputType {
 	FORWARD,
 	BACKWARD,
 	QC_F,
-	QC_B,
-	DOUBLE_TAP_F,
-	DOUBLE_TAP_B;
+	QC_B,;
 	
 }

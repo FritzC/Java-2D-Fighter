@@ -73,14 +73,39 @@ public class Box {
 	 * @return - Whether the boxes are intersecting
 	 */
 	public boolean intersects(Box box) {
-		int multiplier = 10000;
-		Rectangle r1 = new Rectangle((int) (topLeft.getX() * multiplier), (int) (topLeft.getY() * multiplier),
-				(int) (Math.abs(bottomRight.getX() - topLeft.getX()) * multiplier),
-				(int) (Math.abs(topLeft.getY() - bottomRight.getY()) * multiplier));
-		Rectangle r2 = new Rectangle((int) (box.topLeft.getX() * multiplier), (int) (box.topLeft.getY() * multiplier),
-				(int) (Math.abs(box.bottomRight.getX() - box.topLeft.getX()) * multiplier),
-				(int) (Math.abs(box.topLeft.getY() - box.bottomRight.getY()) * multiplier));
-		return r1.intersects(r2);
+		if (topLeft.getX() >= box.topLeft.getX() && topLeft.getX() <= box.bottomRight.getX()
+				&& topLeft.getY() >= box.bottomRight.getY() && topLeft.getY() <= box.topLeft.getY()) {
+			return true;
+		}
+		if (bottomRight.getX() >= box.topLeft.getX() && bottomRight.getX() <= box.bottomRight.getX()
+					&& topLeft.getY() >= box.bottomRight.getY() && topLeft.getY() <= box.topLeft.getY()) {
+			return true;
+		}
+		if (topLeft.getX() >= box.topLeft.getX() && topLeft.getX() <= box.bottomRight.getX()
+					&& bottomRight.getY() >= box.bottomRight.getY() && bottomRight.getY() <= box.topLeft.getY()) {
+			return true;
+		}
+		if (bottomRight.getX() >= box.topLeft.getX() && bottomRight.getX() <= box.bottomRight.getX()
+				&& bottomRight.getY() >= box.bottomRight.getY() && bottomRight.getY() <= box.topLeft.getY()) {
+			return true;
+		}
+		if (box.topLeft.getX() >= topLeft.getX() && box.topLeft.getX() <= bottomRight.getX()
+				&& box.topLeft.getY() >= bottomRight.getY() && box.topLeft.getY() <= topLeft.getY()) {
+			return true;
+		}
+		if (box.bottomRight.getX() >= topLeft.getX() && box.bottomRight.getX() <= bottomRight.getX()
+				&& box.topLeft.getY() >= bottomRight.getY() && box.topLeft.getY() <= topLeft.getY()) {
+			return true;
+		}
+		if (box.topLeft.getX() >= topLeft.getX() && box.topLeft.getX() <= bottomRight.getX()
+				&& box.bottomRight.getY() >= bottomRight.getY() && box.bottomRight.getY() <= topLeft.getY()) {
+			return true;
+		}
+		if (box.bottomRight.getX() >= topLeft.getX() && box.bottomRight.getX() <= bottomRight.getX()
+				&& box.bottomRight.getY() >= bottomRight.getY() && box.bottomRight.getY() <= topLeft.getY()) {
+			return true;
+		}
+		return false;
 	}
 	
 	/**

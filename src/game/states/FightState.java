@@ -390,6 +390,11 @@ public class FightState extends GameState {
 	public void playerLogic(Fighter player, Fighter other) {
 		/** Animations **/
 		player.stepAnimation(camera);
+		/** Facing **/
+		if (player.needFaceCheck()) {
+			player.setFace((player.getPosition().getX() < other.getPosition().getX()) ? 1 : -1);
+			player.resetFaceCheck();
+		}
 		if (player.getAnimation() == null) {
 			if (player.isGrounded()) {
 				player.updateGroundAnim();
@@ -496,12 +501,6 @@ public class FightState extends GameState {
 			off = player.getPosition().getX() - newPos.getX();
 			player.setPosition(new Position(player.getPosition().getX() - off / 2, 0));
 			other.setPosition(new Position(other.getPosition().getX() + off / 2, 0));
-		}
-		
-		/** Facing **/
-		if (player.needFaceCheck()) {
-			player.setFace((player.getPosition().getX() < other.getPosition().getX()) ? 1 : -1);
-			player.resetFaceCheck();
 		}
 		
 		/** Hitstun **/

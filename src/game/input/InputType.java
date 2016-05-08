@@ -15,5 +15,7 @@ public enum InputType {
 	EX_K,
 	CANCEL, 
 	START, 
-	GRAB;
+	GRAB,
+	DASH_F,
+	DASH_B;
 }

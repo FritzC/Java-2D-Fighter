@@ -2,23 +2,27 @@ package game.input;
 
 public interface InputTaker {
 
-	public void stickMoved(InputSource source);
+	public boolean stickMoved(InputSource source);
 	
-	public void lightPunchPressed(InputSource source);
+	public boolean lightPunchPressed(int attempt, InputSource source);
 	
-	public void heavyPunchPressed(InputSource source);
+	public boolean heavyPunchPressed(int attempt, InputSource source);
 	
-	public void lightKickPressed(InputSource source);
+	public boolean lightKickPressed(int attempt, InputSource source);
 	
-	public void heavyKickPressed(InputSource source);
+	public boolean heavyKickPressed(int attempt, InputSource source);
 	
-	public void cancelPressed(InputSource source);
+	public boolean cancelPressed(int attempt, InputSource source);
 	
-	public void startPressed(InputSource source);
+	public boolean startPressed(int attempt, InputSource source);
 
-	public void grabPressed(InputSource source);
+	public boolean grabPressed(int attempt, InputSource source);
 
-	public void exKickPressed(InputSource source);
+	public boolean exKickPressed(int attempt, InputSource source);
 
-	public void exPunchPressed(InputSource source);
+	public boolean exPunchPressed(int attempt, InputSource source);
+	
+	public boolean doubleTappedForward(int attempt, InputSource source);
+
+	public boolean doubleTappedBack(int attempt, InputSource source);
 }

@@ -80,7 +80,7 @@ public class Editor {
 			}
 		};
 		camera.setFocus(new Position(0.5f, 0.4f));
-		camera.setZoom(1);
+		camera.setZoom(1.25);
 		keysDown = new ArrayList<>();
 		frame.getContentPane().setLayout(new GridLayout(2, 1));
 		initViewPortPanel();

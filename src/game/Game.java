@@ -20,6 +20,8 @@ import game.util.Position;
  */
 public class Game {
 	
+	public final static int INPUT_BUFFER = 15;
+	
 	/**
 	 * Number of times the game loop is ran per second
 	 */

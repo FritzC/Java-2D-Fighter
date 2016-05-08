@@ -26,9 +26,18 @@ public enum SharedAnimation {
 	LP_ST,
 	MP_ST,
 	HP_ST,
+	LK_CR,
+	MK_CR,
+	HK_CR,
+	LK_ST,
+	MK_ST,
+	HK_ST,
 	LP_AIR,
 	MP_AIR,
-	HP_AIR;
+	HP_AIR,
+	LK_AIR,
+	MK_AIR,
+	HK_AIR;
 	
 	public static SharedAnimation forString(String s) {
 		for (SharedAnimation reqAnim : values()) {

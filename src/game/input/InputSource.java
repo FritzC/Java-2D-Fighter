@@ -20,6 +20,8 @@ public abstract class InputSource {
 	
 	protected Map<InputType, Boolean> buttons;
 	
+	protected Map<InputType, Integer> bufferedInputs;
+	
 	protected InputTaker boundTo;
 	
 	/**
@@ -39,6 +41,7 @@ public abstract class InputSource {
 		for (InputType type : InputType.values()) {
 			buttons.put(type, false);
 		}
+		bufferedInputs = new HashMap<>();
 	}
 	
 	public void bind(InputTaker inputTaker) {
@@ -49,6 +52,12 @@ public abstract class InputSource {
 	 * Polls the device
 	 */
 	public abstract void poll();
+	
+	public void handleBufferedInputs() {
+		for (InputType type : bufferedInputs.keySet()) {
+			fireEvent(bufferedInputs.get(type), type);
+		}
+	}
 	
 	public StickInput getStickInputs(int face, boolean acceptEmpty, int ageLimit) {
 		for (int i = stickInputs.size() - 1; i >= 0; i--) {
@@ -87,12 +96,12 @@ public abstract class InputSource {
 						&& stickInputs.get(i - 1).getValues().isEmpty()
 						&& stickInputs.get(i - 2).getValues().contains(backward)
 						&& stickInputs.get(i - 2).getAge() < 20) {
-					copy.getValues().add(StickInputType.DOUBLE_TAP_B);
+					fireEvent(0, InputType.DASH_B);
 				} else if (stickInputs.get(i).getValues().contains(forward)
 						&& stickInputs.get(i - 1).getValues().isEmpty()
 						&& stickInputs.get(i - 2).getValues().contains(forward)
 						&& stickInputs.get(i - 2).getAge() < 20) {
-					copy.getValues().add(StickInputType.DOUBLE_TAP_F);
+					fireEvent(0, InputType.DASH_F);
 				}
 			}
 			return copy;
@@ -104,5 +113,48 @@ public abstract class InputSource {
 		return getStickInputs(face, b, Integer.MAX_VALUE);
 	}
 	
+	public void fireEvent(int attempt, InputType type) {
+		boolean success = false;
+		switch (type) {
+			case LP:
+				success = boundTo.lightPunchPressed(attempt, this);
+				break;
+			case HP:
+				success = boundTo.heavyPunchPressed(attempt, this);
+				break;
+			case LK:
+				success = boundTo.lightKickPressed(attempt, this);
+				break;
+			case HK:
+				success = boundTo.heavyKickPressed(attempt, this);
+				break;
+			case EX_P:
+				success = boundTo.exPunchPressed(attempt, this);
+				break;
+			case EX_K:
+				success = boundTo.exKickPressed(attempt, this);
+				break;
+			case CANCEL:
+				success = boundTo.cancelPressed(attempt, this);
+				break;
+			case START:
+				success = boundTo.startPressed(attempt, this);
+				break;
+			case GRAB:
+				success = boundTo.grabPressed(attempt, this);
+				break;
+			case DASH_B:
+				success = boundTo.doubleTappedBack(attempt, this);
+				break;
+			case DASH_F:
+				success = boundTo.doubleTappedForward(attempt, this);
+				break;
+		}
+		if (!success) {
+			bufferedInputs.put(type, ++attempt);
+		} else {
+			bufferedInputs.remove(type);
+		}
+	}
 
 }

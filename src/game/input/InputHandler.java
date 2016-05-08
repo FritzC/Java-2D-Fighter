@@ -53,6 +53,7 @@ public class InputHandler {
 	 */
 	public static void poll() {
 		for (InputSource source : devices) {
+			source.handleBufferedInputs();
 			source.poll();
 		}
 	}

@@ -567,7 +567,8 @@ public class Fighter implements InputTaker {
 	}
 	
 	public boolean needFaceCheck() {
-		return needFaceCheck || animation.getName().equalsIgnoreCase(SharedAnimation.IDLE.toString());
+		return needFaceCheck
+				|| animation != null && animation.getName().equalsIgnoreCase(SharedAnimation.IDLE.toString());
 	}
 
 	public boolean needsKnockdown() {
@@ -721,10 +722,11 @@ public class Fighter implements InputTaker {
 		knockedDown = false;
 
 	}
-	
+
 	public boolean hasNeutralGroundState() {
-		return isGrounded() && (doingAnim(SharedAnimation.IDLE) || doingAnim(SharedAnimation.WALK_B)
-				|| doingAnim(SharedAnimation.WALK_F) || doingAnim(SharedAnimation.CROUCH));
+		return isGrounded() && animation != null
+				&& (doingAnim(SharedAnimation.IDLE) || doingAnim(SharedAnimation.WALK_B)
+						|| doingAnim(SharedAnimation.WALK_F) || doingAnim(SharedAnimation.CROUCH));
 	}
 	
 	public boolean doingAnim(SharedAnimation anim) {
@@ -745,10 +747,6 @@ public class Fighter implements InputTaker {
 			}
 		} else if (inputs.contains(StickInputType.DOWN)) {
 			setAnimation(SharedAnimation.CROUCH, false);
-		} else if (inputs.contains(StickInputType.DOUBLE_TAP_F)) {
-			setAnimation(SharedAnimation.DASH_F, false);
-		} else if (inputs.contains(StickInputType.DOUBLE_TAP_B)) {
-			setAnimation(SharedAnimation.DASH_B, false);
 		} else if (inputs.contains(StickInputType.FORWARD)) {
 			setAnimation(SharedAnimation.WALK_F, false);
 		} else if (inputs.contains(StickInputType.BACKWARD)) {
@@ -757,52 +755,86 @@ public class Fighter implements InputTaker {
 	}
 
 	@Override
-	public void stickMoved(InputSource source) {
-		if (hitStun > 0 || blockInput) {
-			return;
+	public boolean stickMoved(InputSource source) {
+		if (hitStun == 0 && !blockInput) {
+			List<StickInputType> inputs = source.getStickInputs(face, true).getValues();
+			if (hasNeutralGroundState()) {
+				updateGroundAnim();
+			}
 		}
-		List<StickInputType> inputs = source.getStickInputs(face, true).getValues();
-		if (hasNeutralGroundState()) {
-			updateGroundAnim();
-		}
+		return true;
 	}
 
 	@Override
-	public void lightPunchPressed(InputSource source) {
-		if (hitStun > 0 || blockInput) {
-			return;
+	public boolean doubleTappedForward(int attempt, InputSource source) {
+		if (hitStun == 0 && !blockInput) {
+			if (hasNeutralGroundState()) {
+				setAnimation(SharedAnimation.DASH_F, false);
+				return true;
+			}
 		}
-		if (hasNeutralGroundState() && !isCrouching()) {
-			setAnimation(SharedAnimation.LP_ST, true);
-		}
+		return attempt >= Game.INPUT_BUFFER;
 	}
 
 	@Override
-	public void heavyPunchPressed(InputSource source) {
-		if (hitStun > 0 || blockInput) {
-			return;
+	public boolean doubleTappedBack(int attempt, InputSource source) {
+		if (hitStun == 0 && !blockInput) {
+			if (hasNeutralGroundState()) {
+				setAnimation(SharedAnimation.DASH_B, false);
+				return true;
+			}
 		}
-		if (isGrounded() && (hasNeutralGroundState() || deadHitboxes.size() > 0 && animation.isSpecialCancelable())) {
-			setAnimation(SharedAnimation.HP_ST, true);
-		}
+		return attempt >= Game.INPUT_BUFFER;
 	}
 
 	@Override
-	public void lightKickPressed(InputSource source) {
-		if (hitStun > 0 || blockInput) {
-			return;
+	public boolean lightPunchPressed(int attempt, InputSource source) {
+		if (hitStun == 0 && !blockInput) {
+			if (hasNeutralGroundState()) {
+				setAnimation(isCrouching() ? SharedAnimation.LP_CR : SharedAnimation.LP_ST, true);
+				return true;
+			}
 		}
+		return attempt >= Game.INPUT_BUFFER;
 	}
 
 	@Override
-	public void heavyKickPressed(InputSource source) {
-		if (hitStun > 0 || blockInput) {
-			return;
+	public boolean heavyPunchPressed(int attempt, InputSource source) {
+		if (hitStun == 0 && !blockInput) {
+			if (hasNeutralGroundState()) {
+				setAnimation(isCrouching() ? SharedAnimation.HP_CR : SharedAnimation.HP_ST, true);
+				return true;
+			}
 		}
+		return attempt >= Game.INPUT_BUFFER;
 	}
 
 	@Override
-	public void cancelPressed(InputSource source) {
+	public boolean lightKickPressed(int attempt, InputSource source) {
+		if (hitStun == 0 && !blockInput) {
+			if (hasNeutralGroundState()) {
+				setAnimation(isCrouching() ? SharedAnimation.LK_CR : SharedAnimation.LK_ST, true);
+				return true;
+			}
+		}
+		return attempt >= Game.INPUT_BUFFER;
+	}
+
+	@Override
+	public boolean heavyKickPressed(int attempt, InputSource source) {
+		if (hitStun == 0 && !blockInput) {
+			if (hasNeutralGroundState()) {
+				setAnimation(isCrouching() ? SharedAnimation.HK_CR : SharedAnimation.HK_ST, true);
+				return true;
+			} else if (!isGrounded() && doingAnim(SharedAnimation.IN_AIR)) {
+				setAnimation(SharedAnimation.HK_AIR, false);
+			}
+		}
+		return attempt >= Game.INPUT_BUFFER;
+	}
+
+	@Override
+	public boolean cancelPressed(int attempt, InputSource source) {
 		if (meter >= 0.5 && !blockInput) {
 			addMeter(-0.5);
 			hitStun = 0;
@@ -814,36 +846,36 @@ public class Fighter implements InputTaker {
 			}
 			slowDownRemaining = 180;
 		}
+		return true;
 	}
 
 	@Override
-	public void startPressed(InputSource source) {
-		
-		
+	public boolean startPressed(int attempt, InputSource source) {
+		return true;		
 	}
 
 	@Override
-	public void grabPressed(InputSource source) {
-		if (hitStun > 0 || blockInput) {
-			return;
+	public boolean grabPressed(int attempt, InputSource source) {
+		if (hitStun == 0 && !blockInput) {
+			return true;
 		}
-		
+		return attempt >= Game.INPUT_BUFFER;
 	}
 
 	@Override
-	public void exKickPressed(InputSource source) {
-		if (hitStun > 0 || blockInput) {
-			return;
+	public boolean exKickPressed(int attempt, InputSource source) {
+		if (hitStun == 0 && !blockInput) {
+			return true;
 		}
-		
+		return attempt >= Game.INPUT_BUFFER;
 	}
 
 	@Override
-	public void exPunchPressed(InputSource source) {
-		if (hitStun > 0 || blockInput) {
-			return;
+	public boolean exPunchPressed(int attempt, InputSource source) {
+		if (hitStun == 0 && !blockInput) {
+			return true;
 		}
-		
+		return attempt >= Game.INPUT_BUFFER;
 	}
 
 	public boolean usingQuickGetUp() {

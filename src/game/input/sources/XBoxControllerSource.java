@@ -72,6 +72,9 @@ public class XBoxControllerSource extends InputSource {
 	public void poll() {
 		controller.poll();
 		List<StickInputType> currentInputs = new ArrayList<>();
+		if (boundTo == null) {
+			return;
+		}
 		if (yAxis.getPollData() < -0.4) {
 			currentInputs.add(StickInputType.UP);
 		}
@@ -84,40 +87,40 @@ public class XBoxControllerSource extends InputSource {
 		if (xAxis.getPollData() > 0.4) {
 			currentInputs.add(StickInputType.RIGHT);
 		}
-		if (x.getPollData() == 1 && !buttons.get(InputType.LP) && boundTo != null) {
-			boundTo.lightPunchPressed(this);
+		if (x.getPollData() == 1 && !buttons.get(InputType.LP)) {
+			fireEvent(0, InputType.LP);
 		}
 		buttons.put(InputType.LP, x.getPollData() == 1);
-		if (y.getPollData() == 1 && !buttons.get(InputType.HP) && boundTo != null) {
-			boundTo.heavyPunchPressed(this);
+		if (y.getPollData() == 1 && !buttons.get(InputType.HP)) {
+			fireEvent(0, InputType.HP);
 		}
 		buttons.put(InputType.HP, y.getPollData() == 1);
-		if (a.getPollData() == 1 && !buttons.get(InputType.LK) && boundTo != null) {
-			boundTo.lightKickPressed(this);
+		if (a.getPollData() == 1 && !buttons.get(InputType.LK)) {
+			fireEvent(0, InputType.LK);
 		}
 		buttons.put(InputType.LK, a.getPollData() == 1);
-		if (b.getPollData() == 1 && !buttons.get(InputType.HK) && boundTo != null) {
-			boundTo.heavyKickPressed(this);
+		if (b.getPollData() == 1 && !buttons.get(InputType.HK)) {
+			fireEvent(0, InputType.HK);
 		}
 		buttons.put(InputType.HK, b.getPollData() == 1);
-		if (start.getPollData() == 1 && !buttons.get(InputType.START) && boundTo != null) {
-			boundTo.startPressed(this);
+		if (start.getPollData() == 1 && !buttons.get(InputType.START)) {
+			fireEvent(0, InputType.START);
 		}
 		buttons.put(InputType.START, start.getPollData() == 1);
-		if (lt.getPollData() == 1 && !buttons.get(InputType.GRAB) && boundTo != null) {
-			boundTo.grabPressed(this);
+		if (lt.getPollData() == 1 && !buttons.get(InputType.GRAB)) {
+			fireEvent(0, InputType.GRAB);
 		}
 		buttons.put(InputType.GRAB, lt.getPollData() == 1);
-		if (lb.getPollData() < -0.5 && !buttons.get(InputType.CANCEL) && boundTo != null) {
-			boundTo.cancelPressed(this);
+		if (lb.getPollData() < -0.5 && !buttons.get(InputType.CANCEL)) {
+			fireEvent(0, InputType.CANCEL);
 		}
 		buttons.put(InputType.CANCEL, lb.getPollData() < -0.5);
-		if (rb.getPollData() > 0.5 && !buttons.get(InputType.EX_K) && boundTo != null) {
-			boundTo.exKickPressed(this);
+		if (rb.getPollData() > 0.5 && !buttons.get(InputType.EX_K)) {
+			fireEvent(0, InputType.EX_K);
 		}
 		buttons.put(InputType.EX_K, rb.getPollData() > 0.5);
-		if (rt.getPollData() == 1 && !buttons.get(InputType.EX_P) && boundTo != null) {
-			boundTo.exPunchPressed(this);
+		if (rt.getPollData() == 1 && !buttons.get(InputType.EX_P)) {
+			fireEvent(0, InputType.EX_P);
 		}
 		buttons.put(InputType.EX_P, rt.getPollData() == 1);
 		if (!stickInputs.get(stickInputs.size() - 1).getValues().equals(currentInputs)) {
