@@ -73,7 +73,9 @@ public class Fighter implements InputTaker {
 	 */
 	private Position position;
 	
-	private int face;
+	private int animFace;
+	
+	private int realFace;
 	
 	private boolean needFaceCheck;
 	
@@ -135,6 +137,10 @@ public class Fighter implements InputTaker {
 	
 	private boolean blockInput;
 	
+	private int jumpsLeft;
+	
+	private boolean counterHit;
+	
 	/**
 	 * Initializes a new fighter
 	 * 
@@ -152,11 +158,13 @@ public class Fighter implements InputTaker {
 		animations = new ArrayList<>();
 		velocity = new Vector(0, 0);
 		position = new Position(0.25, 0);
-		face = 1;
+		animFace = 1;
 		deadHitboxes = new ArrayList<>();
 		fighterColor = Color.BLACK;
 		decrementAmts = new int[3];
 		setAnimation(SharedAnimation.IDLE.toString(), false);
+		jumpsLeft = 2;
+		counterHit = false;
 	}
 	
 	public Fighter(Fighter copy) {
@@ -172,11 +180,13 @@ public class Fighter implements InputTaker {
 		}
 		velocity = new Vector(0, 0);
 		position = new Position(0.25, 0);
-		face = copy.face;
+		animFace = copy.animFace;
 		deadHitboxes = new ArrayList<>();
 		fighterColor = Color.BLACK;
 		decrementAmts = new int[3];
 		setAnimation(SharedAnimation.IDLE.toString(), false);
+		jumpsLeft = 2;
+		counterHit = false;
 	}
 
 	/**
@@ -226,12 +236,18 @@ public class Fighter implements InputTaker {
 		}
 	}
 
-	public void dealHit(Fighter defender, String name, double pushBack, HitBox hitBox, int success) {
+	public void dealHit(Fighter defender, String name, double pushBack, HitBox hitBox, String triggeredAnimation,
+			int success) {
 		if (success > 0) {
-			position = position.applyVector(new Vector(-face * pushBack / 2, 0));
-			addMeter(success * 2 * hitBox.getDamage() / 4000D);
+			position = position.applyVector(new Vector(-realFace * pushBack / 2, 0));
+			addMeter(success * 2 * hitBox.getDamage() / 6000D);
 			if (success == 2) {
-				comboCount ++;
+				if (hitBox.getType() != HitBoxType.GRAB) {
+					comboCount ++;
+				}
+				if (triggeredAnimation != null && !triggeredAnimation.equals("")) {
+					setAnimation(triggeredAnimation, true);
+				}
 			}
 		}
 	}
@@ -239,7 +255,7 @@ public class Fighter implements InputTaker {
 	public int applyHit(Fighter attacker, String name, HitBoxType type, int damage, int hitStun, int blockStun, double pushBack,
 			Vector launchVector, String attachTo, String triggerAnimation, String triggerTargetAnimation,
 			boolean release, boolean knockDown) {
-		if (attacker.deadHitboxes.contains(name)) {
+		if (attacker.deadHitboxes.contains(name) || (this.hitStun != 0 && type == HitBoxType.GRAB)) {
 			return 0;
 		}
 		attacker.deadHitboxes.add(name);
@@ -247,11 +263,20 @@ public class Fighter implements InputTaker {
 			grabbed = false;
 			attacker.skeleton.release();
 		}
+		if (attacker.comboCount > 0) {
+			damage /= ((comboCount + 2) / 2);
+		}
 		if (isGrounded()) {
-			position = position.applyVector(new Vector(-face * pushBack / 2, 0));
+			if (isParrying() && type != HitBoxType.GRAB) {
+				setAnimation(SharedAnimation.PARRY, true);
+				addMeter(damage / 2000D);
+				Sounds.playSound(Sounds.PARRY);
+				setColor(Color.MAGENTA);
+				return 1;
+			}
+			position = position.applyVector(new Vector(-realFace * pushBack / 2, 0));
 			if ((isBlocking(type) && type != HitBoxType.GRAB) || type == HitBoxType.AIR_GRAB) {
 				this.hitStun = blockStun;
-				// build guard break meter
 				setAnimation(isCrouching() ? SharedAnimation.BLOCK_CR.toString() : SharedAnimation.BLOCK_ST.toString(), true);
 				if (damage > currentHealth) {
 					damage = (int) currentHealth;
@@ -260,9 +285,14 @@ public class Fighter implements InputTaker {
 				setColor(Color.BLUE);
 				currentHealth -= damage;
 				greyHealth += damage;
-				addMeter(damage / 4000D);
+				addMeter(damage / 6000D);
 				return 1;
 			} else {
+				if (animation.getHitboxes().size() > 0) {
+					counterHit = true;
+					hitStun *= 1.5;
+					damage *= 1.5;
+				}
 				if (hitStun != 0) {
 					comboDamage += damage;
 				}
@@ -276,31 +306,41 @@ public class Fighter implements InputTaker {
 				} else {
 					setAnimation(isCrouching() ? SharedAnimation.HIT_CR.toString() : SharedAnimation.HIT_ST.toString(), true);
 				}
-				velocity.setX(-face * launchVector.getX());
+				velocity.setX(-animFace * launchVector.getX());
 				velocity.setY(launchVector.getY());
 				if (velocity.getY() > 0) {
 					this.hitStun = -hitStun;
 					setAnimation(SharedAnimation.HIT_AIR.toString(), false);
 				}
-				setColor(Color.RED);
-				Sounds.playSound(Sounds.PUNCH);
+				if (type != HitBoxType.GRAB) {
+					setColor(Color.RED);
+					Sounds.playSound(Sounds.PUNCH);
+				}
 				currentHealth -= damage;
 				greyHealth = 0;
 				if (currentHealth < 0) {
 					currentHealth = 0;
 				}
-				addMeter(damage / 3000D);
+				addMeter(damage / 5000D);
 				return 2;
 			}
-		} else {
+		} else if (type != HitBoxType.GRAB) {
+			if (animation.getHitboxes().size() > 0) {
+				counterHit = true;
+				hitStun *= 1.5;
+				damage *= 1.5;
+			}
 			this.knockedDown = knockDown;
 			juggleCount ++;
 			if (hitStun != 0) {
 				comboDamage += damage;
 			}
 			this.hitStun = -hitStun;
-			velocity.setX(-face * launchVector.getX());
-			velocity.setY(launchVector.getY() / (double) juggleCount);
+			if (launchVector.getX() == 0 && launchVector.getY() == 0) {
+				launchVector = new Vector(0.02, 0.02);
+			}
+			velocity.setX(-animFace * launchVector.getX());
+			velocity.setY(launchVector.getY() / ((juggleCount + 2) / 2D));
 			setAnimation(SharedAnimation.HIT_AIR.toString(), false);
 			currentHealth -= damage;
 			greyHealth = 0;
@@ -309,12 +349,14 @@ public class Fighter implements InputTaker {
 			}
 			setColor(Color.RED);
 			Sounds.playSound(Sounds.PUNCH);
-			addMeter(damage / 3000D);
+			addMeter(damage / 5000D);
 			return 2;
 		}
+		return 0;
 	}
 
 	public void reset() {
+		knockedDown = false;
 		currentHealth = health;
 		comboCount = 0;
 		comboDamage = 0;
@@ -366,7 +408,11 @@ public class Fighter implements InputTaker {
 			case VELOCITY_X:
 				//velocity.setX(interpolation.getInterpolatedValue(velocity.getX(), data, completion));
 				if (completion >= 1) {
-					velocity.setX(face * data);
+					if (doingAnim(SharedAnimation.WALK_B) || doingAnim(SharedAnimation.WALK_F)) {
+						velocity.setX(realFace * data);
+					} else {
+						velocity.setX(animFace * data);
+					}
 				}
 				break;
 			case VELOCITY_Y:
@@ -509,16 +555,35 @@ public class Fighter implements InputTaker {
 	public boolean isGrabbed() {
 		return grabbed;
 	}
+	
+
+	public boolean isParrying() {
+		StickInput inputs = inputSource.getStickInputs(realFace, true, 20);
+		if (hitStun != 0) {
+			return false;
+		}
+		if (animation != null
+				&& inputSource != null && inputs != null && (hasNeutralGroundState()
+						|| animation.getName().toLowerCase().contains("block") || doingAnim(SharedAnimation.PARRY))
+				&& inputs.getValues().contains(StickInputType.FORWARD) && inputs.getValues().size() == 1) {
+			return true;
+		}
+		return false;
+	}
 
 	public boolean isBlocking(HitBoxType hitType) {
-		StickInput inputs = inputSource.getStickInputs(face, true);
-		if (animation != null && inputSource != null && inputs != null
-				&& (hasNeutralGroundState() || animation.getName().toLowerCase().contains("block"))
+		StickInput inputs = inputSource.getStickInputs(realFace, true);
+		if (hitStun != 0) {
+			return false;
+		}
+		if (animation != null
+				&& inputSource != null && inputs != null && (hasNeutralGroundState()
+						|| animation.getName().toLowerCase().contains("block") || doingAnim(SharedAnimation.PARRY))
 				&& inputs.getValues().contains(StickInputType.BACKWARD)) {
 			return (inputs.getValues().contains(StickInputType.DOWN)) ? hitType != HitBoxType.HIGH
 					: hitType != HitBoxType.LOW;
 		}
-		return Math.random() < 0.5;
+		return false;
 	}
 
 	private boolean isCrouching() {
@@ -559,11 +624,19 @@ public class Fighter implements InputTaker {
 	}
 	
 	public int getFace() {
-		return face;
+		return animFace;
 	}
 	
-	public void setFace(int value) {
-		face = (int) Math.signum(value);
+	public int getRealFace() {
+		return realFace;
+	}
+	
+	public void setAnimFace(int value) {
+		animFace = (int) Math.signum(value);
+	}
+	
+	public void setRealFace(int value) {
+		realFace = (int) Math.signum(value);
 	}
 	
 	public boolean needFaceCheck() {
@@ -730,11 +803,18 @@ public class Fighter implements InputTaker {
 	}
 	
 	public boolean doingAnim(SharedAnimation anim) {
+		if (animation == null) {
+			return false;
+		}
 		return animation.getName().equalsIgnoreCase(anim.toString());
 	}
 	
 	public void updateGroundAnim() {
-		List<StickInputType> inputs = inputSource.getStickInputs(face, true).getValues();
+		List<StickInputType> inputs = inputSource.getStickInputs(realFace, true).getValues();
+		if (doingAnim(SharedAnimation.KNOCKED_DOWN_FAST) || doingAnim(SharedAnimation.KNOCKED_DOWN_SLOW)) {
+			return;
+		}
+		jumpsLeft = 2;
 		if (inputs.isEmpty()) {
 			setAnimation(SharedAnimation.IDLE, false);
 		} else if (inputs.contains(StickInputType.UP)) {
@@ -745,6 +825,7 @@ public class Fighter implements InputTaker {
 			} else {
 				setAnimation(SharedAnimation.JUMPSQUAT_N, true);
 			}
+			jumpsLeft--;
 		} else if (inputs.contains(StickInputType.DOWN)) {
 			setAnimation(SharedAnimation.CROUCH, false);
 		} else if (inputs.contains(StickInputType.FORWARD)) {
@@ -757,9 +838,20 @@ public class Fighter implements InputTaker {
 	@Override
 	public boolean stickMoved(InputSource source) {
 		if (hitStun == 0 && !blockInput) {
-			List<StickInputType> inputs = source.getStickInputs(face, true).getValues();
+			List<StickInputType> inputs = source.getStickInputs(realFace, true).getValues();
 			if (hasNeutralGroundState()) {
 				updateGroundAnim();
+			} else if (doingAnim(SharedAnimation.IN_AIR) && jumpsLeft > 0 && hitStun == 0) {
+				if (inputs.contains(StickInputType.UP)) {
+					if (inputs.contains(StickInputType.BACKWARD)) {
+						setAnimation(SharedAnimation.JUMPSQUAT_B, true);
+					} else if (inputs.contains(StickInputType.FORWARD)) {
+						setAnimation(SharedAnimation.JUMPSQUAT_F, true);
+					} else {
+						setAnimation(SharedAnimation.JUMPSQUAT_N, true);
+					}
+					jumpsLeft--;
+				}
 			}
 		}
 		return true;
@@ -790,8 +882,17 @@ public class Fighter implements InputTaker {
 	@Override
 	public boolean lightPunchPressed(int attempt, InputSource source) {
 		if (hitStun == 0 && !blockInput) {
-			if (hasNeutralGroundState()) {
+			List<StickInputType> inputs = source.getStickInputs(realFace, true).getValues();
+			if ((hasNeutralGroundState() || (animation.isSpecialCancelable() && deadHitboxes.size() > 0))
+					&& inputs != null && inputs.contains(StickInputType.QC_F)) {
+				setAnimation(SharedAnimation.LP_SPECIAL_1, true);
+				return true;
+			} else if (hasNeutralGroundState()) {
 				setAnimation(isCrouching() ? SharedAnimation.LP_CR : SharedAnimation.LP_ST, true);
+				return true;
+			} else if (!isGrounded() && (doingAnim(SharedAnimation.IN_AIR) || doingAnim(SharedAnimation.JUMPSQUAT_B)
+					|| doingAnim(SharedAnimation.JUMPSQUAT_F) || doingAnim(SharedAnimation.JUMPSQUAT_N))) {
+				setAnimation(SharedAnimation.LP_AIR, true);
 				return true;
 			}
 		}
@@ -801,8 +902,21 @@ public class Fighter implements InputTaker {
 	@Override
 	public boolean heavyPunchPressed(int attempt, InputSource source) {
 		if (hitStun == 0 && !blockInput) {
-			if (hasNeutralGroundState()) {
-				setAnimation(isCrouching() ? SharedAnimation.HP_CR : SharedAnimation.HP_ST, true);
+			List<StickInputType> inputs = source.getStickInputs(realFace, true).getValues();
+			if ((hasNeutralGroundState() || (animation.isSpecialCancelable() && deadHitboxes.size() > 0))
+					&& inputs != null && inputs.contains(StickInputType.QC_F)) {
+				setAnimation(SharedAnimation.HP_SPECIAL_1, true);
+				return true;
+			} else if (hasNeutralGroundState()) {
+				if (source.getStickInputs(realFace, true).getValues().contains(StickInputType.FORWARD)) {
+					setAnimation(SharedAnimation.MP_ST, true);
+				} else {
+					setAnimation(isCrouching() ? SharedAnimation.HP_CR : SharedAnimation.HP_ST, true);
+				}
+				return true;
+			} else if (!isGrounded() && (doingAnim(SharedAnimation.IN_AIR) || doingAnim(SharedAnimation.JUMPSQUAT_B)
+					|| doingAnim(SharedAnimation.JUMPSQUAT_F) || doingAnim(SharedAnimation.JUMPSQUAT_N))) {
+				setAnimation(SharedAnimation.HP_AIR, true);
 				return true;
 			}
 		}
@@ -812,8 +926,17 @@ public class Fighter implements InputTaker {
 	@Override
 	public boolean lightKickPressed(int attempt, InputSource source) {
 		if (hitStun == 0 && !blockInput) {
-			if (hasNeutralGroundState()) {
+			List<StickInputType> inputs = source.getStickInputs(realFace, true).getValues();
+			if ((hasNeutralGroundState() || (animation.isSpecialCancelable() && deadHitboxes.size() > 0))
+					&& inputs != null && inputs.contains(StickInputType.QC_B)) {
+				setAnimation(SharedAnimation.LK_SPECIAL_1, true);
+				return true;
+			} else if (hasNeutralGroundState()) {
 				setAnimation(isCrouching() ? SharedAnimation.LK_CR : SharedAnimation.LK_ST, true);
+				return true;
+			} else if (!isGrounded() && (doingAnim(SharedAnimation.IN_AIR) || doingAnim(SharedAnimation.JUMPSQUAT_B)
+					|| doingAnim(SharedAnimation.JUMPSQUAT_F) || doingAnim(SharedAnimation.JUMPSQUAT_N))) {
+				setAnimation(SharedAnimation.LK_AIR, true);
 				return true;
 			}
 		}
@@ -823,11 +946,18 @@ public class Fighter implements InputTaker {
 	@Override
 	public boolean heavyKickPressed(int attempt, InputSource source) {
 		if (hitStun == 0 && !blockInput) {
-			if (hasNeutralGroundState()) {
+			List<StickInputType> inputs = source.getStickInputs(realFace, true).getValues();
+			if ((hasNeutralGroundState() || (animation.isSpecialCancelable() && deadHitboxes.size() > 0))
+					&& inputs != null && inputs.contains(StickInputType.QC_B)) {
+				setAnimation(SharedAnimation.HK_SPECIAL_1, true);
+				return true;
+			} else if (hasNeutralGroundState()) {
 				setAnimation(isCrouching() ? SharedAnimation.HK_CR : SharedAnimation.HK_ST, true);
 				return true;
-			} else if (!isGrounded() && doingAnim(SharedAnimation.IN_AIR)) {
-				setAnimation(SharedAnimation.HK_AIR, false);
+			} else if (!isGrounded() && (doingAnim(SharedAnimation.IN_AIR) || doingAnim(SharedAnimation.JUMPSQUAT_B)
+					|| doingAnim(SharedAnimation.JUMPSQUAT_F) || doingAnim(SharedAnimation.JUMPSQUAT_N))) {
+				setAnimation(SharedAnimation.HK_AIR, true);
+				return true;
 			}
 		}
 		return attempt >= Game.INPUT_BUFFER;
@@ -857,7 +987,10 @@ public class Fighter implements InputTaker {
 	@Override
 	public boolean grabPressed(int attempt, InputSource source) {
 		if (hitStun == 0 && !blockInput) {
-			return true;
+			if (hasNeutralGroundState()) {
+				setAnimation(SharedAnimation.GRAB, true);
+				return true;
+			}
 		}
 		return attempt >= Game.INPUT_BUFFER;
 	}
@@ -865,7 +998,15 @@ public class Fighter implements InputTaker {
 	@Override
 	public boolean exKickPressed(int attempt, InputSource source) {
 		if (hitStun == 0 && !blockInput) {
-			return true;
+			List<StickInputType> inputs = source.getStickInputs(realFace, true).getValues();
+			if ((hasNeutralGroundState() || (animation.isSpecialCancelable() && deadHitboxes.size() > 0))
+					&& inputs != null && inputs.contains(StickInputType.QC_B)
+					&& meter >= 0.25) {
+				setAnimation(SharedAnimation.EX_K_SPECIAL_1, true);
+				setColor(Color.CYAN);
+				meter -= 0.25;
+				return true;
+			}
 		}
 		return attempt >= Game.INPUT_BUFFER;
 	}
@@ -873,13 +1014,21 @@ public class Fighter implements InputTaker {
 	@Override
 	public boolean exPunchPressed(int attempt, InputSource source) {
 		if (hitStun == 0 && !blockInput) {
-			return true;
+			List<StickInputType> inputs = source.getStickInputs(realFace, true).getValues();
+			if ((hasNeutralGroundState() || (animation.isSpecialCancelable() && deadHitboxes.size() > 0))
+					&& inputs != null && inputs.contains(StickInputType.QC_F)
+					&& meter >= 0.25) {
+				setAnimation(SharedAnimation.EX_P_SPECIAL_1, true);
+				setColor(Color.CYAN);
+				meter -= 0.25;
+				return true;
+			}
 		}
 		return attempt >= Game.INPUT_BUFFER;
 	}
 
 	public boolean usingQuickGetUp() {
-		StickInput input = inputSource.getStickInputs(face, true, 10);
+		StickInput input = inputSource.getStickInputs(realFace, true, 60);
 		return input != null && input.getValues().contains(StickInputType.UP);
 	}
 	
@@ -905,84 +1054,10 @@ public class Fighter implements InputTaker {
 		blockInput = value;
 	}
 	
-
-
-/*	public void handleInputs() {
-		if (hitStun != 0) {
-			return;
-		}
-		String animName = "";
-		boolean hasInput = inputSource.getLastInput() != null;
-		InputType forward = (face == 1) ? InputType.RIGHT : InputType.LEFT;
-		InputType backward = (face == 1) ? InputType.LEFT : InputType.RIGHT;
-		if (animation != null) {
-			animName = animation.getName();
-		}
-		boolean groundMovement = animName.equalsIgnoreCase(SharedAnimation.WALK_F.toString())
-				|| animName.equalsIgnoreCase(SharedAnimation.WALK_B.toString())
-				|| animName.equalsIgnoreCase(SharedAnimation.IDLE.toString()) || animName.equalsIgnoreCase("")
-				|| animName.equalsIgnoreCase(SharedAnimation.IN_AIR.toString())
-				|| animName.equalsIgnoreCase(SharedAnimation.CROUCH.toString())
-				|| animName.equalsIgnoreCase(SharedAnimation.HIT_CR.toString())
-				|| animName.equalsIgnoreCase(SharedAnimation.HIT_ST.toString())
-				|| animName.equalsIgnoreCase(SharedAnimation.BLOCK_CR.toString())
-				|| animName.equalsIgnoreCase(SharedAnimation.BLOCK_ST.toString());
-		if (hasInput && groundMovement && inputSource.getLastInput().getTypes().contains(InputType.ATTACK_1)
-				&& !inputSource.getLastInput().hasBeenUsed() && isGrounded()) {
-			setAnimation(SharedAnimation.LP_ST.toString(), false);
-			inputSource.getLastInput().setUsed();
-		} else if (hasInput && groundMovement && inputSource.getLastInput().getTypes().contains(InputType.ATTACK_2)
-				&& !inputSource.getLastInput().hasBeenUsed() && isGrounded()) {
-			setAnimation(SharedAnimation.MP_ST.toString(), false);
-			inputSource.getLastInput().setUsed();
-		} else if (hasInput && (groundMovement || animation.isSpecialCancelable() && deadHitboxes.size() > 0)
-				&& inputSource.getLastInput().getTypes().contains(InputType.ATTACK_3)
-				&& !inputSource.getLastInput().hasBeenUsed() && isGrounded()) {
-			setAnimation(SharedAnimation.HP_ST.toString(), false);
-			inputSource.getLastInput().setUsed();
-		} else if (deadHitboxes.size() > 0 && inputSource.getLastInput().getTypes().contains(InputType.CANCEL)) {
-			setAnimation(SharedAnimation.IDLE, false);
-			setColor(Color.GREEN);
-		} else if (hasInput && groundMovement && inputSource.getPreviousInput(0).getTypes().contains(forward)
-				&& !inputSource.getPreviousInput(1).getTypes().contains(forward)
-				&& inputSource.getPreviousInput(2).getTypes().contains(forward)
-				&& inputSource.getPreviousInput(2).getAge() < 30
-				&& !inputSource.getLastInput().hasBeenUsed() && isGrounded()) {
-			setAnimation(SharedAnimation.DASH_F.toString(), false);
-			inputSource.getLastInput().setUsed();
-		} else if (hasInput && groundMovement && inputSource.getPreviousInput(0).getTypes().contains(backward)
-				&& !inputSource.getPreviousInput(1).getTypes().contains(backward)
-				&& inputSource.getPreviousInput(2).getTypes().contains(backward)
-				&& inputSource.getPreviousInput(2).getAge() < 30
-				&& !inputSource.getLastInput().hasBeenUsed() && isGrounded()) {
-			setAnimation(SharedAnimation.DASH_B.toString(), false);
-			inputSource.getLastInput().setUsed();
-		} else if (hasInput && groundMovement && inputSource.getLastInput().getTypes().contains(InputType.UP)
-				&& isGrounded() && !inputSource.getLastInput().hasBeenUsed()) {
-			if (inputSource.getLastInput().getTypes().contains(forward)) {
-				setAnimation(SharedAnimation.JUMPSQUAT_F.toString(), false);
-			} else if (inputSource.getLastInput().getTypes().contains(backward)) {
-				setAnimation(SharedAnimation.JUMPSQUAT_B.toString(), false);
-			} else {
-				setAnimation(SharedAnimation.JUMPSQUAT_N.toString(), false);
-			}
-			inputSource.getLastInput().setUsed();
-		} else if (hasInput && groundMovement && inputSource.getLastInput().getTypes().contains(InputType.DOWN) && isGrounded()) {
-			setAnimation(SharedAnimation.CROUCH.toString(), false);
-		} else if (hasInput && groundMovement && inputSource.getLastInput().getTypes().contains(forward) && isGrounded()) {
-			setAnimation(SharedAnimation.WALK_F.toString(), false);
-		} else if (hasInput && groundMovement && inputSource.getLastInput().getTypes().contains(backward) && isGrounded()) {
-			setAnimation(SharedAnimation.WALK_B.toString(), false);
-		} else if (hasInput && groundMovement && isGrounded()
-				&& (inputSource.getLastInput().getTypes().size() == 0 || inputSource.getLastInput().hasBeenUsed())) {
-			setAnimation(SharedAnimation.IDLE.toString(), false);
-		} else if (!isGrounded() && !animName.equalsIgnoreCase(SharedAnimation.HP_ST.toString())) {
-			if (inputSource.getLastInput().getTypes().contains(InputType.ATTACK_3)) {
-				setAnimation(SharedAnimation.HP_AIR.toString(), false);
-			} else if (!animName.equalsIgnoreCase(SharedAnimation.HP_AIR.toString())) {
-				setAnimation(SharedAnimation.IN_AIR.toString(), false);
-			}
-		}
-	}*/
+	public boolean gotCounterHit() {
+		boolean ret = counterHit;
+		counterHit = false;
+		return ret;
+	}
 	
 }

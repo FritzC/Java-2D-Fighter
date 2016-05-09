@@ -113,81 +113,67 @@
 	},
 	"steps": {
 		"keyframe": {
-			"bone": "back_m",
-			"frame": 5,
-			"type": ROTATE,
-			"interpolation": SMOOTH_IN,
-			"data": 92.91083782616775
-		},
-		"keyframe": {
-			"bone": "back_u",
-			"frame": 5,
-			"type": ROTATE,
-			"interpolation": SMOOTH_IN,
-			"data": 92.79270236571328
-		},
-		"keyframe": {
-			"bone": "neck",
-			"frame": 5,
-			"type": ROTATE,
-			"interpolation": SMOOTH_IN,
-			"data": 100.73889710090543
-		},
-		"keyframe": {
-			"bone": "head",
-			"frame": 5,
-			"type": ROTATE,
-			"interpolation": SMOOTH_IN,
-			"data": 113.58703052512824
-		},
-		"keyframe": {
 			"bone": "l_tricep",
 			"frame": 5,
 			"type": ROTATE,
-			"interpolation": SMOOTH_IN,
-			"data": 298.17859010995915
+			"interpolation": LINEAR,
+			"data": 275.1944289077348
 		},
 		"keyframe": {
 			"bone": "l_bicep",
 			"frame": 5,
 			"type": ROTATE,
-			"interpolation": SMOOTH_IN,
-			"data": 38.659808254090095
+			"interpolation": LINEAR,
+			"data": 306.86989764584405
 		},
 		"keyframe": {
 			"bone": "l_bicep",
 			"frame": 5,
 			"type": LENGTH,
-			"interpolation": SMOOTH_IN,
-			"data": 0.08475220777391425
+			"interpolation": LINEAR,
+			"data": 0.10687093873439492
 		},
 		"keyframe": {
 			"bone": "r_tricep",
 			"frame": 5,
 			"type": ROTATE,
-			"interpolation": SMOOTH_IN,
-			"data": 236.02345596374315
+			"interpolation": LINEAR,
+			"data": 266.6335393365702
 		},
 		"keyframe": {
 			"bone": "r_bicep",
 			"frame": 5,
 			"type": ROTATE,
-			"interpolation": SMOOTH_IN,
-			"data": 348.05582281155364
+			"interpolation": LINEAR,
+			"data": 249.82054133548905
 		},
 		"keyframe": {
 			"bone": "r_bicep",
 			"frame": 5,
 			"type": LENGTH,
-			"interpolation": SMOOTH_IN,
-			"data": 0.08475220777391425
+			"interpolation": LINEAR,
+			"data": 0.11473585322563186
 		},
 		"keyframe": {
-			"bone": "l_hip",
-			"frame": 1000,
+			"bone": "neck",
+			"frame": 5,
 			"type": ROTATE,
 			"interpolation": LINEAR,
-			"data": 0.0
+			"data": 95.4403320310055
+		},
+		"keyframe": {
+			"bone": "head",
+			"frame": 5,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 85.19651424093092
+		},
+		"keyframe": {
+			"bone": "root",
+			"frame": 100,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 90.0
 		},
 	},
 	"ecbs": {
@@ -196,10 +182,10 @@
 			"endFrame": 1000,
 			"collision": {
 				"box": {
-					"top_l x": -0.122,
-					"top_l y": 0.63,
-					"bottom_r x": 0.119,
-					"bottom_r y": -0.029
+					"top_l x": -0.094,
+					"top_l y": 0.628,
+					"bottom_r x": 0.079,
+					"bottom_r y": -0.007
 				}
 			}
 		},
@@ -207,13 +193,13 @@
 	"hurtboxes": {
 		"hurtbox": {
 			"startFrame": 0,
-			"endFrame": 1200,
+			"endFrame": 1000,
 			"collision": {
 				"box": {
-					"top_l x": -0.191,
-					"top_l y": 0.607,
-					"bottom_r x": 0.188,
-					"bottom_r y": -0.029
+					"top_l x": -0.221,
+					"top_l y": 0.643,
+					"bottom_r x": 0.196,
+					"bottom_r y": -0.036
 				}
 			}
 		},

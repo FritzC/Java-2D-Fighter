@@ -22,6 +22,8 @@ public abstract class InputSource {
 	
 	protected Map<InputType, Integer> bufferedInputs;
 	
+	protected List<InputType> completedBuffers;
+	
 	protected InputTaker boundTo;
 	
 	/**
@@ -42,6 +44,7 @@ public abstract class InputSource {
 			buttons.put(type, false);
 		}
 		bufferedInputs = new HashMap<>();
+		completedBuffers = new ArrayList<>();
 	}
 	
 	public void bind(InputTaker inputTaker) {
@@ -57,6 +60,10 @@ public abstract class InputSource {
 		for (InputType type : bufferedInputs.keySet()) {
 			fireEvent(bufferedInputs.get(type), type);
 		}
+		for (InputType type : completedBuffers) {
+			bufferedInputs.remove(type);
+		}
+		completedBuffers.clear();
 	}
 	
 	public StickInput getStickInputs(int face, boolean acceptEmpty, int ageLimit) {
@@ -80,17 +87,13 @@ public abstract class InputSource {
 						&& !stickInputs.get(i).getValues().contains(StickInputType.DOWN)
 						&& stickInputs.get(i - 1).getValues().contains(forward)
 						&& stickInputs.get(i - 1).getValues().contains(StickInputType.DOWN)
-						&& !stickInputs.get(i - 2).getValues().contains(forward)
-						&& stickInputs.get(i - 2).getValues().contains(StickInputType.DOWN)
-						&& stickInputs.get(i - 2).getAge() < 20) {
+						&& stickInputs.get(i - 1).getAge() < 20) {
 					copy.getValues().add(StickInputType.QC_F);
 				} else if (stickInputs.get(i).getValues().contains(backward)
 						&& !stickInputs.get(i).getValues().contains(StickInputType.DOWN)
 						&& stickInputs.get(i - 1).getValues().contains(backward)
 						&& stickInputs.get(i - 1).getValues().contains(StickInputType.DOWN)
-						&& !stickInputs.get(i - 2).getValues().contains(backward)
-						&& stickInputs.get(i - 2).getValues().contains(StickInputType.DOWN)
-						&& stickInputs.get(i - 2).getAge() < 20) {
+						&& stickInputs.get(i - 1).getAge() < 20) {
 					copy.getValues().add(StickInputType.QC_B);
 				} else if (stickInputs.get(i).getValues().contains(backward)
 						&& stickInputs.get(i - 1).getValues().isEmpty()
@@ -153,7 +156,7 @@ public abstract class InputSource {
 		if (!success) {
 			bufferedInputs.put(type, ++attempt);
 		} else {
-			bufferedInputs.remove(type);
+			completedBuffers.add(type);
 		}
 	}
 

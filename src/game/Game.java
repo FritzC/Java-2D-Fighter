@@ -20,7 +20,7 @@ import game.util.Position;
  */
 public class Game {
 	
-	public final static int INPUT_BUFFER = 15;
+	public final static int INPUT_BUFFER = 5;
 	
 	/**
 	 * Number of times the game loop is ran per second
@@ -30,7 +30,7 @@ public class Game {
 	/**
 	 * Whether to display hitboxes
 	 */
-	public static final boolean DEBUG = true;
+	public static final boolean DEBUG = false;
 
 	/**
 	 * The current GameState

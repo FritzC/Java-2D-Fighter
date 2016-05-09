@@ -131,7 +131,7 @@
 			"frame": 10,
 			"type": ROTATE,
 			"interpolation": LINEAR,
-			"data": 210.7354877019201
+			"data": 164.5387822595581
 		},
 		"keyframe": {
 			"bone": "l_tricep",
@@ -152,7 +152,7 @@
 			"frame": 10,
 			"type": ROTATE,
 			"interpolation": LINEAR,
-			"data": 311.6335393365702
+			"data": 254.69915442755
 		},
 		"keyframe": {
 			"bone": "r_shoulder",
@@ -173,28 +173,28 @@
 			"frame": 10,
 			"type": ROTATE,
 			"interpolation": LINEAR,
-			"data": 32.005383208083494
+			"data": 352.25528945357706
 		},
 		"keyframe": {
 			"bone": "r_tricep",
 			"frame": 10,
 			"type": LENGTH,
 			"interpolation": LINEAR,
-			"data": 0.13315095919300915
+			"data": 0.11610861416184924
 		},
 		"keyframe": {
 			"bone": "r_bicep",
 			"frame": 10,
 			"type": ROTATE,
 			"interpolation": LINEAR,
-			"data": 91.06749968374021
+			"data": 1.7489460445542306
 		},
 		"keyframe": {
 			"bone": "r_bicep",
 			"frame": 10,
 			"type": LENGTH,
 			"interpolation": LINEAR,
-			"data": 0.13466552118488917
+			"data": 0.10840431606232774
 		},
 		"keyframe": {
 			"bone": "root",
@@ -215,7 +215,7 @@
 			"frame": 3,
 			"type": ROTATE,
 			"interpolation": LINEAR,
-			"data": 215.7066914006029
+			"data": 183.43363036245051
 		},
 		"keyframe": {
 			"bone": "r_shoulder",
@@ -229,7 +229,7 @@
 			"frame": 3,
 			"type": ROTATE,
 			"interpolation": LINEAR,
-			"data": 336.3706222693432
+			"data": 35.3112134396332
 		},
 		"keyframe": {
 			"bone": "r_bicep",
@@ -665,6 +665,20 @@
 			"interpolation": LINEAR,
 			"data": 0.10124462073993022
 		},
+		"keyframe": {
+			"bone": "r_tricep",
+			"frame": 6,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.0
+		},
+		"keyframe": {
+			"bone": "r_tricep",
+			"frame": 6,
+			"type": ROTATE,
+			"interpolation": NONE,
+			"data": 0.0
+		},
 	},
 	"ecbs": {
 		"ecb": {
@@ -698,10 +712,10 @@
 			"endFrame": 15,
 			"collision": {
 				"box": {
-					"top_l x": -0.122,
-					"top_l y": 0.619,
-					"bottom_r x": 0.267,
-					"bottom_r y": 0.258
+					"top_l x": -0.079,
+					"top_l y": 0.617,
+					"bottom_r x": 0.323,
+					"bottom_r y": 0.247
 				}
 			}
 		},
@@ -709,12 +723,12 @@
 	"hitboxes": {
 		"hitbox": {
 			"group": "1",
-			"startFrame": 7,
+			"startFrame": 10,
 			"endFrame": 10,
 			"damage": 70,
-			"blockstun": 10,
-			"hitstun": 19,
-			"pushback": 0.085,
+			"blockstun": 17,
+			"hitstun": 20,
+			"pushback": 0.095,
 			"knockdown": false,
 			"type": MID,
 			"release": false,
@@ -723,10 +737,10 @@
 			"triggerTargetAnim": "",
 			"collision": {
 				"box": {
-					"top_l x": -0.058,
-					"top_l y": 0.822,
-					"bottom_r x": 0.334,
-					"bottom_r y": 0.235
+					"top_l x": 0.036,
+					"top_l y": 0.697,
+					"bottom_r x": 0.461,
+					"bottom_r y": 0.323
 				},
 			},
 			"velocity": {

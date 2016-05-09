@@ -493,7 +493,7 @@
 			"blockstun": 30,
 			"hitstun": 40,
 			"pushback": 0.2,
-			"knockdown": false,
+			"knockdown": true,
 			"type": HIGH,
 			"release": false,
 			"attach": "",
@@ -509,8 +509,8 @@
 			},
 			"velocity": {
 				"vector": {
-					"x": 0.085,
-					"y": 0.03
+					"x": 0.08,
+					"y": 0.05
 				}
 			}
 		},

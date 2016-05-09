@@ -38,7 +38,7 @@ public class InputHandler {
 		Controller[] ca = ControllerEnvironment.getDefaultEnvironment().getControllers();
 
 		for (int i = 0; i < ca.length; i++) {
-			if (ca[i].getName().toLowerCase().contains("xbox")) {
+			if (ca[i].getType() == Controller.Type.GAMEPAD) {
 				devices.add(new XBoxControllerSource(ca[i]));
 			}
 			/*if (ca[i].getType() == Type.GAMEPAD) {

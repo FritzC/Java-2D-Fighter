@@ -136,7 +136,7 @@ public class HitBox extends CollisionBox {
 	public boolean applyHit(Fighter source, Fighter defender) {
 		int success = defender.applyHit(source, group, type, damage, hitStun, blockStun, pushBack, launchVelocity, attachTo, triggerAnimation,
 				triggerTargetAnimation, release, knockDown);
-		source.dealHit(defender, group, pushBack, this, success);
+		source.dealHit(defender, group, pushBack, this, triggerAnimation, success);
 		return success > 0;
 	}
 
@@ -220,6 +220,10 @@ public class HitBox extends CollisionBox {
 	
 	public int getDamage() {
 		return damage;
+	}
+
+	public HitBoxType getType() {
+		return type;
 	}
 
 	public void save(File f, PrintWriter pw) {

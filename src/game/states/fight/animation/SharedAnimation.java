@@ -37,7 +37,17 @@ public enum SharedAnimation {
 	HP_AIR,
 	LK_AIR,
 	MK_AIR,
-	HK_AIR;
+	HK_AIR,
+	GRAB,
+	GRAB_CONNECT,
+	GRABBED,
+	LP_SPECIAL_1,
+	HP_SPECIAL_1,
+	EX_P_SPECIAL_1,
+	LK_SPECIAL_1,
+	HK_SPECIAL_1,
+	EX_K_SPECIAL_1,
+	PARRY;
 	
 	public static SharedAnimation forString(String s) {
 		for (SharedAnimation reqAnim : values()) {

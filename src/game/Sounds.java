@@ -6,6 +6,7 @@ public class Sounds {
 
 	public final static String PUNCH = "assets/Synth_hit_punch_m_wav.aax_0000.wav";
 	public final static String BLOCK_PUNCH = "assets/Synth_guard0_wav.aax_0000.wav";
+	public final static String PARRY = "assets/anvil.wav";
 	
 	public final static void playSound(String location) {
 		(new Thread(new Runnable() {

@@ -111,14 +111,14 @@ public class XBoxControllerSource extends InputSource {
 			fireEvent(0, InputType.GRAB);
 		}
 		buttons.put(InputType.GRAB, lt.getPollData() == 1);
-		if (lb.getPollData() < -0.5 && !buttons.get(InputType.CANCEL)) {
-			fireEvent(0, InputType.CANCEL);
-		}
-		buttons.put(InputType.CANCEL, lb.getPollData() < -0.5);
-		if (rb.getPollData() > 0.5 && !buttons.get(InputType.EX_K)) {
+		if (lb.getPollData() < -0.5 && !buttons.get(InputType.EX_K)) {
 			fireEvent(0, InputType.EX_K);
 		}
-		buttons.put(InputType.EX_K, rb.getPollData() > 0.5);
+		buttons.put(InputType.EX_K, lb.getPollData() < -0.5);
+		if (rb.getPollData() > 0.5 && !buttons.get(InputType.CANCEL)) {
+			fireEvent(0, InputType.CANCEL);
+		}
+		buttons.put(InputType.CANCEL, rb.getPollData() > 0.5);
 		if (rt.getPollData() == 1 && !buttons.get(InputType.EX_P)) {
 			fireEvent(0, InputType.EX_P);
 		}

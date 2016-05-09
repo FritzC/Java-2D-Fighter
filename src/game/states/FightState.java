@@ -70,6 +70,8 @@ public class FightState extends GameState {
 	
 	private int[][] comboData;
 	
+	private int[] counterHit;
+	
 	private int hitLag;
 	
 	/**
@@ -86,9 +88,11 @@ public class FightState extends GameState {
 		tickRoundStarted = Game.tick;
 		this.roundLength = roundLength;
 		startRoundTick = Game.tick + 60 * 4;
-		player2.setFace(-1);
+		player2.setAnimFace(-1);
+		player2.setRealFace(-1);
 		endRoundMessage = "";
 		comboData = new int[2][2];
+		counterHit = new int[2];
 	}
 
 	@Override
@@ -204,7 +208,7 @@ public class FightState extends GameState {
 		g2.drawRoundRect(hpBarX2 + hpBarPadding / 2, hpBarY + hpBarPadding / 2, hpBarWidth - hpBarPadding,
 				hpBarHeight - hpBarPadding, hpBarPadding / 2, hpBarPadding / 2);
 		g2.setStroke(new BasicStroke((float) 0));
-		
+
 		/** Draw Combo Count **/
 		int comboX1 = camera.getRelativeScreenX(0.15);
 		int comboX2 = camera.getRelativeScreenX(0.85);
@@ -213,8 +217,8 @@ public class FightState extends GameState {
 		Window.coggersFont = Window.coggersFont.deriveFont((float) fontSize);
 		g2.setFont(Window.coggersFont);
 		int fontHeight = g2.getFontMetrics().getAscent();
-		GradientPaint yellowToGold = new GradientPaint(comboX1, comboY - fontHeight / 2, Color.YELLOW, comboX1,
-				comboY + fontHeight / 2, Color.ORANGE);
+		GradientPaint yellowToGold = new GradientPaint(0, - fontHeight / 2, Color.YELLOW, 0,
+				fontHeight / 2, Color.ORANGE);
 		if (player1.getComboCount() > 0 || comboData[0][1] == 0) {
 			comboData[0][0] = player1.getComboCount();
 			comboData[0][1] = 120;
@@ -230,6 +234,27 @@ public class FightState extends GameState {
 		if (comboData[1][0] > 1) {
 			Window.drawCenteredString(g2, comboData[1][0] + " COMBO!", comboX2, comboY, yellowToGold, fontSize / 15);
 			comboData[1][1]--;
+		}
+		
+		/** Draw Combo Count **/
+		int counterHitX1 = camera.getRelativeScreenX(0.15);
+		int counterHitX2 = camera.getRelativeScreenX(0.85);
+		int counterHitY = comboY + camera.getRelativeScreenY(0.09);
+		GradientPaint blueToGreen = new GradientPaint(0, -fontHeight / 2,
+				new Color(0, 255, 170), 0, fontHeight / 2, new Color(0, 170, 255));
+		if (player1.gotCounterHit()) {
+			counterHit[0] = 120;
+		}
+		if (counterHit[0] > 0) {
+			Window.drawCenteredString(g2, "Counter Hit!", counterHitX1, counterHitY, blueToGreen, fontSize / 15);
+			counterHit[0]--;
+		}
+		if (player2.gotCounterHit()) {
+			counterHit[1] = 120;
+		}
+		if (counterHit[1] > 0) {
+			Window.drawCenteredString(g2, "Counter Hit!", counterHitX2, counterHitY, blueToGreen, fontSize / 15);
+			counterHit[1]--;
 		}
 		
 		/** Draw Round Count **/
@@ -270,8 +295,9 @@ public class FightState extends GameState {
 		int nameSize = camera.getRelativeScreenX(0.015);
 		Window.coggersFont = Window.coggersFont.deriveFont((float) nameSize);
 		g2.setFont(Window.coggersFont);
-		Window.drawCenteredString(g2, "Player 1", nameX1, nameY, Color.WHITE, 2);
-		Window.drawCenteredString(g2, "Player 2", nameX2, nameY, Color.WHITE, 2);
+		GradientPaint whiteToBlack = new GradientPaint(0, nameSize, Color.BLACK, 0, -nameSize / 2, Color.WHITE);
+		Window.drawCenteredString(g2, "Player 1", nameX1, nameY, whiteToBlack, 2);
+		Window.drawCenteredString(g2, "Player 2", nameX2, nameY, whiteToBlack, 2);
 		
 		/** Timer **/
 		int timerX = camera.getRelativeScreenX(0.5);
@@ -345,8 +371,10 @@ public class FightState extends GameState {
 			tickRoundStarted = Game.tick;
 			player1.setPosition(new Position(stage.getWidth() / 4, 0));
 			player2.setPosition(new Position(stage.getWidth() / 4 * 3, 0));
-			player1.setFace(1);
-			player2.setFace(-1);
+			player1.setAnimFace(1);
+			player2.setAnimFace(-1);
+			player1.setRealFace(1);
+			player2.setRealFace(-1);
 			player1.reset();
 			player2.reset();
 			player1.blockInput(true);
@@ -392,9 +420,10 @@ public class FightState extends GameState {
 		player.stepAnimation(camera);
 		/** Facing **/
 		if (player.needFaceCheck()) {
-			player.setFace((player.getPosition().getX() < other.getPosition().getX()) ? 1 : -1);
+			player.setAnimFace((player.getPosition().getX() < other.getPosition().getX()) ? 1 : -1);
 			player.resetFaceCheck();
 		}
+		player.setRealFace((player.getPosition().getX() < other.getPosition().getX()) ? 1 : -1);
 		if (player.getAnimation() == null) {
 			if (player.isGrounded()) {
 				player.updateGroundAnim();
@@ -415,7 +444,15 @@ public class FightState extends GameState {
 				}
 			} else if (player.isGrounded()) {
 				if (player.getVelocity().getY() < 0) {
-					player.getVelocity().setY(0);
+					if (player.getVelocity().getY() >= player.getMaxFallSpeed()) {
+						player.getVelocity().setY(0);
+					} else {
+						player.getVelocity().setY(-player.getVelocity().getY() * 0.85);
+						player.setAnimation(SharedAnimation.HIT_AIR, true);
+						if (player.getHitStun() > 0) {
+							player.setHitStun(-player.getHitStun());
+						}
+					}
 				}
 				player.getPosition().setY(0);
 			}
@@ -436,9 +473,11 @@ public class FightState extends GameState {
 		if (!player.isGrounded()) {
 			if (player.getPosition().getX() < 0.2) {
 				player.getVelocity().setX(-player.getVelocity().getX());
+				player.setAnimFace((player.getPosition().getX() < other.getPosition().getX()) ? 1 : -1);
 			}
 			if (player.getPosition().getX() > stage.getWidth() - 0.2) {
 				player.getVelocity().setX(-player.getVelocity().getX());
+				player.setAnimFace((player.getPosition().getX() < other.getPosition().getX()) ? 1 : -1);
 			}
 		}
 		
@@ -473,21 +512,31 @@ public class FightState extends GameState {
 		if (other.getPosition().getX() - player.getPosition().getX() > camera.getViewportSize() - 0.35) {
 			player.getPosition().setX(other.getPosition().getX() - camera.getViewportSize() + 0.35);
 		}
-		if (camera.getScreenX(player.getPosition()) - camera.toPixels(0.2) < 0
-				/*&& other.getPosition().getX() - player.getPosition().getX() < camera.getViewportSize() - 0.4*/) {
+		if (camera.getScreenX(player.getPosition()) - camera.toPixels(0.2) < 0) {
 			camera.setFocus(new Position(
 					camera.getFocus().getX()
 							+ camera.toGameDistance(camera.getScreenX(player.getPosition()) - camera.toPixels(0.2)),
 					camera.getFocus().getY()));
-		}
-		if (camera.getScreenX(player.getPosition()) + camera.toPixels(0.2) > camera.getScreenWidth()
-				/*&& player.getPosition().getX() - other.getPosition().getX() < camera.getViewportSize() - 0.4*/) {
+		} else if (camera.getScreenX(player.getPosition()) + camera.toPixels(0.2) > camera.getScreenWidth()) {
 			camera.setFocus(new Position(
 					camera.getFocus().getX() + camera.toGameDistance(
 							camera.getScreenX(player.getPosition()) + camera.toPixels(0.2) - camera.getScreenWidth()),
 					camera.getFocus().getY()));
+		} else {
+			double distance = Math.abs(other.getPosition().getX() - player.getPosition().getX());
+			double xPos = Math.min(player.getPosition().getX(), other.getPosition().getX()) + distance / 2d;
+			double yPos = Math.min(player.getPosition().getY(), other.getPosition().getY()) / 2d + 1.35;
+			if (xPos < camera.getViewportSize() / 2d) {
+				xPos = camera.getViewportSize() / 2d;
+			} else if (xPos > stage.getWidth() - camera.getViewportSize() / 2d) {
+				xPos = stage.getWidth() - camera.getViewportSize() / 2d;
+			}
+			if (yPos < 1.35) {
+				yPos = 1.35;
+			}
+			camera.setFocus(new Position(xPos, yPos));
 		}
-		
+
 		/** ECB Collisions **/
 		if (player.getECB().forOffset(player.getFace(), player.getPosition())
 				.intersects(other.getECB().forOffset(other.getFace(), other.getPosition())) && player.isGrounded()
@@ -512,7 +561,7 @@ public class FightState extends GameState {
 				player.updateGroundAnim();
 			}
 		}
-		if (player.isGrounded() && player.getHitStun() < 0) {
+		if (player.isGrounded() && player.getHitStun() < 0 && player.getVelocity().getY() >= player.getMaxFallSpeed()) {
 			player.setHitStun(0);
 			other.setComboCount(0);
 			player.resetCombo();
