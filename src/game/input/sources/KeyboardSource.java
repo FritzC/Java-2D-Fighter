@@ -17,9 +17,6 @@ public class KeyboardSource extends InputSource {
 	@Override
 	public void poll() {
 		List<StickInputType> currentInputs = new ArrayList<>();
-		if (boundTo == null) {
-			return;
-		}
 		if (KeyStates.getState(KeyEvent.VK_W)) {
 			currentInputs.add(StickInputType.UP);
 		}

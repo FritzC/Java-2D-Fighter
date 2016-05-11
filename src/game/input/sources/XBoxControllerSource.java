@@ -6,6 +6,7 @@ import java.util.List;
 
 import game.Game;
 import game.input.Input;
+import game.input.InputHandler;
 import game.input.InputSource;
 import game.input.InputType;
 import game.input.KeyStates;
@@ -72,9 +73,6 @@ public class XBoxControllerSource extends InputSource {
 	public void poll() {
 		controller.poll();
 		List<StickInputType> currentInputs = new ArrayList<>();
-		if (boundTo == null) {
-			return;
-		}
 		if (yAxis.getPollData() < -0.4) {
 			currentInputs.add(StickInputType.UP);
 		}
@@ -123,7 +121,7 @@ public class XBoxControllerSource extends InputSource {
 			fireEvent(0, InputType.EX_P);
 		}
 		buttons.put(InputType.EX_P, rt.getPollData() == 1);
-		if (!stickInputs.get(stickInputs.size() - 1).getValues().equals(currentInputs)) {
+		if (stickInputs.size() == 0 || !stickInputs.get(stickInputs.size() - 1).getValues().equals(currentInputs)) {
 			stickInputs.add(new StickInput(Game.tick, currentInputs));
 			if (boundTo != null) {
 				boundTo.stickMoved(this);

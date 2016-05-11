@@ -48,6 +48,7 @@ public class Window extends JFrame {
 		loadAssets();
 		addKeyListener(new KeyStates());
 		add(drawPanel);
+		setTitle("Stick Fighter");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setPreferredSize(new Dimension(1000, 500));
 		pack();

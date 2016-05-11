@@ -66,8 +66,8 @@ public class Game {
 	 */
 	public static void main(String[] args) throws FileNotFoundException {
 		InputHandler.initialize();
-		state = new FightState(new BasicFighter(InputHandler.getSource(0), new Position(1, 0)),
-				new BasicFighter(InputHandler.getSource(1), new Position(2, 0)), new Stage(), 3, 99);
+		state = new FightState(new BasicFighter(new Position(1, 0)),
+				new BasicFighter(new Position(2, 0)), new Stage(), 3, 99);
 		window = new Window();
 		window.setState(state);
 		gameLoop = new Runnable() {

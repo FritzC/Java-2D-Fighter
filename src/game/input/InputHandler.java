@@ -18,6 +18,8 @@ import net.java.games.input.ControllerEnvironment;
  */
 public class InputHandler {
 	
+	private static InputSource deviceLastUpdated;
+	
 	/**
 	 * List of all supported input devices
 	 */
@@ -60,5 +62,13 @@ public class InputHandler {
 	
 	public static InputSource getSource(int i) {
 		return devices.get(i);
+	}
+
+	public static InputSource getMostRecentDevice() {
+		return deviceLastUpdated;
+	}
+
+	public static void setMostRecentDevice(InputSource source) {
+		deviceLastUpdated = source;
 	}
 }

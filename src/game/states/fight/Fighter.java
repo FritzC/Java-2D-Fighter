@@ -141,6 +141,8 @@ public class Fighter implements InputTaker {
 	
 	private boolean counterHit;
 	
+	private boolean wantsRematch;
+	
 	/**
 	 * Initializes a new fighter
 	 * 
@@ -238,9 +240,9 @@ public class Fighter implements InputTaker {
 
 	public void dealHit(Fighter defender, String name, double pushBack, HitBox hitBox, String triggeredAnimation,
 			int success) {
-		if (success > 0) {
+		if (success != 0) {
 			position = position.applyVector(new Vector(-realFace * pushBack / 2, 0));
-			addMeter(success * 2 * hitBox.getDamage() / 6000D);
+			addMeter(Math.abs(success) * 2 * hitBox.getDamage() / 6000D);
 			if (success == 2) {
 				if (hitBox.getType() != HitBoxType.GRAB) {
 					comboCount ++;
@@ -266,21 +268,21 @@ public class Fighter implements InputTaker {
 		if (attacker.comboCount > 0) {
 			damage /= ((comboCount + 2) / 2);
 		}
+		if (damage > currentHealth) {
+			damage = (int) currentHealth;
+		}
 		if (isGrounded()) {
 			if (isParrying() && type != HitBoxType.GRAB) {
 				setAnimation(SharedAnimation.PARRY, true);
-				addMeter(damage / 2000D);
+				addMeter(damage / 500D);
 				Sounds.playSound(Sounds.PARRY);
 				setColor(Color.MAGENTA);
-				return 1;
+				return -1;
 			}
 			position = position.applyVector(new Vector(-realFace * pushBack / 2, 0));
 			if ((isBlocking(type) && type != HitBoxType.GRAB) || type == HitBoxType.AIR_GRAB) {
 				this.hitStun = blockStun;
 				setAnimation(isCrouching() ? SharedAnimation.BLOCK_CR.toString() : SharedAnimation.BLOCK_ST.toString(), true);
-				if (damage > currentHealth) {
-					damage = (int) currentHealth;
-				}
 				Sounds.playSound(Sounds.BLOCK_PUNCH);
 				setColor(Color.BLUE);
 				currentHealth -= damage;
@@ -558,7 +560,7 @@ public class Fighter implements InputTaker {
 	
 
 	public boolean isParrying() {
-		StickInput inputs = inputSource.getStickInputs(realFace, true, 20);
+		StickInput inputs = inputSource.getStickInputs(realFace, true, 30);
 		if (hitStun != 0) {
 			return false;
 		}
@@ -573,7 +575,7 @@ public class Fighter implements InputTaker {
 
 	public boolean isBlocking(HitBoxType hitType) {
 		StickInput inputs = inputSource.getStickInputs(realFace, true);
-		if (hitStun != 0) {
+		if (hitStun != 0 && !animation.getName().toLowerCase().contains("block")) {
 			return false;
 		}
 		if (animation != null
@@ -968,7 +970,9 @@ public class Fighter implements InputTaker {
 		if (meter >= 0.5 && !blockInput) {
 			addMeter(-0.5);
 			hitStun = 0;
+			knockedDown = false;
 			setColor(Color.GREEN);
+			deadHitboxes.clear();
 			if (isGrounded()) {
 				updateGroundAnim();
 			} else {
@@ -981,6 +985,7 @@ public class Fighter implements InputTaker {
 
 	@Override
 	public boolean startPressed(int attempt, InputSource source) {
+		wantsRematch = true;
 		return true;		
 	}
 
@@ -1057,6 +1062,21 @@ public class Fighter implements InputTaker {
 	public boolean gotCounterHit() {
 		boolean ret = counterHit;
 		counterHit = false;
+		return ret;
+	}
+
+	public void setInputSource(InputSource source) {
+		inputSource = source;
+		source.bind(this);
+	}
+
+	public InputSource getInputSource() {
+		return inputSource;
+	}
+	
+	public boolean doesWantRematch() {
+		boolean ret = wantsRematch;
+		wantsRematch = false;
 		return ret;
 	}
 	

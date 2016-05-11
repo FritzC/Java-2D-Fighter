@@ -5,13 +5,13 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Graphics2D;
-import java.awt.Shape;
-import java.awt.font.GlyphVector;
 import java.util.ArrayList;
 import java.util.List;
 
 import game.Game;
 import game.Window;
+import game.input.InputHandler;
+import game.input.InputSource;
 import game.states.fight.Camera;
 import game.states.fight.FightResult;
 import game.states.fight.Fighter;
@@ -74,6 +74,12 @@ public class FightState extends GameState {
 	
 	private int hitLag;
 	
+	private int controllersSelected;
+	
+	private int[] winCount;
+	
+	private int rounds;
+	
 	/**
 	 * Initializes the fight state
 	 */
@@ -82,17 +88,22 @@ public class FightState extends GameState {
 		this.player2 = player2;
 		this.stage = stage;
 		this.camera = new Camera(stage);
-		this.camera.setFocus(new Position(2, 1.25));
+		this.camera.setFocus(new Position(2, 1.35));
 		particles = new ArrayList<>();
 		results = new FightResult[2][rounds / 2 + 1];
+		this.rounds = rounds;
 		tickRoundStarted = Game.tick;
 		this.roundLength = roundLength;
 		startRoundTick = Game.tick + 60 * 4;
 		player2.setAnimFace(-1);
 		player2.setRealFace(-1);
+		player1.setPosition(new Position(stage.getWidth() / 4, 0));
+		player2.setPosition(new Position(stage.getWidth() / 4 * 3, 0));
 		endRoundMessage = "";
 		comboData = new int[2][2];
 		counterHit = new int[2];
+		winCount = new int[2];
+		controllersSelected = 0;
 	}
 
 	@Override
@@ -218,13 +229,13 @@ public class FightState extends GameState {
 		g2.setFont(Window.coggersFont);
 		int fontHeight = g2.getFontMetrics().getAscent();
 		GradientPaint yellowToGold = new GradientPaint(0, - fontHeight / 2, Color.YELLOW, 0,
-				fontHeight / 2, Color.ORANGE);
+				fontHeight / 2, new Color(255, 43, 0));
 		if (player1.getComboCount() > 0 || comboData[0][1] == 0) {
 			comboData[0][0] = player1.getComboCount();
 			comboData[0][1] = 120;
 		}
 		if (comboData[0][0] > 1) {
-			Window.drawCenteredString(g2, comboData[0][0] + " COMBO!", comboX1, comboY, yellowToGold, fontSize / 15);
+			Window.drawCenteredString(g2, comboData[0][0] + " HIT COMBO!", comboX1, comboY, yellowToGold, fontSize / 15);
 			comboData[0][1]--;
 		}
 		if (player2.getComboCount() > 0 || comboData[1][1] == 0) {
@@ -232,11 +243,11 @@ public class FightState extends GameState {
 			comboData[1][1] = 120;
 		}
 		if (comboData[1][0] > 1) {
-			Window.drawCenteredString(g2, comboData[1][0] + " COMBO!", comboX2, comboY, yellowToGold, fontSize / 15);
+			Window.drawCenteredString(g2, comboData[1][0] + " HIT COMBO!", comboX2, comboY, yellowToGold, fontSize / 15);
 			comboData[1][1]--;
 		}
 		
-		/** Draw Combo Count **/
+		/** Draw Counterhit **/
 		int counterHitX1 = camera.getRelativeScreenX(0.15);
 		int counterHitX2 = camera.getRelativeScreenX(0.85);
 		int counterHitY = comboY + camera.getRelativeScreenY(0.09);
@@ -292,12 +303,21 @@ public class FightState extends GameState {
 		int nameX1 = hpBarX1 + camera.getRelativeScreenX(0.05);
 		int nameX2 = hpBarX2  + hpBarWidth - camera.getRelativeScreenX(0.05);
 		int nameY = meterY + meterHeight + camera.getRelativeScreenY(0.021);
+		int winCountX1 = hpBarX1 + hpBarWidth / 2;
+		int winCountX2 = hpBarX2 + hpBarWidth / 2;
+		int winCountY = hpBarY - camera.getRelativeScreenX(0.01);
 		int nameSize = camera.getRelativeScreenX(0.015);
 		Window.coggersFont = Window.coggersFont.deriveFont((float) nameSize);
 		g2.setFont(Window.coggersFont);
 		GradientPaint whiteToBlack = new GradientPaint(0, nameSize, Color.BLACK, 0, -nameSize / 2, Color.WHITE);
 		Window.drawCenteredString(g2, "Player 1", nameX1, nameY, whiteToBlack, 2);
 		Window.drawCenteredString(g2, "Player 2", nameX2, nameY, whiteToBlack, 2);
+		if (winCount[0] > 0) {
+			Window.drawCenteredString(g2, winCount[0] + " Win" + ((winCount[0] > 1) ? "s" : ""), winCountX1, winCountY, whiteToBlack, nameSize / 10);
+		}
+		if (winCount[1] > 0) {
+			Window.drawCenteredString(g2, winCount[1] + " Win" + ((winCount[1] > 1) ? "s" : ""), winCountX2, winCountY, whiteToBlack, nameSize / 10);
+		}
 		
 		/** Timer **/
 		int timerX = camera.getRelativeScreenX(0.5);
@@ -305,7 +325,13 @@ public class FightState extends GameState {
 		int timerSize = camera.getRelativeScreenX(0.05);
 		Window.coggersFont = Window.coggersFont.deriveFont((float) timerSize);
 		g2.setFont(Window.coggersFont);
-		Window.drawCenteredString(g2, "" + getTime(), timerX, timerY, Color.WHITE, 3);
+		GradientPaint timerColor = new GradientPaint(0, timerSize, Color.BLACK, 0, -timerSize / 2, Color.WHITE);
+		if (getTime() < 10) {
+			timerColor = new GradientPaint(0, timerSize / 2, new Color(80, 0, 0), 0, -timerSize / 2, Color.RED);
+		} else if (getTime() < 25) {
+			timerColor = new GradientPaint(0, timerSize / 2, new Color(255, 43, 0), 0, -timerSize / 2, Color.YELLOW);
+		}
+		Window.drawCenteredString(g2, "" + getTime(), timerX, timerY, timerColor, timerSize / 20);
 		
 		/** Results **/
 		if (startRoundTick - Game.tick > 0 || gameOver) {
@@ -316,28 +342,67 @@ public class FightState extends GameState {
 		int messageY = camera.getRelativeScreenY(0.5);
 		int messageFontSize = camera.getRelativeScreenX(0.1);
 		Window.coggersFont = Window.coggersFont.deriveFont((float) messageFontSize);
+		GradientPaint whiteToBlackMessage = new GradientPaint(0, messageFontSize, Color.BLACK, 0,
+				-messageFontSize / 2, Color.WHITE);
 		g2.setFont(Window.coggersFont);
-		if (startRoundTick - Game.tick > 60 * 4 && !gameOver) {
-			Window.drawCenteredString(g2, endRoundMessage, messageX, messageY, Color.WHITE, messageFontSize / 20);
+		if (controllersSelected < 2) {
+			Window.coggersFont = Window.coggersFont.deriveFont((float) messageFontSize / 2);
+			g2.setFont(Window.coggersFont);
+			Window.drawCenteredString(g2, "Press any button on controller " + (controllersSelected + 1), messageX,
+					messageY, new GradientPaint(0, messageFontSize / 2, Color.BLACK, 0,
+							-messageFontSize / 4, Color.WHITE), messageFontSize / 20);
+		} else if (startRoundTick - Game.tick > 60 * 4 && !gameOver) {
+			Window.drawCenteredString(g2, endRoundMessage, messageX, messageY, whiteToBlackMessage, messageFontSize / 20);
 		} else if (startRoundTick - Game.tick > 60 && !gameOver) {
-			Window.drawCenteredString(g2, "" + ((startRoundTick - Game.tick) / 60), messageX, messageY, Color.WHITE, messageFontSize / 10);
+			Window.drawCenteredString(g2, "" + ((startRoundTick - Game.tick) / 60), messageX, messageY, whiteToBlackMessage, messageFontSize / 10);
 		} else if (startRoundTick - Game.tick > 0 && !gameOver) {
-			Window.drawCenteredString(g2, "FIGHT!", messageX, messageY, Color.WHITE, messageFontSize / 20);
+			Window.drawCenteredString(g2, "FIGHT!", messageX, messageY, whiteToBlackMessage, messageFontSize / 20);
 		} else if (gameOver) {
-			int gameOverY = camera.getRelativeScreenY(0.35);
-			int subMessageY = camera.getRelativeScreenY(0.65);
-			Window.drawCenteredString(g2, endRoundMessage, messageX, subMessageY, Color.WHITE, messageFontSize / 20);
+			int gameOverY = camera.getRelativeScreenY(0.3);
+			int subMessageY = camera.getRelativeScreenY(0.6);
+			int replayY = camera.getRelativeScreenY(0.8);
+			GradientPaint yellowToGoldSubMessage = new GradientPaint(0, - messageFontSize / 2, Color.YELLOW, 0,
+					messageFontSize / 2, new Color(255, 43, 0));
+			Window.drawCenteredString(g2, endRoundMessage, messageX, subMessageY, yellowToGoldSubMessage, messageFontSize / 20);
 			int gameOverFontSize = camera.getRelativeScreenX(0.16);
 			Window.coggersFont = Window.coggersFont.deriveFont((float) gameOverFontSize);
 			g2.setFont(Window.coggersFont);
-			Window.drawCenteredString(g2, "GAME OVER", messageX, gameOverY, Color.WHITE, messageFontSize / 20);
+			GradientPaint whiteToBlackGameOver = new GradientPaint(0, gameOverFontSize, Color.BLACK, 0,
+					-gameOverFontSize / 2, Color.WHITE);
+			Window.drawCenteredString(g2, "GAME OVER", messageX, gameOverY, whiteToBlackGameOver, messageFontSize / 20);
+			Window.coggersFont = Window.coggersFont.deriveFont((float) messageFontSize / 3);
+			g2.setFont(Window.coggersFont);
+			Window.drawCenteredString(g2, "Press 'START' to play again", messageX,
+					replayY, Color.WHITE, messageFontSize / 30);
 		}
 	}
 
 	@Override
 	public void logic() {
+		if (controllersSelected < 2) {
+			InputSource source = InputHandler.getMostRecentDevice();
+			if (source != null) {
+				if (controllersSelected == 0) {
+					player1.setInputSource(source);
+					controllersSelected++;
+				} else if (player1.getInputSource() != source) {
+					player2.setInputSource(source);
+					controllersSelected++;
+				}
+			}
+			tickRoundStarted = Game.tick;
+			startRoundTick = Game.tick + 60 * 4;
+			return;
+		}
 		if (gameOver) {
 			tickRoundStarted = Integer.MIN_VALUE;
+			if (player1.doesWantRematch() || player2.doesWantRematch()) {
+				startRoundTick = Game.tick + 60 * 4;
+				player1.addMeter(-1);
+				player2.addMeter(-1);
+				results = new FightResult[2][rounds / 2 + 1];
+				gameOver = false;
+			}
 			return;
 		}
 		if (startRoundTick - Game.tick < 0) {
@@ -411,6 +476,12 @@ public class FightState extends GameState {
 		}
 		if (p1Wins || p2Wins) {
 			gameOver = true;
+			if (p1Wins) {
+				winCount[0] ++;
+			}
+			if (p2Wins) {
+				winCount[1] ++;
+			}
 		}
 		startRoundTick = Game.tick + 60 * 6;
 	}
@@ -500,8 +571,8 @@ public class FightState extends GameState {
 		
 		/** Knockdown **/
 		if (player.isGrounded() && player.needsKnockdown()) {
-			player.setAnimation(player.usingQuickGetUp() ? SharedAnimation.KNOCKED_DOWN_FAST.toString()
-					: SharedAnimation.KNOCKED_DOWN_SLOW.toString(), false);
+			player.setAnimation(player.usingQuickGetUp() ? SharedAnimation.KNOCKED_DOWN_SLOW.toString()
+					: SharedAnimation.KNOCKED_DOWN_FAST.toString(), false);
 			player.resetKnockdown();
 		}
 		
@@ -599,7 +670,7 @@ public class FightState extends GameState {
 				}
 			}
 		}
-		boolean appliedHit = false;
+		int appliedHit = 0;
 		if (hitPlayer1 != null || hitPlayer2 != null) {
 			if (hitPlayer1 == null && hitPlayer2 != null) {
 				appliedHit = hitPlayer2.applyHit(player1, player2);
@@ -618,8 +689,10 @@ public class FightState extends GameState {
 				}
 			}
 		}
-		if (appliedHit) {
+		if (appliedHit > 0) {
 			hitLag = 10;
+		} else if (appliedHit < 0) {
+			hitLag = 25;
 		}
 	}
 	

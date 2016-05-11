@@ -118,6 +118,10 @@ public abstract class InputSource {
 	
 	public void fireEvent(int attempt, InputType type) {
 		boolean success = false;
+		InputHandler.setMostRecentDevice(this);
+		if (boundTo == null) {
+			return;
+		}
 		switch (type) {
 			case LP:
 				success = boundTo.lightPunchPressed(attempt, this);
