@@ -1,0 +1,144 @@
+{
+	"name": "basic",
+	"health": 1000.0,
+	"skeleton": {
+		"bone": {
+			"name": "root",
+			"drawMode": LINE,
+			"length": 0.18297350618539393,
+			"width": 0.05,
+			"angle": 90.0,
+			"visible": false,
+			"sprite": "",
+			"children": {
+				"bone": {
+					"name": "l_upper_leg",
+					"drawMode": LINE,
+					"length": 0.11436584616227231,
+					"width": 0.05,
+					"angle": 336.44773632710536,
+					"visible": true,
+					"sprite": "",
+					"children": {
+						"bone": {
+							"name": "l_lower_leg",
+							"drawMode": LINE,
+							"length": 0.13611816022765766,
+							"width": 0.05,
+							"angle": 279.09027692082236,
+							"visible": true,
+							"sprite": "",
+							"children": {}
+						}
+					}
+				},
+				"bone": {
+					"name": "r_upper_leg",
+					"drawMode": LINE,
+					"length": 0.06842968850192395,
+					"width": 0.05,
+					"angle": 225.0,
+					"visible": true,
+					"sprite": "",
+					"children": {
+						"bone": {
+							"name": "r_lower_leg",
+							"drawMode": LINE,
+							"length": 0.13775406425074146,
+							"width": 0.05,
+							"angle": 252.97947438848013,
+							"visible": true,
+							"sprite": "",
+							"children": {}
+						}
+					}
+				},
+				"bone": {
+					"name": "lower_body",
+					"drawMode": LINE,
+					"length": 0.09960756620241347,
+					"width": 0.05,
+					"angle": 93.0940580589171,
+					"visible": true,
+					"sprite": "",
+					"children": {
+						"bone": {
+							"name": "upper_body",
+							"drawMode": LINE,
+							"length": 0.11809614320692902,
+							"width": 0.05,
+							"angle": 78.17851165939275,
+							"visible": true,
+							"sprite": "",
+							"children": {
+								"bone": {
+									"name": "l_upper_arm",
+									"drawMode": LINE,
+									"length": 0.12081830674324856,
+									"width": 0.05,
+									"angle": 302.2756443145776,
+									"visible": true,
+									"sprite": "",
+									"children": {
+										"bone": {
+											"name": "l_lower_arm",
+											"drawMode": LINE,
+											"length": 0.08436749906707106,
+											"width": 0.05,
+											"angle": 22.479434397103113,
+											"visible": true,
+											"sprite": "",
+											"children": {}
+										}
+									}
+								},
+								"bone": {
+									"name": "r_upper_arm",
+									"drawMode": LINE,
+									"length": 0.13874718172649397,
+									"width": 0.05,
+									"angle": 234.46232220802563,
+									"visible": true,
+									"sprite": "",
+									"children": {
+										"bone": {
+											"name": "r_lower_arm",
+											"drawMode": LINE,
+											"length": 0.07056131585164886,
+											"width": 0.05,
+											"angle": 17.744671625056935,
+											"visible": true,
+											"sprite": "",
+											"children": {}
+										}
+									}
+								},
+								"bone": {
+									"name": "neck",
+									"drawMode": LINE,
+									"length": 0.040088790342327756,
+									"width": 0.05,
+									"angle": 85.0,
+									"visible": true,
+									"sprite": "",
+									"children": {
+										"bone": {
+											"name": "head",
+											"drawMode": CIRCLE,
+											"length": 0.10881176406988355,
+											"width": 0.05,
+											"angle": 70.0,
+											"visible": true,
+											"sprite": "",
+											"children": {}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,424 @@
+{
+	"loop": false,
+	"specialCancelable": false,
+	"initialPose": {
+		"bonePose": {
+			"name": "l_upper_arm",
+			"length": 0.12081830674324856,
+			"angle": 302.2756443145776,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "l_lower_arm",
+			"length": 0.08436749906707106,
+			"angle": 22.479434397103113,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "neck",
+			"length": 0.040088790342327756,
+			"angle": 85.0,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "r_upper_leg",
+			"length": 0.06842968850192395,
+			"angle": 225.0,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "r_lower_leg",
+			"length": 0.13775406425074146,
+			"angle": 252.97947438848013,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "head",
+			"length": 0.10881176406988355,
+			"angle": 70.0,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "l_lower_leg",
+			"length": 0.13611816022765766,
+			"angle": 279.09027692082236,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "l_upper_leg",
+			"length": 0.11436584616227231,
+			"angle": 336.44773632710536,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "upper_body",
+			"length": 0.11809614320692902,
+			"angle": 78.17851165939275,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "root",
+			"length": 0.18297350618539393,
+			"angle": 90.0,
+			"visible": false
+		},
+		"bonePose": {
+			"name": "lower_body",
+			"length": 0.09960756620241347,
+			"angle": 93.0940580589171,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "r_upper_arm",
+			"length": 0.13874718172649397,
+			"angle": 234.46232220802563,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "r_lower_arm",
+			"length": 0.07056131585164886,
+			"angle": 17.744671625056935,
+			"visible": true
+		},
+	},
+	"steps": {
+		"keyframe": {
+			"bone": "root",
+			"frame": 5,
+			"type": LENGTH,
+			"interpolation": COS,
+			"data": 0.1022067621159296
+		},
+		"keyframe": {
+			"bone": "l_upper_leg",
+			"frame": 5,
+			"type": ROTATE,
+			"interpolation": COS,
+			"data": 20.0
+		},
+		"keyframe": {
+			"bone": "l_lower_leg",
+			"frame": 5,
+			"type": ROTATE,
+			"interpolation": SMOOTH_OUT,
+			"data": 260.0
+		},
+		"keyframe": {
+			"bone": "r_upper_leg",
+			"frame": 5,
+			"type": ROTATE,
+			"interpolation": SMOOTH_OUT,
+			"data": 150.0
+		},
+		"keyframe": {
+			"bone": "r_lower_leg",
+			"frame": 5,
+			"type": ROTATE,
+			"interpolation": SMOOTH_OUT,
+			"data": 275.0
+		},
+		"keyframe": {
+			"bone": "r_upper_leg",
+			"frame": 5,
+			"type": LENGTH,
+			"interpolation": SMOOTH_OUT,
+			"data": 0.08283853102404835
+		},
+		"keyframe": {
+			"bone": "lower_body",
+			"frame": 5,
+			"type": LENGTH,
+			"interpolation": SMOOTH_OUT,
+			"data": 0.08061982110843187
+		},
+		"keyframe": {
+			"bone": "root",
+			"frame": 10,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.2507233978355874
+		},
+		"keyframe": {
+			"bone": "l_upper_leg",
+			"frame": 10,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 300.0
+		},
+		"keyframe": {
+			"bone": "l_lower_leg",
+			"frame": 10,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 270.0
+		},
+		"keyframe": {
+			"bone": "r_upper_leg",
+			"frame": 10,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 230.0
+		},
+		"keyframe": {
+			"bone": "r_lower_leg",
+			"frame": 10,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 260.0
+		},
+		"keyframe": {
+			"bone": "r_upper_leg",
+			"frame": 10,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.11101151091465947
+		},
+		"keyframe": {
+			"bone": "l_upper_arm",
+			"frame": 5,
+			"type": ROTATE,
+			"interpolation": SMOOTH_OUT,
+			"data": 325.0
+		},
+		"keyframe": {
+			"bone": "l_lower_arm",
+			"frame": 5,
+			"type": LENGTH,
+			"interpolation": SMOOTH_OUT,
+			"data": 0.032550814975289874
+		},
+		"keyframe": {
+			"bone": "r_upper_arm",
+			"frame": 5,
+			"type": ROTATE,
+			"interpolation": SMOOTH_OUT,
+			"data": 210.0
+		},
+		"keyframe": {
+			"bone": "r_lower_arm",
+			"frame": 5,
+			"type": ROTATE,
+			"interpolation": SMOOTH_OUT,
+			"data": 45.0
+		},
+		"keyframe": {
+			"bone": "r_lower_arm",
+			"frame": 5,
+			"type": LENGTH,
+			"interpolation": SMOOTH_OUT,
+			"data": 0.0026666666666666666
+		},
+		"keyframe": {
+			"bone": "upper_body",
+			"frame": 5,
+			"type": ROTATE,
+			"interpolation": SMOOTH_OUT,
+			"data": 78.17851165939275
+		},
+		"keyframe": {
+			"bone": "upper_body",
+			"frame": 10,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 90.0
+		},
+		"keyframe": {
+			"bone": "lower_body",
+			"frame": 10,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 90.0
+		},
+		"keyframe": {
+			"bone": "l_upper_arm",
+			"frame": 10,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 300.0
+		},
+		"keyframe": {
+			"bone": "l_lower_arm",
+			"frame": 10,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 275.0
+		},
+		"keyframe": {
+			"bone": "l_lower_arm",
+			"frame": 10,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.064882800323181
+		},
+		"keyframe": {
+			"bone": "r_upper_arm",
+			"frame": 10,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 230.0
+		},
+		"keyframe": {
+			"bone": "r_lower_arm",
+			"frame": 10,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.06225396015962001
+		},
+		"keyframe": {
+			"bone": "r_lower_arm",
+			"frame": 10,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 260.0
+		},
+		"keyframe": {
+			"bone": "root",
+			"frame": 15,
+			"type": LENGTH,
+			"interpolation": SMOOTH_IN,
+			"data": 0.18980223625892528
+		},
+		"keyframe": {
+			"bone": "r_upper_leg",
+			"frame": 15,
+			"type": ROTATE,
+			"interpolation": SMOOTH_IN,
+			"data": 270.0
+		},
+		"keyframe": {
+			"bone": "r_lower_leg",
+			"frame": 15,
+			"type": ROTATE,
+			"interpolation": SMOOTH_IN,
+			"data": 240.0
+		},
+		"keyframe": {
+			"bone": "l_upper_leg",
+			"frame": 15,
+			"type": ROTATE,
+			"interpolation": SMOOTH_IN,
+			"data": 335.0
+		},
+		"keyframe": {
+			"bone": "l_lower_leg",
+			"frame": 15,
+			"type": ROTATE,
+			"interpolation": SMOOTH_IN,
+			"data": 245.0
+		},
+		"keyframe": {
+			"bone": "lower_body",
+			"frame": 15,
+			"type": ROTATE,
+			"interpolation": SMOOTH_IN,
+			"data": 85.0
+		},
+		"keyframe": {
+			"bone": "upper_body",
+			"frame": 15,
+			"type": ROTATE,
+			"interpolation": SMOOTH_IN,
+			"data": 80.0
+		},
+		"keyframe": {
+			"bone": "l_upper_arm",
+			"frame": 15,
+			"type": ROTATE,
+			"interpolation": SMOOTH_IN,
+			"data": 315.0
+		},
+		"keyframe": {
+			"bone": "l_lower_arm",
+			"frame": 15,
+			"type": ROTATE,
+			"interpolation": SMOOTH_IN,
+			"data": 40.0
+		},
+		"keyframe": {
+			"bone": "r_upper_leg",
+			"frame": 15,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.06798692684790379
+		},
+		"keyframe": {
+			"bone": "upper_body",
+			"frame": 15,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.09113603995005366
+		},
+		"keyframe": {
+			"bone": "r_upper_arm",
+			"frame": 15,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 215.0
+		},
+		"keyframe": {
+			"bone": "r_lower_arm",
+			"frame": 15,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 335.0
+		},
+		"keyframe": {
+			"bone": "l_lower_arm",
+			"frame": 15,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.03341323756304445
+		},
+		"keyframe": {
+			"bone": "root",
+			"frame": 10,
+			"type": VELOCITY_Y,
+			"interpolation": NONE,
+			"data": 0.08
+		},
+		"keyframe": {
+			"bone": "root",
+			"frame": 0,
+			"type": IGNORE_VELOCITY_Y,
+			"interpolation": LINEAR,
+			"data": 1.0
+		},
+		"keyframe": {
+			"bone": "root",
+			"frame": 11,
+			"type": IGNORE_VELOCITY_Y,
+			"interpolation": LINEAR,
+			"data": 0.0
+		},
+	},
+	"ecbs": {
+		"ecb": {
+			"startFrame": 0,
+			"endFrame": 15,
+			"collision": {
+				"box": {
+					"top_l x": -0.112,
+					"top_l y": 0.584,
+					"bottom_r x": 0.109,
+					"bottom_r y": -0.002
+				}
+			}
+		},
+	},
+	"hurtboxes": {
+		"hurtbox": {
+			"startFrame": 0,
+			"endFrame": 15,
+			"collision": {
+				"box": {
+					"top_l x": -0.176,
+					"top_l y": 0.6,
+					"bottom_r x": 0.221,
+					"bottom_r y": -0.021
+				}
+			}
+		},
+	},
+	"hitboxes": {
+	},
+}

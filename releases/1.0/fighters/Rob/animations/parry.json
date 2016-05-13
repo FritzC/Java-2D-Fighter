@@ -1,0 +1,134 @@
+{
+	"loop": false,
+	"specialCancelable": false,
+	"initialPose": {
+		"bonePose": {
+			"name": "l_hip",
+			"length": 0.05232558139534884,
+			"angle": 0.0,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "r_bicep",
+			"length": 0.13466552118488917,
+			"angle": 349.8457334197997,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "l_bicep",
+			"length": 0.11287953900442635,
+			"angle": 95.77432590266328,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "neck",
+			"length": 0.041110859371310905,
+			"angle": 95.0,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "l_shoulder",
+			"length": 0.03677067046707418,
+			"angle": 340.0,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "l_tricep",
+			"length": 0.12340107719064607,
+			"angle": 5.355825042855191,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "r_tricep",
+			"length": 0.11422606223481685,
+			"angle": 232.06672971640108,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "head",
+			"length": 0.12418610094938272,
+			"angle": 65.0,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "r_hip",
+			"length": 0.038235309412691584,
+			"angle": 185.0,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "l_thigh",
+			"length": 0.07348745790754609,
+			"angle": 331.6992442339936,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "r_calf",
+			"length": 0.08974628659323014,
+			"angle": 247.55724663470565,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "back_l",
+			"length": 0.07982285010317432,
+			"angle": 100.0,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "back_m",
+			"length": 0.072732534902307,
+			"angle": 90.0,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "root",
+			"length": 0.15113833098172544,
+			"angle": 90.0,
+			"visible": false
+		},
+		"bonePose": {
+			"name": "r_shoulder",
+			"length": 0.04427775061548784,
+			"angle": 200.0,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "back_u",
+			"length": 0.06786405540656251,
+			"angle": 80.0,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "l_calf",
+			"length": 0.11880656049616145,
+			"angle": 272.7263109939063,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "r_thigh",
+			"length": 0.10078451060092858,
+			"angle": 220.6012946450045,
+			"visible": true
+		},
+	},
+	"steps": {
+	},
+	"ecbs": {
+		"ecb": {
+			"startFrame": 0,
+			"endFrame": 1,
+			"collision": {
+				"box": {
+					"top_l x": -0.087,
+					"top_l y": 0.577,
+					"bottom_r x": 0.105,
+					"bottom_r y": -0.01
+				}
+			}
+		},
+	},
+	"hurtboxes": {
+	},
+	"hitboxes": {
+	},
+}

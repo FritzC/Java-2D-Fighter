@@ -1,0 +1,1022 @@
+{
+	"loop": false,
+	"specialCancelable": false,
+	"initialPose": {
+		"bonePose": {
+			"name": "l_hip",
+			"length": 0.04292099726812035,
+			"angle": 0.0,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "r_bicep",
+			"length": 0.08450256891714322,
+			"angle": 350.0,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "l_bicep",
+			"length": 0.0793982574636492,
+			"angle": 40.0,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "neck",
+			"length": 0.03953915845562629,
+			"angle": 80.0,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "l_shoulder",
+			"length": 0.028630400586616582,
+			"angle": 355.0,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "l_tricep",
+			"length": 0.08711234920797498,
+			"angle": 295.0,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "r_tricep",
+			"length": 0.10207587131441534,
+			"angle": 235.0,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "head",
+			"length": 0.12418610094938272,
+			"angle": 75.0,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "r_hip",
+			"length": 0.02096250741548831,
+			"angle": 185.0,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "l_thigh",
+			"length": 0.08955187093458931,
+			"angle": 30.0,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "r_calf",
+			"length": 0.1443278044462204,
+			"angle": -90.0,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "back_l",
+			"length": 0.07982285010317432,
+			"angle": 95.0,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "back_m",
+			"length": 0.02680100128054619,
+			"angle": 90.0,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "root",
+			"length": 0.10853578315461902,
+			"angle": 90.0,
+			"visible": false
+		},
+		"bonePose": {
+			"name": "r_shoulder",
+			"length": 0.02680100132933979,
+			"angle": 185.0,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "back_u",
+			"length": 0.06786405540656251,
+			"angle": 85.0,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "l_calf",
+			"length": 0.15082699060440063,
+			"angle": 260.0,
+			"visible": true
+		},
+		"bonePose": {
+			"name": "r_thigh",
+			"length": 0.04941860465116279,
+			"angle": 140.0,
+			"visible": true
+		},
+	},
+	"steps": {
+		"keyframe": {
+			"bone": "back_l",
+			"frame": 15,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 90.0
+		},
+		"keyframe": {
+			"bone": "back_m",
+			"frame": 15,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 90.0
+		},
+		"keyframe": {
+			"bone": "back_u",
+			"frame": 15,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 90.0
+		},
+		"keyframe": {
+			"bone": "neck",
+			"frame": 15,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.0
+		},
+		"keyframe": {
+			"bone": "back_l",
+			"frame": 15,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.055585241790619015
+		},
+		"keyframe": {
+			"bone": "back_m",
+			"frame": 15,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.05202696607295187
+		},
+		"keyframe": {
+			"bone": "back_u",
+			"frame": 15,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.04360465116279069
+		},
+		"keyframe": {
+			"bone": "r_tricep",
+			"frame": 15,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 244.20397350550007
+		},
+		"keyframe": {
+			"bone": "r_tricep",
+			"frame": 15,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.0937753481145635
+		},
+		"keyframe": {
+			"bone": "r_bicep",
+			"frame": 15,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 48.468229258917155
+		},
+		"keyframe": {
+			"bone": "r_bicep",
+			"frame": 15,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.07482289346647529
+		},
+		"keyframe": {
+			"bone": "l_tricep",
+			"frame": 15,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 312.58049078334363
+		},
+		"keyframe": {
+			"bone": "l_tricep",
+			"frame": 15,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.08711234920797498
+		},
+		"keyframe": {
+			"bone": "l_bicep",
+			"frame": 15,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 123.27488798483492
+		},
+		"keyframe": {
+			"bone": "l_bicep",
+			"frame": 15,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.0793982574636492
+		},
+		"keyframe": {
+			"bone": "l_shoulder",
+			"frame": 15,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 321.5626985089375
+		},
+		"keyframe": {
+			"bone": "r_shoulder",
+			"frame": 15,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 228.69138598645128
+		},
+		"keyframe": {
+			"bone": "l_thigh",
+			"frame": 15,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 82.14668669802178
+		},
+		"keyframe": {
+			"bone": "l_thigh",
+			"frame": 15,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.08955187093458931
+		},
+		"keyframe": {
+			"bone": "l_calf",
+			"frame": 15,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 268.8308606720926
+		},
+		"keyframe": {
+			"bone": "l_calf",
+			"frame": 15,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.1350356408144044
+		},
+		"keyframe": {
+			"bone": "r_thigh",
+			"frame": 15,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 100.30484646876603
+		},
+		"keyframe": {
+			"bone": "r_thigh",
+			"frame": 15,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.08027151902025625
+		},
+		"keyframe": {
+			"bone": "r_calf",
+			"frame": 15,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 281.6893691754392
+		},
+		"keyframe": {
+			"bone": "r_calf",
+			"frame": 15,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.1443278044462204
+		},
+		"keyframe": {
+			"bone": "r_thigh",
+			"frame": 20,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.12295729880587668
+		},
+		"keyframe": {
+			"bone": "r_thigh",
+			"frame": 20,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 275.5275401516562
+		},
+		"keyframe": {
+			"bone": "r_calf",
+			"frame": 20,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 272.5261169116195
+		},
+		"keyframe": {
+			"bone": "r_calf",
+			"frame": 20,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.1443278044462204
+		},
+		"keyframe": {
+			"bone": "l_thigh",
+			"frame": 20,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 276.89742755775177
+		},
+		"keyframe": {
+			"bone": "l_calf",
+			"frame": 20,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 268.8308606720926
+		},
+		"keyframe": {
+			"bone": "l_thigh",
+			"frame": 20,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.10232651046750525
+		},
+		"keyframe": {
+			"bone": "back_l",
+			"frame": 20,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.06272774891581419
+		},
+		"keyframe": {
+			"bone": "back_m",
+			"frame": 20,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.0678835090562115
+		},
+		"keyframe": {
+			"bone": "back_u",
+			"frame": 20,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.08165772185408514
+		},
+		"keyframe": {
+			"bone": "back_u",
+			"frame": 20,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 104.78272604261568
+		},
+		"keyframe": {
+			"bone": "back_m",
+			"frame": 20,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 96.0724564072077
+		},
+		"keyframe": {
+			"bone": "back_l",
+			"frame": 20,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 82.50414236027014
+		},
+		"keyframe": {
+			"bone": "l_tricep",
+			"frame": 20,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 0.0
+		},
+		"keyframe": {
+			"bone": "l_tricep",
+			"frame": 20,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.08711234920797498
+		},
+		"keyframe": {
+			"bone": "l_bicep",
+			"frame": 20,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 115.38790629109593
+		},
+		"keyframe": {
+			"bone": "l_bicep",
+			"frame": 20,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.09655036522955249
+		},
+		"keyframe": {
+			"bone": "neck",
+			"frame": 20,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.03633720930232558
+		},
+		"keyframe": {
+			"bone": "neck",
+			"frame": 20,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 124.93093730111057
+		},
+		"keyframe": {
+			"bone": "head",
+			"frame": 15,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 75.0
+		},
+		"keyframe": {
+			"bone": "r_tricep",
+			"frame": 20,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 186.1701750950296
+		},
+		"keyframe": {
+			"bone": "r_tricep",
+			"frame": 20,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.08483006925820313
+		},
+		"keyframe": {
+			"bone": "r_bicep",
+			"frame": 20,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 76.8424572599852
+		},
+		"keyframe": {
+			"bone": "r_bicep",
+			"frame": 20,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.10328975583976667
+		},
+		"keyframe": {
+			"bone": "r_thigh",
+			"frame": 17,
+			"type": ROTATE,
+			"interpolation": NONE,
+			"data": 285.25511870305775
+		},
+		"keyframe": {
+			"bone": "r_thigh",
+			"frame": 17,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.0
+		},
+		"keyframe": {
+			"bone": "l_thigh",
+			"frame": 17,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.0
+		},
+		"keyframe": {
+			"bone": "l_thigh",
+			"frame": 17,
+			"type": ROTATE,
+			"interpolation": NONE,
+			"data": 284.3645824496972
+		},
+		"keyframe": {
+			"bone": "l_hip",
+			"frame": 30,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 0.0
+		},
+		"keyframe": {
+			"bone": "l_hip",
+			"frame": 30,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.04292099726812035
+		},
+		"keyframe": {
+			"bone": "neck",
+			"frame": 30,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 124.93093730111057
+		},
+		"keyframe": {
+			"bone": "neck",
+			"frame": 30,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.03633720930232558
+		},
+		"keyframe": {
+			"bone": "l_shoulder",
+			"frame": 30,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 321.5626985089375
+		},
+		"keyframe": {
+			"bone": "l_shoulder",
+			"frame": 30,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.028630400586616582
+		},
+		"keyframe": {
+			"bone": "head",
+			"frame": 30,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 75.0
+		},
+		"keyframe": {
+			"bone": "head",
+			"frame": 30,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.12418610094938272
+		},
+		"keyframe": {
+			"bone": "r_hip",
+			"frame": 30,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 185.0
+		},
+		"keyframe": {
+			"bone": "r_hip",
+			"frame": 30,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.02096250741548831
+		},
+		"keyframe": {
+			"bone": "l_thigh",
+			"frame": 30,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 284.03624346792645
+		},
+		"keyframe": {
+			"bone": "l_thigh",
+			"frame": 30,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.013101567134680192
+		},
+		"keyframe": {
+			"bone": "r_calf",
+			"frame": 30,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 272.04540848888723
+		},
+		"keyframe": {
+			"bone": "r_calf",
+			"frame": 30,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.1443278044462204
+		},
+		"keyframe": {
+			"bone": "root",
+			"frame": 30,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 90.0
+		},
+		"keyframe": {
+			"bone": "root",
+			"frame": 30,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.10853578315461902
+		},
+		"keyframe": {
+			"bone": "r_shoulder",
+			"frame": 30,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 228.69138598645128
+		},
+		"keyframe": {
+			"bone": "r_shoulder",
+			"frame": 30,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.02680100132933979
+		},
+		"keyframe": {
+			"bone": "back_u",
+			"frame": 30,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 104.78272604261568
+		},
+		"keyframe": {
+			"bone": "back_u",
+			"frame": 30,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.08165772185408514
+		},
+		"keyframe": {
+			"bone": "l_calf",
+			"frame": 30,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 274.3987053549955
+		},
+		"keyframe": {
+			"bone": "l_calf",
+			"frame": 30,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.1350356408144044
+		},
+		"keyframe": {
+			"bone": "r_thigh",
+			"frame": 30,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 299.95360816780146
+		},
+		"keyframe": {
+			"bone": "r_thigh",
+			"frame": 30,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.01816860465116279
+		},
+		"keyframe": {
+			"bone": "l_hip",
+			"frame": 35,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 0.0
+		},
+		"keyframe": {
+			"bone": "l_hip",
+			"frame": 35,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.04292099726812035
+		},
+		"keyframe": {
+			"bone": "r_bicep",
+			"frame": 35,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 350.0
+		},
+		"keyframe": {
+			"bone": "r_bicep",
+			"frame": 35,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.08450256891714322
+		},
+		"keyframe": {
+			"bone": "l_bicep",
+			"frame": 35,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 40.0
+		},
+		"keyframe": {
+			"bone": "l_bicep",
+			"frame": 35,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.0793982574636492
+		},
+		"keyframe": {
+			"bone": "neck",
+			"frame": 35,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 80.0
+		},
+		"keyframe": {
+			"bone": "neck",
+			"frame": 35,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.03953915845562629
+		},
+		"keyframe": {
+			"bone": "l_shoulder",
+			"frame": 35,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 355.0
+		},
+		"keyframe": {
+			"bone": "l_shoulder",
+			"frame": 35,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.028630400586616582
+		},
+		"keyframe": {
+			"bone": "l_tricep",
+			"frame": 35,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 295.0
+		},
+		"keyframe": {
+			"bone": "l_tricep",
+			"frame": 35,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.08711234920797498
+		},
+		"keyframe": {
+			"bone": "r_tricep",
+			"frame": 35,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 235.0
+		},
+		"keyframe": {
+			"bone": "r_tricep",
+			"frame": 35,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.10207587131441534
+		},
+		"keyframe": {
+			"bone": "head",
+			"frame": 35,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 75.0
+		},
+		"keyframe": {
+			"bone": "head",
+			"frame": 35,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.12418610094938272
+		},
+		"keyframe": {
+			"bone": "r_hip",
+			"frame": 35,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 185.0
+		},
+		"keyframe": {
+			"bone": "r_hip",
+			"frame": 35,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.02096250741548831
+		},
+		"keyframe": {
+			"bone": "l_thigh",
+			"frame": 35,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 30.0
+		},
+		"keyframe": {
+			"bone": "l_thigh",
+			"frame": 35,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.08955187093458931
+		},
+		"keyframe": {
+			"bone": "r_calf",
+			"frame": 35,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": -90.0
+		},
+		"keyframe": {
+			"bone": "r_calf",
+			"frame": 35,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.1443278044462204
+		},
+		"keyframe": {
+			"bone": "back_l",
+			"frame": 35,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 95.0
+		},
+		"keyframe": {
+			"bone": "back_l",
+			"frame": 35,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.07982285010317432
+		},
+		"keyframe": {
+			"bone": "back_m",
+			"frame": 35,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 90.0
+		},
+		"keyframe": {
+			"bone": "back_m",
+			"frame": 35,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.02680100128054619
+		},
+		"keyframe": {
+			"bone": "root",
+			"frame": 35,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 90.0
+		},
+		"keyframe": {
+			"bone": "root",
+			"frame": 35,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.10853578315461902
+		},
+		"keyframe": {
+			"bone": "r_shoulder",
+			"frame": 35,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 185.0
+		},
+		"keyframe": {
+			"bone": "r_shoulder",
+			"frame": 35,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.02680100132933979
+		},
+		"keyframe": {
+			"bone": "back_u",
+			"frame": 35,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 85.0
+		},
+		"keyframe": {
+			"bone": "back_u",
+			"frame": 35,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.06786405540656251
+		},
+		"keyframe": {
+			"bone": "l_calf",
+			"frame": 35,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 260.0
+		},
+		"keyframe": {
+			"bone": "l_calf",
+			"frame": 35,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.15082699060440063
+		},
+		"keyframe": {
+			"bone": "r_thigh",
+			"frame": 35,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 140.0
+		},
+		"keyframe": {
+			"bone": "r_thigh",
+			"frame": 35,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.04941860465116279
+		},
+		"keyframe": {
+			"bone": "l_tricep",
+			"frame": 30,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 0.0
+		},
+		"keyframe": {
+			"bone": "l_tricep",
+			"frame": 30,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.08711234920797498
+		},
+		"keyframe": {
+			"bone": "l_bicep",
+			"frame": 30,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 115.38790629109593
+		},
+		"keyframe": {
+			"bone": "l_bicep",
+			"frame": 30,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.09655036522955249
+		},
+		"keyframe": {
+			"bone": "r_tricep",
+			"frame": 30,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 186.1701750950296
+		},
+		"keyframe": {
+			"bone": "r_tricep",
+			"frame": 30,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.08483006925820313
+		},
+		"keyframe": {
+			"bone": "r_bicep",
+			"frame": 30,
+			"type": ROTATE,
+			"interpolation": LINEAR,
+			"data": 76.8424572599852
+		},
+		"keyframe": {
+			"bone": "r_bicep",
+			"frame": 30,
+			"type": LENGTH,
+			"interpolation": LINEAR,
+			"data": 0.10328975583976667
+		},
+	},
+	"ecbs": {
+		"ecb": {
+			"startFrame": 0,
+			"endFrame": 1000,
+			"collision": {
+				"box": {
+					"top_l x": -0.101,
+					"top_l y": 0.563,
+					"bottom_r x": 0.138,
+					"bottom_r y": -0.014
+				}
+			}
+		},
+	},
+	"hurtboxes": {
+		"hurtbox": {
+			"startFrame": 0,
+			"endFrame": 1000,
+			"collision": {
+				"box": {
+					"top_l x": -0.101,
+					"top_l y": 0.53,
+					"bottom_r x": 0.145,
+					"bottom_r y": -0.018
+				}
+			}
+		},
+	},
+	"hitboxes": {
+		"hitbox": {
+			"group": "1",
+			"startFrame": 20,
+			"endFrame": 21,
+			"damage": 70,
+			"blockstun": 30,
+			"hitstun": 40,
+			"pushback": 0.0,
+			"knockdown": true,
+			"type": HIGH,
+			"release": false,
+			"attach": "",
+			"triggerAnim": "",
+			"triggerTargetAnim": "",
+			"collision": {
+				"box": {
+					"top_l x": -0.216,
+					"top_l y": 0.496,
+					"bottom_r x": 0.219,
+					"bottom_r y": -0.146
+				},
+			},
+			"velocity": {
+				"vector": {
+					"x": 0.0,
+					"y": -0.13
+				}
+			}
+		},
+	},
+}

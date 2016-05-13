@@ -1,0 +1,58 @@
+{
+	"name": "test_guy",
+	"health": 1000.0,
+	"skeleton": {
+		"bone": {
+			"name": "root",
+			"drawMode": LINE,
+			"length": 0.5,
+			"width": 0.05,
+			"angle": 60.0,
+			"visible": false,
+			"sprite": "",
+			"children": {
+				"bone": {
+					"name": "l_arm",
+					"drawMode": LINE,
+					"length": 0.1,
+					"width": 0.05,
+					"angle": 0.0,
+					"visible": true,
+					"sprite": "",
+					"children": {
+						"bone": {
+							"name": "l_hand",
+							"drawMode": LINE,
+							"length": 0.05,
+							"width": 0.05,
+							"angle": 90.0,
+							"visible": true,
+							"sprite": "",
+							"children": {}
+						},
+						"bone": {
+							"name": "l_hand_2",
+							"drawMode": LINE,
+							"length": 0.01,
+							"width": 0.05,
+							"angle": 180.0,
+							"visible": true,
+							"sprite": "",
+							"children": {}
+						}
+					}
+				},
+				"bone": {
+					"name": "r_arm",
+					"drawMode": LINE,
+					"length": 0.15,
+					"width": 0.05,
+					"angle": 180.0,
+					"visible": true,
+					"sprite": "",
+					"children": {}
+				}
+			}
+		}
+	}
+}

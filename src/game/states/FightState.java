@@ -482,6 +482,8 @@ public class FightState extends GameState {
 			if (p2Wins) {
 				winCount[1] ++;
 			}
+			player1.doesWantRematch();
+			player2.doesWantRematch();
 		}
 		startRoundTick = Game.tick + 60 * 6;
 	}
